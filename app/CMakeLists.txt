@@ -1,4 +1,4 @@
-project(app)
+project(app VERSION 0.0.1)
 
 add_executable(RaportGen main.cpp)
 

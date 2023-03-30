@@ -25,10 +25,19 @@ if(NOT EXISTS ${toolchain_path})
 	message(FATAL_ERROR "Cannot find VCPKG cmake script.")
 endif()
 
-set(CMAKE_TOOLCHAIN_FILE ${toolchain_path})
+include(${toolchain_path})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+find_package(Qt6Core CONFIG REQUIRED)
+find_package(Qt6Gui CONFIG REQUIRED)
+find_package(Qt6Widgets CONFIG REQUIRED)
+find_package(Qt6Declarative CONFIG REQUIRED)
 
 include(GNUInstallDirs)
 
