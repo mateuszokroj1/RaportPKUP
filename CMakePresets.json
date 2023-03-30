@@ -1,0 +1,18 @@
+{
+  "version": 4,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "x64 RelWithDebInfo",
+      "description": "Default build using Ninja generator",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build",
+      "installDir": "${sourceDir}/out/install",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_C_COMPILER": null,
+        "CMAKE_CXX_COMPILER": null
+      }
+    }
+  ]
+}

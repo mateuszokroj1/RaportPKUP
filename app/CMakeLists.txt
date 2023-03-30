@@ -1,0 +1,11 @@
+project(app)
+
+add_executable(RaportGen main.cpp)
+
+install(
+	TARGETS RaportGen
+	EXPORT RaportGenTargets
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
