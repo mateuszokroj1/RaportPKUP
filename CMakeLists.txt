@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 
 if(WIN32)
 	find_program(MSVC NAMES cl REQUIRED)
@@ -33,11 +33,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-
-find_package(Qt6Core CONFIG REQUIRED)
-find_package(Qt6Gui CONFIG REQUIRED)
-find_package(Qt6Widgets CONFIG REQUIRED)
-find_package(Qt6Declarative CONFIG REQUIRED)
 
 include(GNUInstallDirs)
 
