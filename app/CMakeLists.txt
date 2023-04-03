@@ -17,14 +17,19 @@ qt_add_executable(RaportGen main.cpp)
 			MainWindow.qml
 	)
 
-	get_filename_component(qplugins "${Qt6Gui_DIR}/../../Qt6/plugins" ABSOLUTE)
+	if(WIN32)
+		if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+			find_program(TOOL_WINDEPLOYQT NAMES windeployqt.debug.bat REQUIRED)
+		else()
+			find_program(TOOL_WINDEPLOYQT NAMES windeployqt REQUIRED)
+		endif()
 
-	message(${qplugins})
-
-	add_custom_command(
-		TARGET RaportGen POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${qplugins} $<TARGET_FILE_DIR:RaportGen>
-	)
+		add_custom_command(TARGET RaportGen POST_BUILD
+			COMMAND ${TOOL_WINDEPLOYQT}
+				$<TARGET_FILE:RaportGen>
+			COMMENT "Deploying QT on Windows..."
+		)
+	endif()
 
 	install(
 		TARGETS RaportGen
