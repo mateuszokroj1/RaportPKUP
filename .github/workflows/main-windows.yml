@@ -1,0 +1,39 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure Visual Studio path
+      uses: egor-tensin/vs-shell@v2
+
+    - name: Install Qt 6
+      # You may pin to the exact commit or the version.
+      # uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
+      uses: jurplel/install-qt-action@v3.3.0
+      with:
+        # Version of Qt to install
+        version: 6.6.*
+        # Specify which Qt archive to install
+        archives: qtbase qtdeclarative qtsvg
+        # Whether or not to cache Qt automatically
+        cache: true
+
+    - name: Configure CMake
+      shell: sh
+      run: cmake --target "Release"
+
+    - name: Build all
+      shell: sh
+      working-directory: out/build
+      run: cmake --build .
