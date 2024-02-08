@@ -5,25 +5,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_program(vcpkg NAMES vcpkg REQUIRED)
 get_filename_component(vcpkg_dir ${vcpkg} DIRECTORY)
 
-if(CMAKE_HOST_WIN32)
-	find_program(clang_cl NAMES "clang-cl" REQUIRED)
-	set(CMAKE_C_COMPILER ${clang_cl})
-	set(CMAKE_CXX_COMPILER ${clang_cl})
-else()
-	find_program(clang NAMES clang REQUIRED)
-	set(CMAKE_C_COMPILER ${clang})
-	set(CMAKE_CXX_COMPILER ${clang})
-endif()
-
 set(toolchain_file "${vcpkg_dir}/scripts/buildsystems/vcpkg.cmake")
 
 if(NOT EXISTS ${toolchain_file})
 	message(FATAL_ERROR "Cannot find VCPKG CMake script.")
 endif()
-
-set(VCPKG_TARGET_ARCHITECTURE "x64")
-set(VCPKG_CRT_LINKAGE dynamic)
-set(VCPKG_LIBRARY_LINKAGE dynamic)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 	set(VCPKG_BUILD_TYPE debug)

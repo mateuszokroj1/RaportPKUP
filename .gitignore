@@ -1,6 +1,8 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
+/out/*
+
 *~
 *.autosave
 *.a
@@ -53,4 +55,4 @@ CMakeLists.txt.user*
 *.pyc
 
 # Visual Studio
-*/.vs/*
+/.vs/*

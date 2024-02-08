@@ -1,0 +1,82 @@
+{
+  "version": 4,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "displayName": "Base",
+      "description": "Base configuration",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build",
+      "installDir": "${sourceDir}/out/install",
+      "cacheVariables": {
+        "VCPKG_CRT_LINKAGE": "dynamic",
+        "VCPKG_LIBRARY_LINKAGE": "dynamic"
+      }
+    },
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "displayName": "Windows base configuration",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
+      }
+    },
+    {
+      "name": "linux-base",
+      "hidden": true,
+      "displayName": "Other systems base configuration",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": [
+        "base",
+        "windows-base",
+        "linux-base"
+      ],
+      "displayName": "Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "rel-debinfo",
+      "inherits": [
+        "base",
+        "windows-base",
+        "linux-base"
+      ],
+      "displayName": "Release with debug info",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": [
+        "base",
+        "windows-base",
+        "linux-base"
+      ],
+      "displayName": "Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ]
+}
