@@ -53,4 +53,4 @@ CMakeLists.txt.user*
 *.pyc
 
 # Visual Studio
-*/.vs/*
+/.vs/*
