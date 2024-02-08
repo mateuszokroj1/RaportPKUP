@@ -31,9 +31,25 @@ jobs:
 
     - name: Configure CMake
       shell: sh
-      run: cmake --target "Release"
+      run: cmake --preset "Release"
 
     - name: Build all
       shell: sh
-      working-directory: out/build
-      run: cmake --build .
+      run: cmake --build out/build
+
+    - name: Install artifacts
+      shell: sh
+      run: cmake --install out/build
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        # Artifact name
+        name: Build on Windows - $GITHUB_HEAD_REF - $GITHUB_SHA
+        # A file, directory or wildcard pattern that describes what to upload
+        path: out/install
+        # The desired behavior if no files are found using the provided path.
+        if-no-files-found: warn
+        # Duration after which artifact will expire in days. 0 means using default retention.
+        # Minimum 1 day. Maximum 90 days unless changed from the repository settings page.
+        retention-days: 15
