@@ -17,6 +17,14 @@ jobs:
     - name: Configure Visual Studio path
       uses: egor-tensin/vs-shell@v2
 
+    - name: Cache
+      uses: actions/cache@v4.0.0
+      with:
+        # A list of files, directories, and wildcard patterns to cache and restore
+        path: out/build
+        # An explicit key for restoring and saving the cache
+        key: build-cache
+
     - name: Install Qt 6
       # You may pin to the exact commit or the version.
       # uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
