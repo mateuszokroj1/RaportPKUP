@@ -41,6 +41,9 @@ Thumbs.db
 *.pro.user*
 CMakeLists.txt.user*
 
+# qtdesign
+*.qmlproject.qtds
+
 # xemacs temporary files
 *.flc
 
