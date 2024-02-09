@@ -59,3 +59,5 @@ CMakeLists.txt.user*
 
 # Visual Studio
 /.vs/*
+
+/config/Version.h
