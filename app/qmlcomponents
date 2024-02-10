@@ -15,7 +15,7 @@ FetchContent_Declare(
 FetchContent_GetProperties(ds)
 FetchContent_Populate(ds)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+target_link_libraries(${executable_name} PRIVATE
     QuickStudioComponentsplugin
     QuickStudioEffectsplugin
     QuickStudioApplicationplugin
