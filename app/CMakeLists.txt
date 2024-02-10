@@ -30,6 +30,8 @@ target_link_libraries(${executable_name} PRIVATE
     Qt6::Quick
 )
 
+target_include_directories(${executable_name} INTERFACE "../config/Version.h")
+
 if (BUILD_QDS_COMPONENTS)
     include(${CMAKE_CURRENT_SOURCE_DIR}/qmlcomponents)
 endif()
