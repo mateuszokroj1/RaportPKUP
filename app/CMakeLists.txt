@@ -5,7 +5,7 @@ option(BUILD_QDS_COMPONENTS "Build design studio components" OFF)
 
 set(executable_name RaportPKUPGenerator)
 
-project(${executable_name} LANGUAGES CXX)
+project(${executable_name} LANGUAGES CXX VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 set(CMAKE_AUTOMOC ON)
 
@@ -48,6 +48,13 @@ install(TARGETS ${executable_name}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+qt_generate_deploy_app_script(
+    TARGET ${executable_name}
+    OUTPUT_SCRIPT deploy_script
+    NO_UNSUPPORTED_PLATFORM_ERROR
+)
+install(SCRIPT ${deploy_script})
 
 # make IDEs aware of the QML import path
 set(QML_IMPORT_PATH ${PROJECT_BINARY_DIR}/qml CACHE PATH
