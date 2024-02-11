@@ -43,6 +43,7 @@ CMakeLists.txt.user*
 
 # qtdesign
 *.qmlproject.qtds
+*.qml.*
 
 # xemacs temporary files
 *.flc
