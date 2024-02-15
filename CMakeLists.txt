@@ -20,7 +20,7 @@ endif()
 set(CMAKE_TOOLCHAIN_FILE ${toolchain_file})
 message("Toolchain file: ${toolchain_file}")
 
-option(ENABLE_TESTS "Enable unit tests" OFF)
+set(ENABLE_TESTS True CACHE BOOL "Enable unit tests")
 
 project(RaportPKUP)
 
@@ -35,4 +35,11 @@ configure_file(config/Version.h.in ${CMAKE_CURRENT_LIST_DIR}/config/Version.h @O
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+if(${ENABLE_TESTS})
+	enable_testing()
+	find_package(GTest CONFIG REQUIRED)
+    #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+endif()
+
+add_subdirectory(lib)
 add_subdirectory(app)

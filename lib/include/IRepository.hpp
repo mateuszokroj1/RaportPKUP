@@ -1,0 +1,2 @@
+#include <RaportGenCoreConfigExport.h>
+

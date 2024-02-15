@@ -33,6 +33,16 @@ target_link_libraries(${executable_name} PRIVATE
     Qt6::Qml
     Qt6::Quick
 )
+target_link_libraries(${executable_name} PUBLIC RaportGenCore)
+if(WIN32)
+    add_custom_command(TARGET ${executable_name}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            $<TARGET_RUNTIME_DLLS:${executable_name}>
+            $<TARGET_FILE_DIR:${executable_name}>
+        COMMAND_EXPAND_LISTS
+    )
+endif()
 
 target_include_directories(${executable_name} PRIVATE "${CMAKE_SOURCE_DIR}/config/Version.h")
 
