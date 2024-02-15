@@ -15,11 +15,12 @@ set(PUBLIC_LIBS
 )
 
 set(SOURCES
-    src/respository.cpp
+    repository.cpp
 )
 
+set(tests_dir ${CMAKE_CURRENT_LIST_DIR}/tests)
 set(TESTS
-    tests/test.cpp
+    ${tests_dir}/test.cpp
 )
 
 add_library(${ProjectName} SHARED ${SOURCES})
@@ -31,10 +32,6 @@ target_include_directories(${ProjectName}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-target_include_directories(${ProjectName}
-    PRIVATE $<BUILD_INTERFACE:"RaportGenCoreExport.h">
-    PUBLIC $<INSTALL_INTERFACE:"${CMAKE_INSTALL_INCLUDEDIR}/RaportGenCoreExport.h">
-)
 
 target_compile_definitions(${ProjectName} PRIVATE ${ProjectName}_EXPORTS)
 
@@ -45,7 +42,6 @@ if(${ENABLE_TESTS})
     target_compile_definitions(${ProjectName} PRIVATE ${ProjectName}_TESTS)
 
     target_include_directories(${ProjectName} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
-    target_include_directories(${ProjectName} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/RaportGenCoreExport.h)
 
     include(GoogleTest)
     gtest_discover_tests(${ProjectName}Tests)
