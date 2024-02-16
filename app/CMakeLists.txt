@@ -16,6 +16,10 @@ if (Qt6_VERSION VERSION_GREATER_EQUAL 6.3)
 endif()
 
 qt_add_executable(${executable_name} src/main.cpp)
+if(WIN32)
+    configure_file(app.rc.in app.rc @ONLY)
+    target_sources(${executable_name} PUBLIC app.rc)
+endif()
 
 qt_add_resources(${executable_name} "configuration"
     PREFIX "/"
@@ -30,7 +34,7 @@ target_link_libraries(${executable_name} PRIVATE
     Qt6::Quick
 )
 
-target_include_directories(${executable_name} INTERFACE "../config/Version.h")
+target_include_directories(${executable_name} PRIVATE "${CMAKE_SOURCE_DIR}/config/Version.h")
 
 if (BUILD_QDS_COMPONENTS)
     include(${CMAKE_CURRENT_SOURCE_DIR}/qmlcomponents)
