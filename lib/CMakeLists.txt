@@ -7,7 +7,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 set(PRIVATE_LIBS
-
+    TBB::tbb
 )
 
 set(PUBLIC_LIBS
@@ -15,7 +15,7 @@ set(PUBLIC_LIBS
 )
 
 set(SOURCES
-    repository.cpp
+    git_repository.cpp
 )
 
 set(tests_dir ${CMAKE_CURRENT_LIST_DIR}/tests)

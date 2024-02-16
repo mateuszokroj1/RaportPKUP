@@ -9,8 +9,8 @@ namespace RaportGen
 {
     struct RAPORTGENCORE_EXPORT Commit
     {
-        std::wstring message;
-        time_t datetime;
+        std::string message;
+        DateTime datetime;
         std::string id;
         Author author;
     };
