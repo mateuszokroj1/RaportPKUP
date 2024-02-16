@@ -16,6 +16,10 @@
     {
       "name": "libgit2",
       "version>=": "1.6.4"
+    },
+    { 
+      "name": "tbb",
+      "version>=": "2021.11.0"
     }
   ]
 }
