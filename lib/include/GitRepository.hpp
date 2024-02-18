@@ -11,7 +11,7 @@ namespace RaportGen
     {
     public:
         explicit GitRepository(const std::filesystem::path &);
-        ~GitRepository() override {}
+        ~GitRepository() override;
 
     private:
         GitRepository() = default;

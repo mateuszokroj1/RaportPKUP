@@ -1,7 +1,10 @@
 #include <tbb/parallel_for_each.h>
+#include <git2.h>
 
-#include "include/base.hpp"
-#include "include/GitRepository.hpp"
+#include <base.hpp>
+#include <GitRepository.hpp>
+
+#include "libgit_wrapper.hpp"
 
 namespace RaportGen
 {
@@ -9,8 +12,14 @@ namespace RaportGen
     {
     }
 
+    GitRepository::~GitRepository()
+    {
+        
+    }
+
     std::future<bool> GitRepository::checkIsValidPath(const std::filesystem::path &path)
     {
+const auto git_api = GitAPI::
     }
 
     std::future<Author> GitRepository::getSystemConfigAuthor()

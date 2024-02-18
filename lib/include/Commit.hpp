@@ -3,7 +3,7 @@
 #include <string>
 
 #include "Author.hpp"
-#include "RaportGenCoreExport.h"
+#include <raportgencore_export.h>
 
 namespace RaportGen
 {

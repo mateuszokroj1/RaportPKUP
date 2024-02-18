@@ -1,77 +1,100 @@
-set(ProjectName RaportGenCore)
-
-project(${ProjectName})
-
-include(GenerateExportHeader)
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
+project(RaportGenCore)
 
 set(PRIVATE_LIBS
     TBB::tbb
+    unofficial::libgit2::libgit2
 )
 
 set(PUBLIC_LIBS
 
 )
 
+set(PUBLIC_HEADERS
+    base.hpp
+    Author.hpp
+    Commit.hpp
+    IRepository.hpp
+    GitRepository.hpp
+)
+
 set(SOURCES
+    libgit_wrapper.cpp
     git_repository.cpp
 )
 
-set(tests_dir ${CMAKE_CURRENT_LIST_DIR}/tests)
 set(TESTS
-    ${tests_dir}/test.cpp
+    test.cpp
 )
 
-add_library(${ProjectName} SHARED ${SOURCES})
+set(CMAKE_CXX_STANDARD 23)
 
-target_link_libraries(${ProjectName} PRIVATE ${PRIVATE_LIBS})
-target_link_libraries(${ProjectName} PUBLIC ${PUBLIC_LIBS})
+add_library(${PROJECT_NAME} SHARED)
 
-target_include_directories(${ProjectName}
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PRIVATE_LIBS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PUBLIC_LIBS})
 
-target_compile_definitions(${ProjectName} PRIVATE ${ProjectName}_EXPORTS)
+generate_export_header(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 if(${ENABLE_TESTS})
-    add_executable(${ProjectName}Tests ${SOURCES} ${TESTS})
-    target_link_libraries(${ProjectName}Tests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-    target_link_libraries(${ProjectName}Tests PRIVATE ${PRIVATE_LIBS})
-    target_compile_definitions(${ProjectName} PRIVATE ${ProjectName}_TESTS)
+    set(executable_name ${PROJECT_NAME}Tests)
 
-    target_include_directories(${ProjectName} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
+    add_executable(${executable_name})
+    target_link_libraries(${executable_name} PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+    target_link_libraries(${executable_name} PRIVATE ${PRIVATE_LIBS} ${PUBLIC_LIBS})
+
+    target_include_directories(${executable_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(${executable_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
     include(GoogleTest)
-    gtest_discover_tests(${ProjectName}Tests)
+    gtest_discover_tests(${executable_name})
 endif()
 
-set(ConfigPackageLocation "${CMAKE_INSTALL_LIBDIR}/cmake")
+list(TRANSFORM PUBLIC_HEADERS PREPEND "include/")
+target_sources(
+    ${PROJECT_NAME}
+        PUBLIC FILE_SET public_headers_fileset
+        TYPE HEADERS
+        FILES
+            ${PUBLIC_HEADERS}
+)
+
+foreach(filename ${SOURCES})
+    target_sources(${PROJECT_NAME} PRIVATE src/${filename})
+
+    if(${ENABLE_TESTS})
+        target_sources(${executable_name} PRIVATE src/${filename})
+    endif()
+endforeach()
+
+set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake)
 
 install(
-    TARGETS ${ProjectName}
-    EXPORT ${ProjectName}Targets
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}Targets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILE_SET public_headers_fileset DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(
-    EXPORT ${ProjectName}Targets
-    FILE ${ProjectName}Targets.cmake
+    EXPORT ${PROJECT_NAME}Targets
+    FILE ${PROJECT_NAME}Targets.cmake
     DESTINATION ${ConfigPackageLocation}
 )
 
 configure_package_config_file(
-    ${ProjectName}Config.cmake.in
-    ${ProjectName}Config.cmake
+    ${PROJECT_NAME}Config.cmake.in
+    ${PROJECT_NAME}Config.cmake
     INSTALL_DESTINATION ${ConfigPackageLocation}
     PATH_VARS CMAKE_INSTALL_PREFIX
 )
 
 install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/${ProjectName}Config.cmake"
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     DESTINATION ${ConfigPackageLocation}
 )

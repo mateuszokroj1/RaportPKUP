@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "RaportGenCoreExport.h"
+#include <raportgencore_export.h>
 
 namespace RaportGen
 {

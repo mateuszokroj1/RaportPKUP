@@ -3,14 +3,13 @@
 #include <vector>
 #include <memory>
 #include <chrono>
+#include <optional>
 
 #include "Commit.hpp"
-#include "RaportGenCoreExport.h"
-#include <optional>
 
 namespace RaportGen
 {
-    class RAPORTGENCORE_EXPORT IRepository
+    class IRepository
     {
     protected:
         IRepository() = default;
