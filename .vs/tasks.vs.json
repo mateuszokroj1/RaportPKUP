@@ -1,0 +1,23 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "Configure CMake (Debug)",
+      "type": "default",
+      "appliesTo": "/",
+      "command": "cmake --preset debug ."
+    },
+    {
+      "taskLabel": "Build all",
+      "type": "default",
+      "appliesTo": "/",
+      "command": "cmake --build out/build"
+    },
+    {
+      "taskLabel": "Run all tests",
+      "type": "default",
+      "appliesTo": "/",
+      "command": "ctest out/build"
+    }
+  ]
+}
