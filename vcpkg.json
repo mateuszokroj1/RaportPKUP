@@ -10,9 +10,7 @@
       "name": "gtest",
       "version>=": "1.14.0"
     },
-    "rxqt",
     "rxcpp",
-    "libharu",
     {
       "name": "libgit2",
       "version>=": "1.6.4"

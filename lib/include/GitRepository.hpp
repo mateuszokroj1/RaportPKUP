@@ -16,10 +16,14 @@ namespace RaportGen
     private:
         GitRepository() = default;
 
-    public:
-        static std::future<bool> checkIsValidPath(const std::filesystem::path &);
-        static std::future<Author> getSystemConfigAuthor();
+        const std::filesystem::path _dir;
 
-        std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(const std::chrono::time_point<std::chrono::system_clock>& from, std::optional<std::chrono::time_point<std::chrono::system_clock>> to = {}, std::optional<Author> author = {}) const override;
+        static std::vector<std::string> getLog(const std::wstring& path, const std::string& from, const std::string& to, const std::wstring& author);
+
+    public:
+        static bool checkIsValidPath(const std::filesystem::path &);
+        static Author getSystemConfigAuthor();
+
+        std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(const std::chrono::time_point<std::chrono::system_clock>& from, const std::chrono::time_point<std::chrono::system_clock>& to, const Author& author) const override;
     };
 }

@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "base.hpp"
 #include "Author.hpp"
 #include <raportgencore_export.h>
 

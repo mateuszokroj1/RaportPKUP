@@ -2,13 +2,14 @@
 
 #include <string>
 
-#include <raportgencore_export.h>
-
 namespace RaportGen
 {
-    struct RAPORTGENCORE_EXPORT Author
-    {
-        std::wstring name;
-        std::wstring email;
-    };
+	struct Author
+	{
+		Author() = default;
+		Author(const std::wstring& name, const std::wstring& email) : name(name), email(email) {}
+
+		std::wstring name;
+		std::wstring email;
+	};
 }

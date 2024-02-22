@@ -19,14 +19,17 @@ set(PUBLIC_HEADERS
 
 set(SOURCES
     libgit_wrapper.cpp
+    process_runner.cpp
     git_repository.cpp
 )
 
 set(TESTS
-    test.cpp
+    git_repository.cpp
 )
 
 set(CMAKE_CXX_STANDARD 23)
+
+find_package(unofficial-libgit2 CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED)
 
@@ -41,8 +44,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURR
 if(${ENABLE_TESTS})
     set(executable_name ${PROJECT_NAME}Tests)
 
-    add_executable(${executable_name})
-    target_link_libraries(${executable_name} PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+    list(TRANSFORM TESTS PREPEND "tests/")
+
+    add_executable(${executable_name} ${CMAKE_SOURCE_DIR}/config/test_main.cpp ${TESTS})
+    target_link_libraries(${executable_name} PRIVATE GTest::gtest GTest::gmock GTest::gmock_main)
     target_link_libraries(${executable_name} PRIVATE ${PRIVATE_LIBS} ${PUBLIC_LIBS})
 
     target_include_directories(${executable_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)

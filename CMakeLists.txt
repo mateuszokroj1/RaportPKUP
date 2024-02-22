@@ -18,10 +18,6 @@ set(ENABLE_TESTS True CACHE BOOL "Enable unit tests")
 
 project(RaportPKUP)
 
-find_package(unofficial-libharu CONFIG REQUIRED)
-find_package(rxcpp CONFIG REQUIRED)
-find_package(RXQT REQUIRED)
-find_package(unofficial-libgit2 CONFIG REQUIRED)
 find_package(TBB CONFIG REQUIRED)
 
 include(config/Version.cmake)
@@ -37,7 +33,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 if(${ENABLE_TESTS})
 	enable_testing()
 	find_package(GTest CONFIG REQUIRED)
-    #set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 endif()
 
 add_subdirectory(lib)

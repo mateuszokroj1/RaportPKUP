@@ -19,6 +19,6 @@ namespace RaportGen
         IRepository(IRepository&&) = delete;
         virtual ~IRepository() {}
 
-        virtual std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(const std::chrono::time_point<std::chrono::system_clock>& from, std::optional<std::chrono::time_point<std::chrono::system_clock>> to = {}, std::optional<Author> author = {}) const = 0;
+        virtual std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(const std::chrono::time_point<std::chrono::system_clock>& from, const std::chrono::time_point<std::chrono::system_clock>& to, const Author& author) const = 0;
     };
 }
