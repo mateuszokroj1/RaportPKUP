@@ -4,7 +4,7 @@
 
 namespace RaportGen
 {
-	std::stringstream process_runner(std::wstring& command_line, const std::wstring& working_directory, DWORD& last_error)
+	std::stringstream process_runner(std::wstring& command_line, const std::wstring& working_directory, DWORD& last_error, bool use_default_streams)
 	{
 		Handle outPipe_writer;
 		Handle outPipe_reader;
@@ -24,12 +24,16 @@ namespace RaportGen
 		STARTUPINFOW parameters;
 		ZeroMemory(&parameters, sizeof(parameters));
 		parameters.cb = sizeof(parameters);
-		parameters.hStdOutput = outPipe_writer;
-		parameters.dwFlags = STARTF_USESTDHANDLES;
+
+		if (!use_default_streams)
+		{
+			parameters.hStdOutput = outPipe_writer;
+			parameters.dwFlags = STARTF_USESTDHANDLES;
+		}
 
 		PROCESS_INFORMATION result;
 		ZeroMemory(&result, sizeof(result));
-		if (!CreateProcessW(nullptr, command_line.data(), nullptr, nullptr, true, CREATE_NO_WINDOW, nullptr, !working_directory.empty() ? working_directory.c_str() : nullptr, &parameters, &result))
+		if (!CreateProcessW(nullptr, command_line.data(), nullptr, nullptr, true, !use_default_streams ? CREATE_NO_WINDOW : 0, nullptr, !working_directory.empty() ? working_directory.c_str() : nullptr, &parameters, &result))
 		{
 			last_error = GetLastError();
 			SetLastError(0);
@@ -62,9 +66,6 @@ namespace RaportGen
 		} while (success);
 
 		output.flush();
-
-		if(output.gcount() > 0)
-			output.seekg(output.beg);
 
 		return output;
 	}

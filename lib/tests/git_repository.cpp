@@ -42,3 +42,17 @@ TEST_F(Lib_GitRepository, getSystemConfigAuthor_shouldReturnValid)
 	
 	//EXPECT_THAT(result.email, L"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
 }
+
+TEST_F(Lib_GitRepository, getCommits_shouldReturnValid)
+{
+	RaportGen::GitRepository repo(valid_path);
+	const std::chrono::year_month_day ymd(std::chrono::year(2023), std::chrono::month(1), std::chrono::day(1));
+	const auto vec = repo.getCommitsFromTimeRange(std::chrono::sys_days(ymd), std::chrono::system_clock::now(), {L"Mateusz Okrój",L"mateuszokroj1@gmail.com"});
+
+	ASSERT_TRUE(vec->size() > 0);
+}
+
+TEST_F(Lib_GitRepository, test)
+{
+	ASSERT_NO_THROW(RaportGen::GitRepository::test());
+}

@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <future>
 
+#include <raportgencore_export.h>
+
 #include "IRepository.hpp"
 
 namespace RaportGen
@@ -23,7 +25,7 @@ namespace RaportGen
     public:
         static bool checkIsValidPath(const std::filesystem::path &);
         static Author getSystemConfigAuthor();
-
+        static void test();
         std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(const std::chrono::time_point<std::chrono::system_clock>& from, const std::chrono::time_point<std::chrono::system_clock>& to, const Author& author) const override;
     };
 }

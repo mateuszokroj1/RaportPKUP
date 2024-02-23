@@ -4,11 +4,10 @@
 
 #include "base.hpp"
 #include "Author.hpp"
-#include <raportgencore_export.h>
 
 namespace RaportGen
 {
-    struct RAPORTGENCORE_EXPORT Commit
+    struct Commit
     {
         std::string message;
         DateTime datetime;
