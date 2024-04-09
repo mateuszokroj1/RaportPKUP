@@ -51,8 +51,3 @@ TEST_F(Lib_GitRepository, getCommits_shouldReturnValid)
 
 	ASSERT_TRUE(vec->size() > 0);
 }
-
-TEST_F(Lib_GitRepository, test)
-{
-	ASSERT_NO_THROW(RaportGen::GitRepository::test());
-}

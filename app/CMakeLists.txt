@@ -21,6 +21,8 @@ if(WIN32)
     target_sources(${executable_name} PUBLIC app.rc)
 endif()
 
+set_property(TARGET ${executable_name} PROPERTY CXX_STANDARD 23)
+
 qt_add_resources(${executable_name} "configuration"
     PREFIX "/"
     FILES
@@ -32,6 +34,7 @@ target_link_libraries(${executable_name} PRIVATE
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
+    TBB::tbb
 )
 target_link_libraries(${executable_name} PUBLIC RaportGenCore)
 if(WIN32)
@@ -63,13 +66,13 @@ install(TARGETS ${executable_name}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-qt_generate_deploy_app_script(
+# make IDEs aware of the QML import path
+set(QML_IMPORT_PATH ${PROJECT_BINARY_DIR}/qml CACHE PATH
+    "Path to the custom QML components defined by the project")
+
+    qt_generate_deploy_app_script(
     TARGET ${executable_name}
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
 )
 install(SCRIPT ${deploy_script})
-
-# make IDEs aware of the QML import path
-set(QML_IMPORT_PATH ${PROJECT_BINARY_DIR}/qml CACHE PATH
-    "Path to the custom QML components defined by the project")

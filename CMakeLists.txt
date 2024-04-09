@@ -33,6 +33,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 if(${ENABLE_TESTS})
 	enable_testing()
 	find_package(GTest CONFIG REQUIRED)
+	include(GoogleTest)
 endif()
 
 add_subdirectory(lib)

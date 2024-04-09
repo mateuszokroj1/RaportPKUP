@@ -1,16 +1,13 @@
-#include <tbb/parallel_for_each.h>
-#include <git2.h>
 #include <windows.h>
 #include <regex>
 #include <stdexcept>
-#include <string_view>
 #include <codecvt>
 #include <locale>
+#include <chrono>
 
 #include <base.hpp>
 #include <GitRepository.hpp>
 
-#include "libgit_wrapper.hpp"
 #include "process_runner.hpp"
 
 namespace RaportGen
@@ -28,14 +25,6 @@ namespace RaportGen
 
 	GitRepository::~GitRepository()
 	{
-	}
-
-	void GitRepository::test()
-	{
-		DWORD err = 0;
-		std::wstring cmd = L"texify --run-viewer \"C:/Users/mateu/Desktop/untitled-1.tex\"";
-		auto output = process_runner(cmd, {}, err, true);
-		
 	}
 
 	std::vector<std::string> GitRepository::getLog(const std::wstring& path, const std::string& from, const std::string& to, const std::wstring& author)
@@ -135,7 +124,7 @@ namespace RaportGen
 				std::getline(stream, datetime, '|');
 				std::istringstream stream_date(datetime);
 
-				std::chrono::from_stream(stream_date, "%Y-%m-%d", c.datetime);
+                std::chrono::from_stream(stream_date, "%Y-%m-%d", c.datetime);
 			}
 
 			std::getline(stream, c.message);

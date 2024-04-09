@@ -3,17 +3,10 @@
   "name": "raportpkup",
   "description": "Raport PKUP",
   "builtin-baseline": "c3801cf53c614ffc54c94051d124eba097b057b1",
-  "version-semver": "0.0.1",
-  "supports": "windows",
   "dependencies": [
     {
       "name": "gtest",
       "version>=": "1.14.0"
-    },
-    "rxcpp",
-    {
-      "name": "libgit2",
-      "version>=": "1.6.4"
     },
     { 
       "name": "tbb",
