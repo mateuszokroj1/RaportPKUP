@@ -1,0 +1,23 @@
+repos:
+
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      hooks:
+        - id: check-case-conflict
+        - id: check-yaml
+        - id: check-json
+        - id: check-xml
+        - id: pretty-format-json
+        - id: end-of-file-fixer
+        - id: mixed-line-ending
+
+    - repo: https://github.com/pre-commit/mirrors-clang-format
+      hooks:
+        - id: clang-format
+
+    - repo: https://github.com/cheshirekow/cmake-format-precommit
+      hooks:
+        - id: cmake-format
+
+    - repo: https://github.com/machinekoder/pre-commit-hooks
+      hooks:
+        - id: qmlfmt
