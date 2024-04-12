@@ -25,7 +25,9 @@ set(TESTS
     git_repository.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED)
+list(TRANSFORM SOURCES PREPEND "src/")
+
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
 
@@ -42,9 +44,11 @@ if(${ENABLE_TESTS})
 
     list(TRANSFORM TESTS PREPEND "tests/")
 
-    add_executable(${executable_name} ${CMAKE_SOURCE_DIR}/config/test_main.cpp ${TESTS})
+    add_executable(${executable_name} ${CMAKE_SOURCE_DIR}/config/test_main.cpp ${TESTS} ${SOURCES})
     target_link_libraries(${executable_name} PRIVATE GTest::gtest GTest::gmock GTest::gmock_main)
     target_link_libraries(${executable_name} PRIVATE ${PRIVATE_LIBS} ${PUBLIC_LIBS})
+
+    target_compile_definitions(${executable_name} PRIVATE RAPORTGENCORE_STATIC_DEFINE)
 
     target_include_directories(${executable_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
     target_include_directories(${executable_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
@@ -60,14 +64,6 @@ target_sources(
         FILES
             ${PUBLIC_HEADERS}
 )
-
-foreach(filename ${SOURCES})
-    target_sources(${PROJECT_NAME} PRIVATE src/${filename})
-
-    if(${ENABLE_TESTS})
-        target_sources(${executable_name} PRIVATE src/${filename})
-    endif()
-endforeach()
 
 set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake)
 

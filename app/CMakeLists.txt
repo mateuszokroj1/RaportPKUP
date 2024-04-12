@@ -9,7 +9,7 @@ project(${executable_name} LANGUAGES CXX VERSION ${VERSION_MAJOR}.${VERSION_MINO
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.2 REQUIRED COMPONENTS Core Gui Qml Quick)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Core Gui Qml Quick)
 
 if (Qt6_VERSION VERSION_GREATER_EQUAL 6.3)
     qt_standard_project_setup()
@@ -34,7 +34,6 @@ target_link_libraries(${executable_name} PRIVATE
     Qt6::Gui
     Qt6::Qml
     Qt6::Quick
-    TBB::tbb
 )
 target_link_libraries(${executable_name} PUBLIC RaportGenCore)
 if(WIN32)
@@ -44,6 +43,12 @@ if(WIN32)
             $<TARGET_RUNTIME_DLLS:${executable_name}>
             $<TARGET_FILE_DIR:${executable_name}>
         COMMAND_EXPAND_LISTS
+    )
+    find_program(windep NAMES windeployqt REQUIRED)
+
+    add_custom_command(TARGET ${executable_name}
+        POST_BUILD
+        COMMAND ${windep} $<TARGET_FILE_DIR:${executable_name}>
     )
 endif()
 
@@ -70,7 +75,7 @@ install(TARGETS ${executable_name}
 set(QML_IMPORT_PATH ${PROJECT_BINARY_DIR}/qml CACHE PATH
     "Path to the custom QML components defined by the project")
 
-    qt_generate_deploy_app_script(
+qt_generate_deploy_app_script(
     TARGET ${executable_name}
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
