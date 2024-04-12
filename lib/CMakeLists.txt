@@ -1,0 +1,96 @@
+project(RaportGenCore)
+
+set(PRIVATE_LIBS
+
+)
+
+set(PUBLIC_LIBS
+
+)
+
+set(PUBLIC_HEADERS
+    base.hpp
+    Author.hpp
+    Commit.hpp
+    IRepository.hpp
+    GitRepository.hpp
+)
+
+set(SOURCES
+    process_runner.cpp
+    git_repository.cpp
+)
+
+set(TESTS
+    git_repository.cpp
+)
+
+list(TRANSFORM SOURCES PREPEND "src/")
+
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PRIVATE_LIBS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PUBLIC_LIBS})
+
+generate_export_header(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+
+if(${ENABLE_TESTS})
+    set(executable_name ${PROJECT_NAME}Tests)
+
+    list(TRANSFORM TESTS PREPEND "tests/")
+
+    add_executable(${executable_name} ${CMAKE_SOURCE_DIR}/config/test_main.cpp ${TESTS} ${SOURCES})
+    target_link_libraries(${executable_name} PRIVATE GTest::gtest GTest::gmock GTest::gmock_main)
+    target_link_libraries(${executable_name} PRIVATE ${PRIVATE_LIBS} ${PUBLIC_LIBS})
+
+    target_compile_definitions(${executable_name} PRIVATE RAPORTGENCORE_STATIC_DEFINE)
+
+    target_include_directories(${executable_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(${executable_name} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+    gtest_discover_tests(${executable_name})
+endif()
+
+list(TRANSFORM PUBLIC_HEADERS PREPEND "include/")
+target_sources(
+    ${PROJECT_NAME}
+        PUBLIC FILE_SET public_headers_fileset
+        TYPE HEADERS
+        FILES
+            ${PUBLIC_HEADERS}
+)
+
+set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake)
+
+install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}Targets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILE_SET public_headers_fileset DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(
+    EXPORT ${PROJECT_NAME}Targets
+    FILE ${PROJECT_NAME}Targets.cmake
+    DESTINATION ${ConfigPackageLocation}
+)
+
+configure_package_config_file(
+    ${PROJECT_NAME}Config.cmake.in
+    ${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${ConfigPackageLocation}
+    PATH_VARS CMAKE_INSTALL_PREFIX
+)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    DESTINATION ${ConfigPackageLocation}
+)

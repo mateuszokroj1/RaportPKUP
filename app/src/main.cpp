@@ -3,6 +3,9 @@
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <qqmlcontext.h>
+
+#include "WindowController.h"
 
 #include "app_environment.h"
 #include "import_qml_components_plugins.h"
@@ -30,6 +33,8 @@ int main(int argc, char *argv[])
     engine.addImportPath(":/");
 
     engine.load(url);
+
+    engine.rootContext()->setContextProperty("mainContext", new WindowController());
 
     if (engine.rootObjects().isEmpty()) {
         return -1;

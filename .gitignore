@@ -62,3 +62,4 @@ CMakeLists.txt.user*
 /.vs/*
 
 /config/Version.h
+/.vscode/settings.json
