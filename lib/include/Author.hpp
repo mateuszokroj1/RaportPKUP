@@ -4,12 +4,14 @@
 
 namespace RaportGen
 {
-	struct Author
+struct Author
+{
+	Author() = default;
+	Author(const std::wstring &name, const std::wstring &email) : name(name), email(email)
 	{
-		Author() = default;
-		Author(const std::wstring& name, const std::wstring& email) : name(name), email(email) {}
+	}
 
-		std::wstring name;
-		std::wstring email;
-	};
-}
+	std::wstring name;
+	std::wstring email;
+};
+} // namespace RaportGen

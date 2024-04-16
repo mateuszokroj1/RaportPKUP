@@ -4,5 +4,5 @@
 
 namespace RaportGen
 {
-    using DateTime = std::chrono::time_point<std::chrono::system_clock>;
+using DateTime = std::chrono::time_point<std::chrono::system_clock>;
 }

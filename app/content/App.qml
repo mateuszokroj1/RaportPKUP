@@ -8,11 +8,12 @@ import QtQuick.Shapes
 
 Window {
     id: mainWindow
-    width: 640
-    height: 480
+
     color: "#fafafa"
-    visible: true
+    height: 480
     title: "Generator raportów PKUP"
+    visible: true
+    width: 640
 
     MainWindowView {
         anchors.fill: parent
@@ -20,13 +21,15 @@ Window {
         items: [
             MainWindowItem {
                 header: "Wprowadzanie danych"
+
                 content: ColumnLayout {
                     anchors.fill: parent
-                    Text {text: "Text"}
+
+                    Text {
+                        text: "Text"
+                    }
                 }
             }
-
         ]
     }
 }
-
