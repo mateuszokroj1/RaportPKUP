@@ -41,7 +41,7 @@ jobs:
 
     - name: Configure CMake
       shell: sh
-      run: cmake --preset "release" -DDISABLE_PRECOMMIT
+      run: cmake --preset "release" -DDISABLE_PRECOMMIT=true
 
     - name: Build all
       shell: sh
