@@ -10,6 +10,9 @@ repos:
         - id: check-json
         - id: check-xml
         - id: pretty-format-json
+          args: [
+            '--autofix'
+          ]
         - id: end-of-file-fixer
         - id: mixed-line-ending
 
@@ -17,6 +20,7 @@ repos:
       rev: ad270fb9db427f956ce8eb50c74617ed117b9bfc
       hooks:
         - id: clang-format
+          types_or: [c++, c, cuda]
 
     - repo: https://github.com/cheshirekow/cmake-format-precommit
       rev: e2c2116d86a80e72e7146a06e68b7c228afc6319

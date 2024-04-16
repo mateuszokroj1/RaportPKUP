@@ -1,16 +1,16 @@
 {
-	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-	"name": "raportpkup",
-	"description": "Raport PKUP",
-	"builtin-baseline": "c3801cf53c614ffc54c94051d124eba097b057b1",
-	"dependencies": [
-		{
-			"name": "gtest",
-			"version>=": "1.14.0"
-		},
-		{
-			"name": "tbb",
-			"version>=": "2021.11.0"
-		}
-	]
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "builtin-baseline": "c3801cf53c614ffc54c94051d124eba097b057b1",
+  "dependencies": [
+    {
+      "name": "gtest",
+      "version>=": "1.14.0"
+    },
+    {
+      "name": "tbb",
+      "version>=": "2021.11.0"
+    }
+  ],
+  "description": "Raport PKUP",
+  "name": "raportpkup"
 }
