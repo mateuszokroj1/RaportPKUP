@@ -15,8 +15,6 @@ list(TRANSFORM SOURCES PREPEND "src/")
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PRIVATE_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PUBLIC_LIBS})
 

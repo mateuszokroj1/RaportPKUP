@@ -12,7 +12,7 @@ project(
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Core Gui Qml Quick)
+find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Qml Quick)
 
 if(Qt6_VERSION VERSION_GREATER_EQUAL 6.3)
   qt_standard_project_setup()
@@ -24,8 +24,6 @@ if(WIN32)
   configure_file(app.rc.in app.rc @ONLY)
   target_sources(${executable_name} PUBLIC app.rc)
 endif()
-
-set_property(TARGET ${executable_name} PROPERTY CXX_STANDARD 23)
 
 qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES
                  qtquickcontrols2.conf)

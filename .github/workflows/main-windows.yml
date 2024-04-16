@@ -33,7 +33,7 @@ jobs:
       uses: jurplel/install-qt-action@v3.3.0
       with:
         # Version of Qt to install
-        version: 6.6.*
+        version: 6.7.*
         # Specify which Qt archive to install
         archives: qtbase qtdeclarative qtsvg
         # Whether or not to cache Qt automatically
@@ -41,7 +41,7 @@ jobs:
 
     - name: Configure CMake
       shell: sh
-      run: cmake --preset "release"
+      run: cmake --preset "release" -DDISABLE_PRECOMMIT
 
     - name: Build all
       shell: sh
@@ -55,11 +55,11 @@ jobs:
       uses: actions/upload-artifact@v4.3.1
       with:
         # Artifact name
-        name: Build on Windows - $GITHUB_HEAD_REF - $GITHUB_SHA
+        name: Build on Windows - ${{ github.ref_name }} - ${{ github.sha }}
         # A file, directory or wildcard pattern that describes what to upload
         path: out/install
         # The desired behavior if no files are found using the provided path.
         if-no-files-found: warn
         # Duration after which artifact will expire in days. 0 means using default retention.
         # Minimum 1 day. Maximum 90 days unless changed from the repository settings page.
-        retention-days: 15
+        retention-days: 30

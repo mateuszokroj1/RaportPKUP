@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.24)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+if(NOT DEFINED DISABLE_PRECOMMIT)
+  include(PreCommitInstall)
+  precommitinstall()
+endif()
+
 find_program(vcpkg NAMES vcpkg REQUIRED)
 get_filename_component(vcpkg_dir ${vcpkg} DIRECTORY)
 
@@ -30,7 +35,7 @@ include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(${ENABLE_TESTS})
