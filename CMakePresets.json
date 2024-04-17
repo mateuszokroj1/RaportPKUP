@@ -15,42 +15,12 @@
     },
     {
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_C_COMPILER": "cl"
-      },
-      "condition": {
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows",
-        "type": "equals"
-      },
-      "displayName": "Windows base configuration",
-      "hidden": true,
-      "name": "windows-base"
-    },
-    {
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang",
-        "CMAKE_C_COMPILER": "clang"
-      },
-      "condition": {
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows",
-        "type": "notEquals"
-      },
-      "displayName": "Other systems base configuration",
-      "hidden": true,
-      "name": "linux-base"
-    },
-    {
-      "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "VCPKG_BUILD_TYPE": "debug"
       },
       "displayName": "Debug",
       "inherits": [
-        "base",
-        "windows-base",
-        "linux-base"
+        "base"
       ],
       "name": "debug"
     },
@@ -61,9 +31,7 @@
       },
       "displayName": "Release with debug info",
       "inherits": [
-        "base",
-        "windows-base",
-        "linux-base"
+        "base"
       ],
       "name": "rel-debinfo"
     },
@@ -74,9 +42,7 @@
       },
       "displayName": "Release",
       "inherits": [
-        "base",
-        "windows-base",
-        "linux-base"
+        "base"
       ],
       "name": "release"
     }
