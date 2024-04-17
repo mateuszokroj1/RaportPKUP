@@ -1,5 +1,3 @@
-
-
 /*
 This is a UI file (.ui.qml) that is intended to be edited in Qt Design Studio only.
 It is supposed to be strictly declarative and only uses a subset of QML. If you edit
@@ -16,30 +14,30 @@ Button {
 
     property bool selected: false
 
-    width: 250
-    height: 50
-
-    text: "My Button"
-    display: AbstractButton.TextOnly
     antialiasing: true
     bottomInset: 0
-    topInset: 0
-    rightPadding: 0
     bottomPadding: 0
-    topPadding: 0
+    display: AbstractButton.TextOnly
+    height: 50
     leftPadding: 0
+    rightPadding: 0
+    text: "My Button"
+    topInset: 0
+    topPadding: 0
+    width: 250
 
     background: Shape {
         anchors.fill: parent
 
         ShapePath {
             id: backgroundShape
-            strokeWidth: 0
-            fillRule: ShapePath.WindingFill
-            fillColor: "#e6e6e6"
 
+            fillColor: "#e6e6e6"
+            fillRule: ShapePath.WindingFill
             startX: 0
             startY: 0
+            strokeWidth: 0
+
             PathLine {
                 x: 0
                 y: 0
@@ -66,39 +64,35 @@ Button {
             }
         }
     }
-
     contentItem: Text {
         id: textItem
 
-        color: "black"
-
-        text: control.text
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.leftMargin: 20
-        anchors.rightMargin: 0
-        anchors.topMargin: 12
-
         Layout.fillWidth: true
-        horizontalAlignment: Text.AlignLeft
-        verticalAlignment: Text.AlignTop
+        anchors.left: parent.left
+        anchors.leftMargin: 20
+        anchors.right: parent.right
+        anchors.rightMargin: 0
+        anchors.top: parent.top
+        anchors.topMargin: 12
+        color: "black"
         font.family: "Calibri"
         font.pointSize: 12
+        horizontalAlignment: Text.AlignLeft
+        text: control.text
+        verticalAlignment: Text.AlignTop
     }
-
     states: [
         State {
             name: "hover"
             when: control.hovered
 
             PropertyChanges {
-                target: backgroundShape
                 fillColor: "white"
+                target: backgroundShape
             }
             PropertyChanges {
-                target: textItem
                 font.bold: true
+                target: textItem
             }
         },
         State {
@@ -106,14 +100,14 @@ Button {
             when: control.selected
 
             PropertyChanges {
-                target: backgroundShape
                 fillColor: "#1589ff"
+                target: backgroundShape
             }
             PropertyChanges {
-                target: textItem
                 color: "white"
-                font.pointSize: 14
                 font.bold: true
+                font.pointSize: 14
+                target: textItem
             }
         }
     ]

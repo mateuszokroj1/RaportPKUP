@@ -4,33 +4,35 @@
 
 namespace RaportGen
 {
-	class Handle
+class Handle
+{
+  private:
+	HANDLE _val = nullptr;
+
+  public:
+	Handle() = default;
+	~Handle() noexcept
 	{
-	private:
+		release();
+	}
 
-		HANDLE _val = nullptr;
-
-	public:
-		Handle() = default;
-		~Handle() noexcept
+	void release() noexcept
+	{
+		if (_val)
 		{
-			release();
+			CloseHandle(_val);
+			_val = nullptr;
 		}
+	}
 
-		void release() noexcept
-		{
-			if (_val)
-			{
-				CloseHandle(_val);
-				_val = nullptr;
-			}
-		}
+	HANDLE *ptr()
+	{
+		return &_val;
+	}
 
-		HANDLE* ptr()
-		{
-			return &_val;
-		}
-
-		operator HANDLE() noexcept { return _val; }
-	};
-}
+	operator HANDLE() noexcept
+	{
+		return _val;
+	}
+};
+} // namespace RaportGen

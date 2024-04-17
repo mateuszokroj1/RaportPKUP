@@ -1,85 +1,51 @@
 {
-  "version": 4,
   "configurePresets": [
     {
-      "name": "base",
-      "hidden": true,
-      "displayName": "Base",
-      "description": "Base configuration",
-      "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build",
-      "installDir": "${sourceDir}/out/install",
       "cacheVariables": {
         "VCPKG_CRT_LINKAGE": "dynamic",
         "VCPKG_LIBRARY_LINKAGE": "dynamic"
-      }
-    },
-    {
-      "name": "windows-base",
-      "hidden": true,
-      "displayName": "Windows base configuration",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       },
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl",
-        "CMAKE_CXX_COMPILER": "cl"
-      }
-    },
-    {
-      "name": "linux-base",
+      "description": "Base configuration",
+      "displayName": "Base",
+      "generator": "Ninja",
       "hidden": true,
-      "displayName": "Other systems base configuration",
-      "condition": {
-        "type": "notEquals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang",
-        "CMAKE_CXX_COMPILER": "clang"
-      }
+      "installDir": "${sourceDir}/out/install",
+      "name": "base"
     },
     {
-      "name": "debug",
-      "inherits": [
-        "base",
-        "windows-base",
-        "linux-base"
-      ],
-      "displayName": "Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "VCPKG_BUILD_TYPE": "debug"
-      }
+      },
+      "displayName": "Debug",
+      "inherits": [
+        "base"
+      ],
+      "name": "debug"
     },
     {
-      "name": "rel-debinfo",
-      "inherits": [
-        "base",
-        "windows-base",
-        "linux-base"
-      ],
-      "displayName": "Release with debug info",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "VCPKG_BUILD_TYPE": "release"
-      }
+      },
+      "displayName": "Release with debug info",
+      "inherits": [
+        "base"
+      ],
+      "name": "rel-debinfo"
     },
     {
-      "name": "release",
-      "inherits": [
-        "base",
-        "windows-base",
-        "linux-base"
-      ],
-      "displayName": "Release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "VCPKG_BUILD_TYPE": "release"
-      }
+      },
+      "displayName": "Release",
+      "inherits": [
+        "base"
+      ],
+      "name": "release"
     }
-  ]
+  ],
+  "version": 4
 }

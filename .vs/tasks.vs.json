@@ -1,23 +1,23 @@
 {
-  "version": "0.2.1",
   "tasks": [
     {
+      "appliesTo": "/",
+      "command": "cmake --preset debug .",
       "taskLabel": "Configure CMake (Debug)",
-      "type": "default",
-      "appliesTo": "/",
-      "command": "cmake --preset debug ."
+      "type": "default"
     },
     {
+      "appliesTo": "/",
+      "command": "cmake --build out/build",
       "taskLabel": "Build all",
-      "type": "default",
-      "appliesTo": "/",
-      "command": "cmake --build out/build"
+      "type": "default"
     },
     {
-      "taskLabel": "Run all tests",
-      "type": "default",
       "appliesTo": "/",
-      "command": "ctest out/build"
+      "command": "ctest out/build",
+      "taskLabel": "Run all tests",
+      "type": "default"
     }
-  ]
+  ],
+  "version": "0.2.1"
 }

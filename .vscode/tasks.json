@@ -1,26 +1,24 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "label": "Configure CMake (Debug)",
-        "type": "shell",
-        "command": "cmake --preset debug .",
-        "problemMatcher": [
-          "$msCompile"
-        ]
-      },
-      {
-        "label": "Build all",
-        "type": "shell",
-        "command": "cmake --build out/build",
-        "problemMatcher": []
-      },
-      {
-        "label": "Run all tests",
-        "type": "shell",
-        "command": "ctest out/build"
-      }
-    ]
-  }
+  "tasks": [
+    {
+      "command": "cmake --preset debug .",
+      "label": "Configure CMake (Debug)",
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "type": "shell"
+    },
+    {
+      "command": "cmake --build out/build",
+      "label": "Build all",
+      "problemMatcher": [],
+      "type": "shell"
+    },
+    {
+      "command": "ctest out/build",
+      "label": "Run all tests",
+      "type": "shell"
+    }
+  ],
+  "version": "2.0.0"
+}

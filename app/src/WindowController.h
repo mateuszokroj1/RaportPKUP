@@ -3,10 +3,9 @@
 class WindowController : public QObject
 {
 	Q_OBJECT
-public:
+  public:
 	WindowController() = default;
 
-	//Q_PROPERTY(QString author READ isNightMode WRITE setIsNightMode NOTIFY isNightModeChanged)
-
-	
+	// Q_PROPERTY(QString author READ isNightMode WRITE setIsNightMode NOTIFY
+	// isNightModeChanged)
 };

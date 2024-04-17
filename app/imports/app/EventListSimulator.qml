@@ -7,19 +7,21 @@ import QtQuick.Studio.EventSystem 1.0
 
 QtObject {
     id: simulator
-    property bool active: true
 
     property Timer __timer: Timer {
         id: timer
+
         interval: 100
+
         onTriggered: {
-            EventSimulator.show()
+            EventSimulator.show();
         }
     }
+    property bool active: true
 
     Component.onCompleted: {
-        EventSystem.init(Qt.resolvedUrl("EventListModel.qml"))
+        EventSystem.init(Qt.resolvedUrl("EventListModel.qml"));
         if (simulator.active)
-            timer.start()
+            timer.start();
     }
 }
