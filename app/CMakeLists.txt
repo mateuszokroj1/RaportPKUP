@@ -65,11 +65,11 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 
+if(WIN32)
+  install(SCRIPT "${CMAKE_SOURCE_DIR}/cmake/PostInstallWin.cmake")
+endif()
+
 # make IDEs aware of the QML import path
 set(QML_IMPORT_PATH
     ${PROJECT_BINARY_DIR}/qml
     CACHE PATH "Path to the custom QML components defined by the project")
-
-qt_generate_deploy_app_script(TARGET ${executable_name} OUTPUT_SCRIPT
-                              deploy_script NO_UNSUPPORTED_PLATFORM_ERROR)
-install(SCRIPT ${deploy_script})
