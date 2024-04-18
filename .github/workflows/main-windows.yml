@@ -53,7 +53,7 @@ jobs:
 
     - name: Set ref name
       shell: sh
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF//\//_})"
+      run: echo "branch={$(echo ${GITHUB_REF//\//_})}" >> $GITHUB_OUTPUT
       id: ref_name
 
     - name: Upload a Build Artifact
