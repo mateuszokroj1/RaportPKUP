@@ -59,12 +59,11 @@ if(LINK_INSIGHT)
   include(${CMAKE_CURRENT_SOURCE_DIR}/insight)
 endif()
 
-include(GNUInstallDirs)
 install(
   TARGETS ${executable_name}
   BUNDLE DESTINATION .
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  LIBRARY DESTINATION .
+  RUNTIME DESTINATION .)
 
 # make IDEs aware of the QML import path
 set(QML_IMPORT_PATH
