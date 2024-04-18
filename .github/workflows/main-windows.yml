@@ -53,13 +53,15 @@ jobs:
 
     - name: Set ref name
       shell: sh
-      run: echo "_ref_name=$(echo ${GITHUB_REF/\//\_})" >> $GITHUB_ENV
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF//\//_})"
+      id: ref_name
 
     - name: Upload a Build Artifact
+      #if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v4.3.1
       with:
         # Artifact name
-        name: Build on Windows - ${{ env._ref_name }} - ${{ github.sha }}
+        name: Build on Windows - ${{ steps.ref_name.outputs.branch }} - ${{ github.sha }}
         # A file, directory or wildcard pattern that describes what to upload
         path: out/install
         # The desired behavior if no files are found using the provided path.
