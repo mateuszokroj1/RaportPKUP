@@ -43,7 +43,8 @@ if(WIN32)
   add_custom_command(
     TARGET ${executable_name}
     POST_BUILD
-    COMMAND ${windep} $<TARGET_FILE_DIR:${executable_name}>)
+    COMMAND ${windep} --qmldir ${CMAKE_CURRENT_LIST_DIR}
+            $<TARGET_FILE_DIR:${executable_name}>)
 endif()
 
 target_include_directories(${executable_name}
@@ -66,7 +67,17 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 if(WIN32)
-  install(SCRIPT "${CMAKE_SOURCE_DIR}/cmake/PostInstallWin.cmake")
+  install(CODE "set(_qmldir \"${CMAKE_CURRENT_LIST_DIR}\")")
+
+  install(
+    CODE [[
+    find_program(windep NAMES windeployqt REQUIRED)
+
+    execute_process(
+      WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+      COMMAND ${windep} --qmldir {_qmldir} ${CMAKE_INSTALL_PREFIX}
+    )
+  ]])
 endif()
 
 # make IDEs aware of the QML import path

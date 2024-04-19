@@ -52,7 +52,7 @@ list(TRANSFORM PUBLIC_HEADERS PREPEND "include/")
 target_sources(${PROJECT_NAME} PUBLIC FILE_SET public_headers_fileset TYPE
                                       HEADERS FILES ${PUBLIC_HEADERS})
 
-set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake)
+set(ConfigPackageLocation ${CMAKE_INSTALL_PREFIX}/cmake)
 
 install(
   TARGETS ${PROJECT_NAME}
