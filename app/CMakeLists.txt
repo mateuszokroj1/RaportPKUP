@@ -31,6 +31,7 @@ qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES
 target_link_libraries(${executable_name} PRIVATE Qt6::Core Qt6::Gui Qt6::Qml
                                                  Qt6::Quick)
 target_link_libraries(${executable_name} PUBLIC RaportGenCore)
+
 if(WIN32)
   add_custom_command(
     TARGET ${executable_name}
@@ -75,7 +76,7 @@ if(WIN32)
 
     execute_process(
       WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
-      COMMAND ${windep} --qmldir {_qmldir} ${CMAKE_INSTALL_PREFIX}
+      COMMAND ${windep} --qmldir ${_qmldir} ${CMAKE_INSTALL_PREFIX}
     )
   ]])
 endif()
