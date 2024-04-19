@@ -52,12 +52,13 @@ jobs:
       run: cmake --install out/build
 
     - name: Set ref name
+      if: github.event_name != 'pull_request'
       shell: sh
       run: echo "branch=$(echo ${GITHUB_REF//\//_})" >> $GITHUB_OUTPUT
       id: ref_name
 
     - name: Upload a Build Artifact
-      #if: github.event_name != 'pull_request'
+      if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v4.3.1
       with:
         # Artifact name
