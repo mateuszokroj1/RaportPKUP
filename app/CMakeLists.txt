@@ -31,6 +31,7 @@ qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES
 target_link_libraries(${executable_name} PRIVATE Qt6::Core Qt6::Gui Qt6::Qml
                                                  Qt6::Quick)
 target_link_libraries(${executable_name} PUBLIC RaportGenCore)
+
 if(WIN32)
   add_custom_command(
     TARGET ${executable_name}
@@ -43,7 +44,8 @@ if(WIN32)
   add_custom_command(
     TARGET ${executable_name}
     POST_BUILD
-    COMMAND ${windep} $<TARGET_FILE_DIR:${executable_name}>)
+    COMMAND ${windep} --qmldir ${CMAKE_CURRENT_LIST_DIR}
+            $<TARGET_FILE_DIR:${executable_name}>)
 endif()
 
 target_include_directories(${executable_name}
@@ -59,18 +61,27 @@ if(LINK_INSIGHT)
   include(${CMAKE_CURRENT_SOURCE_DIR}/insight)
 endif()
 
-include(GNUInstallDirs)
 install(
   TARGETS ${executable_name}
-  BUNDLE DESTINATION .
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+if(WIN32)
+  install(CODE "set(_qmldir \"${CMAKE_CURRENT_LIST_DIR}\")")
+
+  install(
+    CODE [[
+    find_program(windep NAMES windeployqt REQUIRED)
+
+    execute_process(
+      WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+      COMMAND ${windep} --qmldir ${_qmldir} ${CMAKE_INSTALL_PREFIX}
+    )
+  ]])
+endif()
 
 # make IDEs aware of the QML import path
 set(QML_IMPORT_PATH
     ${PROJECT_BINARY_DIR}/qml
     CACHE PATH "Path to the custom QML components defined by the project")
-
-qt_generate_deploy_app_script(TARGET ${executable_name} OUTPUT_SCRIPT
-                              deploy_script NO_UNSUPPORTED_PLATFORM_ERROR)
-install(SCRIPT ${deploy_script})
