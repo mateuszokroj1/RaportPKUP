@@ -18,8 +18,15 @@ if(Qt6_VERSION VERSION_GREATER_EQUAL 6.3)
   qt_standard_project_setup()
 endif()
 
-qt_add_executable(${executable_name} src/main.cpp src/window_controller.cpp
-                  src/WindowController.h)
+set(is_win "")
+
+if(WIN32)
+  set(is_win "WIN32")
+endif()
+
+qt_add_executable(
+  ${executable_name} ${is_win} src/main.cpp src/window_controller.cpp
+  src/WindowController.h src/Application.cpp)
 if(WIN32)
   configure_file(app.rc.in app.rc @ONLY)
   target_sources(${executable_name} PUBLIC app.rc)
