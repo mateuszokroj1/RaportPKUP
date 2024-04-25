@@ -12,6 +12,7 @@
 #include "import_qml_plugins.h"
 
 #include "Application.hpp"
+
 namespace RaportPKUP
 {
 int main(int argc, char *argv[])
@@ -45,4 +46,6 @@ int main(int argc, char *argv[])
 
 	return app.exec();
 }
+
+// signal(SIGSEGV); TODO
 } // namespace RaportPKUP

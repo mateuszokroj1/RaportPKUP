@@ -25,8 +25,13 @@ if(WIN32)
 endif()
 
 qt_add_executable(
-  ${executable_name} ${is_win} src/main.cpp src/window_controller.cpp
-  src/WindowController.h src/Application.cpp)
+  ${executable_name}
+  ${is_win}
+  src/main.cpp
+  src/window_controller.cpp
+  src/WindowController.h
+  src/Application.cpp
+  src/ApplicationDefinition.hpp)
 if(WIN32)
   configure_file(app.rc.in app.rc @ONLY)
   target_sources(${executable_name} PUBLIC app.rc)
