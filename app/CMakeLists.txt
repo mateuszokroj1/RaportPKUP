@@ -18,15 +18,15 @@ if(Qt6_VERSION VERSION_GREATER_EQUAL 6.3)
   qt_standard_project_setup()
 endif()
 
-set(is_win "")
+set(os_mode "")
 
 if(WIN32)
-  set(is_win "WIN32")
+  set(os_mode "WIN32")
 endif()
 
 qt_add_executable(
   ${executable_name}
-  ${is_win}
+  ${os_mode}
   src/main.cpp
   src/window_controller.cpp
   src/WindowController.h
@@ -35,6 +35,10 @@ qt_add_executable(
 if(WIN32)
   configure_file(app.rc.in app.rc @ONLY)
   target_sources(${executable_name} PUBLIC app.rc)
+endif()
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  target_compile_definitions(${executable_name} PRIVATE RAPORTPKUP_NOSIGNAL)
 endif()
 
 qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES

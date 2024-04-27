@@ -1,3 +1,8 @@
 #include "WindowController.h"
 
-#include <include/GitRepository.hpp>
+namespace RaportPKUP
+{
+WindowController::WindowController(std::weak_ptr<Application> app) : _application(app)
+{
+}
+} // namespace RaportPKUP

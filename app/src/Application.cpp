@@ -1,22 +1,40 @@
-// Copyright (C) 2021 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
+#include <signal.h>
 
-#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <qqmlcontext.h>
-
-#include "WindowController.h"
 
 #include "app_environment.h"
 #include "import_qml_components_plugins.h"
 #include "import_qml_plugins.h"
 
 #include "Application.hpp"
+#include "WindowController.h"
+
+namespace
+{
+#ifndef RAPORTPKUP_NOSIGNAL
+void SignalHandler(int signal)
+{
+	throw std::exception("Wykryto błąd uniemożliwiający dalszą pracę. Kod błedu: 1.");
+}
+#endif
+} // namespace
 
 namespace RaportPKUP
 {
-int main(int argc, char *argv[])
+
+void ApplicationBuilder::build(ApplicationDefinition &&definition, Application &application)
 {
+	application._factories = std::move(definition._factories);
+
+	application._is_built = true;
+}
+
+int Application::run(int argc, char *argv[])
+{
+	if (!_is_built)
+		return -1;
+
 	set_qt_environment();
 
 	QGuiApplication app(argc, argv);
@@ -35,17 +53,24 @@ int main(int argc, char *argv[])
 	engine.addImportPath(QCoreApplication::applicationDirPath() + "/qml");
 	engine.addImportPath(":/");
 
-	engine.load(url);
+	auto context = engine.rootContext();
+	if (!context)
+		return -1;
 
-	engine.rootContext()->setContextProperty("mainContext", new WindowController());
+	WindowController controller(weak_from_this());
+	context->setContextProperty("controller", &controller);
+
+	engine.load(url);
 
 	if (engine.rootObjects().isEmpty())
 	{
 		return -1;
 	}
 
+#ifndef RAPORTPKUP_NOSIGNAL
+	signal(SIGSEGV, SignalHandler);
+#endif
+
 	return app.exec();
 }
-
-// signal(SIGSEGV); TODO
 } // namespace RaportPKUP
