@@ -1,13 +1,17 @@
 import QtQuick 6.2
 import QtQuick.Layouts
 
+import content
+
 ColumnLayout {
+    id: root
+
     antialiasing: true
     spacing: 0
 
     RowLayout {
-        anchors.left: parent.left
-        anchors.right: parent.right
+        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+        Layout.fillWidth: true
         spacing: 0
 
         Rectangle {
@@ -22,10 +26,9 @@ ColumnLayout {
             id: textInput
 
             font.pixelSize: 12
-            height: 20
-            renderType: Text.NativeRendering
             text: qsTr("Text Input")
-            width: 80
+        }
+        UIButton {
         }
     }
 }

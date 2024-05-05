@@ -13,7 +13,7 @@ set(TESTS git_repository.cpp)
 
 list(TRANSFORM SOURCES PREPEND "src/")
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} include/ICommand.hpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PRIVATE_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PUBLIC_LIBS})

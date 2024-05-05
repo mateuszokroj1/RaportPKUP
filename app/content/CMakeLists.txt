@@ -18,4 +18,5 @@ qt6_add_qml_module(
   MainWindowSideButton.ui.qml
   DataInputStepView.qml
   DataFilteringStepView.qml
-  ReportingStepView.qml)
+  ReportingStepView.qml
+  UIButton.qml)
