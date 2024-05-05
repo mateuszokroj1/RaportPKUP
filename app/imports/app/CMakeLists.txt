@@ -2,6 +2,7 @@
 
 qt_add_library(app STATIC)
 set_source_files_properties(Constants.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
+set_source_files_properties(Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 
 qt6_add_qml_module(
   app
@@ -13,6 +14,7 @@ qt6_add_qml_module(
   "/qt/qml"
   QML_FILES
   Constants.qml
+  Theme.qml
   DirectoryFontLoader.qml
   EventListModel.qml
   EventListSimulator.qml)

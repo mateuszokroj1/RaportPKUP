@@ -13,10 +13,7 @@ project(
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Qml Quick)
-
-if(Qt6_VERSION VERSION_GREATER_EQUAL 6.3)
-  qt_standard_project_setup()
-endif()
+qt_standard_project_setup()
 
 set(os_mode "")
 
@@ -29,9 +26,12 @@ qt_add_executable(
   ${os_mode}
   src/main.cpp
   src/window_controller.cpp
-  src/WindowController.h
+  src/WindowController.hpp
   src/Application.cpp
-  src/ApplicationDefinition.hpp)
+  src/process.cpp)
+target_include_directories(${executable_name}
+                           PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
+
 if(WIN32)
   configure_file(app.rc.in app.rc @ONLY)
   target_sources(${executable_name} PUBLIC app.rc)

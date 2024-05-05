@@ -5,11 +5,13 @@ import QtQuick 6.2
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.5
 import QtQuick.Shapes
+import Main
+import app
 
 Window {
     id: mainWindow
 
-    color: "#fafafa"
+    color: Theme.windowBackground
     height: 480
     title: "Generator raportów PKUP"
     visible: true
@@ -17,19 +19,19 @@ Window {
 
     MainWindowView {
         anchors.fill: parent
+        items: controller.items
+        //items#: [
+        //    MainWindowItem {
+        //        header: "Wprowadzanie danych"
 
-        items: [
-            MainWindowItem {
-                header: "Wprowadzanie danych"
+        //        content: ColumnLayout {
+        //            anchors.fill: parent
 
-                content: ColumnLayout {
-                    anchors.fill: parent
-
-                    Text {
-                        text: "Text"
-                    }
-                }
-            }
-        ]
+        //            Text {
+        //                text: "Text"
+        //            }
+        //        }
+        //    }
+        //]
     }
 }

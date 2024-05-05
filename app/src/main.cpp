@@ -1,4 +1,6 @@
 #include "Application.hpp"
+#include "Process.hpp"
+#include "include/IProcess.hpp"
 
 using namespace RaportPKUP;
 
@@ -18,7 +20,7 @@ int main(int argc, char *argv[])
 
 	ApplicationDefinition definition;
 
-	// definition.registerController<>();
+	definition.registerController<RaportGen::IProcessFactory, RaportPKUP::ProcessFactory>();
 
 	Application app;
 	ApplicationBuilder::build(std::move(definition), app);
