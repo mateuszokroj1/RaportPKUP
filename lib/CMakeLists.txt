@@ -4,7 +4,7 @@ set(PRIVATE_LIBS)
 
 set(PUBLIC_LIBS)
 
-set(PUBLIC_HEADERS base.hpp Process.hpp Author.hpp Commit.hpp IRepository.hpp
+set(PUBLIC_HEADERS base.hpp IProcess.hpp Author.hpp Commit.hpp IRepository.hpp
                    GitRepository.hpp)
 
 set(SOURCES process_runner.cpp git_repository.cpp)

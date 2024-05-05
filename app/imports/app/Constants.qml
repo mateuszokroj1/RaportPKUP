@@ -1,11 +1,7 @@
 pragma Singleton
 import QtQuick 6.2
-import QtQuick.Studio.Application
 
 QtObject {
-    property StudioApplication application: StudioApplication {
-        fontPath: Qt.resolvedUrl("../../content/" + relativeFontDirectory)
-    }
     readonly property color backgroundColor: "#EAEAEA"
 
     /* Edit this comment to add your custom font */

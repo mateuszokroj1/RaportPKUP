@@ -8,87 +8,84 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import QtQuick.Shapes
+import QtQuick.Templates as T
 
-Button {
+import app
+
+T.Button {
     id: control
 
-    property bool selected: false
+    property double arrowWidth: 25
 
+    anchors.margins: 0
     antialiasing: true
-    bottomInset: 0
-    bottomPadding: 0
     display: AbstractButton.TextOnly
-    height: 50
-    leftPadding: 0
-    rightPadding: 0
+    implicitHeight: implicitContentHeight + topPadding + bottomPadding
+    implicitWidth: implicitContentWidth + leftPadding + rightPadding + arrowWidth
+    padding: 10
     text: "My Button"
-    topInset: 0
-    topPadding: 0
-    width: 250
 
-    background: Shape {
-        anchors.fill: parent
+    background: RowLayout {
+        id: backgroundLayout
 
-        ShapePath {
-            id: backgroundShape
+        property color backgroundColor: "transparent"
 
-            fillColor: "#e6e6e6"
-            fillRule: ShapePath.WindingFill
-            startX: 0
-            startY: 0
-            strokeWidth: 0
+        anchors.margins: 0
+        antialiasing: true
+        spacing: 0
 
-            PathLine {
-                x: 0
-                y: 0
-            }
-            PathLine {
-                x: 225
-                y: 0
-            }
-            PathLine {
-                x: 250
-                y: 25
-            }
-            PathLine {
-                x: 225
-                y: 50
-            }
-            PathLine {
-                x: 0
-                y: 50
-            }
-            PathLine {
-                x: 0
-                y: 0
+        Rectangle {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            color: backgroundLayout.backgroundColor
+        }
+        Shape {
+            Layout.fillHeight: true
+
+            ShapePath {
+                id: arrowShape
+
+                fillColor: backgroundLayout.backgroundColor
+                fillRule: ShapePath.WindingFill
+                startX: 0
+                startY: 0
+                strokeWidth: 0
+
+                PathLine {
+                    x: 0
+                    y: 0
+                }
+                PathLine {
+                    x: control.arrowWidth
+                    y: control.height / 2
+                }
+                PathLine {
+                    x: 0
+                    y: control.height
+                }
             }
         }
     }
-    contentItem: Text {
-        id: textItem
+    contentItem: RowLayout {
+        Text {
+            id: textItem
 
-        Layout.fillWidth: true
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-        anchors.right: parent.right
-        anchors.rightMargin: 0
-        anchors.top: parent.top
-        anchors.topMargin: 12
-        color: "black"
-        font.family: "Calibri"
-        font.pointSize: 12
-        horizontalAlignment: Text.AlignLeft
-        text: control.text
-        verticalAlignment: Text.AlignTop
+            color: "black"
+            font.family: "Calibri"
+            font.pointSize: 12
+            horizontalAlignment: Text.AlignLeft
+            text: control.text
+            verticalAlignment: Text.AlignVCenter
+        }
     }
     states: [
         State {
             name: "hover"
-            when: control.hovered
+            when: control.hovered && !control.checked && control.enabled
 
             PropertyChanges {
-                fillColor: "white"
-                target: backgroundShape
+                backgroundColor: "white"
+                target: backgroundLayout
             }
             PropertyChanges {
                 font.bold: true
@@ -96,17 +93,26 @@ Button {
             }
         },
         State {
-            name: "selected"
-            when: control.selected
+            name: "checked"
+            when: control.checked && control.enabled
 
             PropertyChanges {
-                fillColor: "#1589ff"
-                target: backgroundShape
+                backgroundColor: Theme.activatedElementBackground
+                target: backgroundLayout
             }
             PropertyChanges {
-                color: "white"
+                color: Theme.highlightedElementBackground
                 font.bold: true
                 font.pointSize: 14
+                target: textItem
+            }
+        },
+        State {
+            name: "disabled"
+            when: !control.enabled
+
+            PropertyChanges {
+                color: "gray"
                 target: textItem
             }
         }

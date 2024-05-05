@@ -8,7 +8,7 @@
 #include "import_qml_plugins.h"
 
 #include "Application.hpp"
-#include "WindowController.h"
+#include "WindowController.hpp"
 
 namespace
 {
@@ -18,11 +18,36 @@ void SignalHandler(int signal)
 	throw std::exception("Wykryto błąd uniemożliwiający dalszą pracę. Kod błedu: 1.");
 }
 #endif
+
+template <typename T, T start_value, T end_value> class SessionSetter final
+{
+  public:
+	SessionSetter(T *value_ptr) : _ptr(value_ptr)
+	{
+		if (value_ptr)
+			*value_ptr = start_value;
+	}
+
+	~SessionSetter()
+	{
+		if (_ptr)
+			*_ptr = end_value;
+	}
+
+  private:
+	T *_ptr = nullptr;
+};
+
+template <typename T> struct EmptyDeleter
+{
+	void operator()(T *)
+	{
+	}
+};
 } // namespace
 
 namespace RaportPKUP
 {
-
 void ApplicationBuilder::build(ApplicationDefinition &&definition, Application &application)
 {
 	application._factories = std::move(definition._factories);
@@ -30,47 +55,56 @@ void ApplicationBuilder::build(ApplicationDefinition &&definition, Application &
 	application._is_built = true;
 }
 
+Application::Application() : _ptr(this, EmptyDeleter<Application>{})
+{
+}
+
 int Application::run(int argc, char *argv[])
 {
-	if (!_is_built)
+	if (!_is_built || _is_running)
 		return -1;
 
-	set_qt_environment();
-
-	QGuiApplication app(argc, argv);
-
-	QQmlApplicationEngine engine;
-	const QUrl url(u"qrc:/qt/qml/Main/main.qml"_qs);
-	QObject::connect(
-		&engine, &QQmlApplicationEngine::objectCreated, &app,
-		[url](QObject *obj, const QUrl &objUrl)
-		{
-			if (!obj && url == objUrl)
-				QCoreApplication::exit(-1);
-		},
-		Qt::QueuedConnection);
-
-	engine.addImportPath(QCoreApplication::applicationDirPath() + "/qml");
-	engine.addImportPath(":/");
-
-	auto context = engine.rootContext();
-	if (!context)
-		return -1;
-
-	WindowController controller(weak_from_this());
-	context->setContextProperty("controller", &controller);
-
-	engine.load(url);
-
-	if (engine.rootObjects().isEmpty())
 	{
-		return -1;
-	}
+		SessionSetter<bool, true, false> locker(&_is_running);
+
+		set_qt_environment();
+
+		auto app = new QGuiApplication(argc, argv);
+		_main_app.reset(app);
+
+		_qml = std::make_unique<QQmlApplicationEngine>();
+		const QUrl url(u"qrc:/qt/qml/Main/main.qml"_qs);
+		QObject::connect(
+			_qml.get(), &QQmlApplicationEngine::objectCreated, app,
+			[url](QObject *obj, const QUrl &objUrl)
+			{
+				if (!obj && url == objUrl)
+					QCoreApplication::exit(-1);
+			},
+			Qt::QueuedConnection);
+
+		_qml->addImportPath(QCoreApplication::applicationDirPath() + "/qml");
+		_qml->addImportPath(":/");
+
+		auto context = _qml->rootContext();
+		if (!context)
+			return -1;
+
+		WindowController controller(_ptr);
+		context->setContextProperty("controller", &controller);
+
+		_qml->load(url);
+
+		if (_qml->rootObjects().isEmpty())
+			return -1;
 
 #ifndef RAPORTPKUP_NOSIGNAL
-	signal(SIGSEGV, SignalHandler);
+		signal(SIGSEGV, SignalHandler);
 #endif
 
-	return app.exec();
+		controller.setParent(_qml->rootObjects().first());
+
+		return app->exec();
+	}
 }
 } // namespace RaportPKUP

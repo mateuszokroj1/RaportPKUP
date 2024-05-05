@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <type_traits>
+#include <typeindex>
 
 #include <include/base.hpp>
 
@@ -15,27 +17,26 @@ class Application;
 
 struct FactoryInfo
 {
-	using Factory = std::function<std::shared_ptr<void>(std::weak_ptr<Application>)>;
+	using Factory = std::function<std::shared_ptr<ICastable>(std::weak_ptr<Application>)>;
 
-	template <typename InterfaceType, typename ControllerType> FactoryInfo(const Factory &factory) : factory(factory)
+	FactoryInfo(std::type_index interface, std::type_index controller, const Factory &factory)
+		: factory(factory), interface(interface), controller(controller)
 	{
-		interface = typeid(InterfaceType);
-		controller = typeid(ControllerType);
 	}
 
-	std::type_info interface;
-	std::type_info controller;
+	std::type_index interface;
+	std::type_index controller;
 	Factory factory;
 };
 
 template <class Type, class Base>
-concept Controller = std::is_final_v<Type> && std::is_base_of_v<Type, Base>;
+concept Controller = std::is_final_v<Type> && std::is_base_of_v<Base, Type>;
 
 class ApplicationDefinition
 {
   public:
 	template <Abstract InterfaceType, Controller<InterfaceType> ControllerType>
-	ApplicationDefinition &registerController()
+	ApplicationDefinition *registerController()
 	{
 		if (std::any_of(_factories.cbegin(), _factories.cend(),
 						[](const FactoryInfo &info) { return info.interface == typeid(InterfaceType); }))
@@ -51,28 +52,30 @@ class ApplicationDefinition
 
 		std::optional<FactoryInfo::Factory> factory;
 
-		if (std::is_constructible_v<ControllerType, std::weak_ptr<Application>>)
+		if constexpr (std::is_constructible_v<ControllerType, std::weak_ptr<Application>>)
 		{
 			factory = [](std::weak_ptr<Application> app)
 			{
 				ControllerType *new_instance = new ControllerType(app);
-				return std::shared_ptr<void>(new_instance);
+				return std::shared_ptr<ICastable>(new_instance);
 			};
 		}
 
-		if (std::is_default_constructible_v<ControllerType>)
+		if constexpr (std::is_default_constructible_v<ControllerType>)
 		{
 			factory = [](std::weak_ptr<Application>)
 			{
-				ControllerType *new_instance = new ControllerType{};
-				return std::shared_ptr<void>(new_instance);
+				ControllerType *new_instance = new ControllerType;
+				return std::shared_ptr<ICastable>(new_instance);
 			};
 		}
 
 		if (!factory)
 			throw std::exception("Not found any compatible constructors.");
 
-		_factories.push_back(FactoryInfo<InterfaceType, ControllerType>(*factory));
+		_factories.emplace_back(typeid(InterfaceType), typeid(ControllerType), *factory);
+
+		return this;
 	}
 
   private:

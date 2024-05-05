@@ -15,4 +15,10 @@ template <class Type>
 concept Final = std::is_final_v<Type>;
 
 using DateTime = std::chrono::time_point<std::chrono::system_clock>;
+
+class ICastable
+{
+  public:
+	virtual ~ICastable() = default;
+};
 } // namespace RaportGen

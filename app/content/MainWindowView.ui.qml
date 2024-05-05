@@ -2,10 +2,13 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
+import Main
+import app
+
 GridLayout {
     id: root
 
-    default required property list<MainWindowItem> items
+    default required property list<MainViewItem> items
 
     columnSpacing: 25
     columns: 2
@@ -13,9 +16,8 @@ GridLayout {
 
     Rectangle {
         Layout.fillHeight: true
-        Layout.maximumWidth: 225
-        Layout.preferredWidth: 225
-        color: "#f1f1f1"
+        Layout.preferredWidth: 200
+        color: Theme.menuBackground
 
         ColumnLayout {
             id: menu
@@ -29,14 +31,15 @@ GridLayout {
                 model: root.items
 
                 MainWindowSideButton {
-                    required property string header
                     required property int index
+                    required property bool isEnabled
+                    required property string name
 
-                    hoverEnabled: !selected
-                    selected: contentStack.currentIndex === index
-                    text: header
+                    checked: contentStack.currentIndex === index
+                    enabled: isEnabled
+                    text: name
 
-                    onClicked: contentStack.currentIndex = index
+                    onClicked: contentStack.currentIndex = enabled ? index : contentStack.currentIndex
                 }
             }
         }
