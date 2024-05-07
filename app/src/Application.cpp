@@ -18,32 +18,6 @@ void SignalHandler(int signal)
 	throw std::exception("Wykryto błąd uniemożliwiający dalszą pracę. Kod błedu: 1.");
 }
 #endif
-
-template <typename T, T start_value, T end_value> class SessionSetter final
-{
-  public:
-	SessionSetter(T *value_ptr) : _ptr(value_ptr)
-	{
-		if (value_ptr)
-			*value_ptr = start_value;
-	}
-
-	~SessionSetter()
-	{
-		if (_ptr)
-			*_ptr = end_value;
-	}
-
-  private:
-	T *_ptr = nullptr;
-};
-
-template <typename T> struct EmptyDeleter
-{
-	void operator()(T *)
-	{
-	}
-};
 } // namespace
 
 namespace RaportPKUP
