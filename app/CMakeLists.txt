@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
 option(LINK_INSIGHT "Link Qt Insight Tracker library" ON)
-option(BUILD_QDS_COMPONENTS "Build design studio components" OFF)
 
 set(executable_name RaportPKUPGenerator)
 
@@ -29,7 +28,9 @@ qt_add_executable(
   src/WindowController.hpp
   src/Application.cpp
   src/process.cpp
+  src/InputDataState.hpp
   src/Command.cpp)
+
 target_include_directories(${executable_name}
                            PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
@@ -47,7 +48,6 @@ qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES
 
 target_link_libraries(${executable_name} PRIVATE Qt6::Core Qt6::Gui Qt6::Qml
                                                  Qt6::Quick)
-target_link_libraries(${executable_name} PUBLIC RaportGenCore)
 
 if(WIN32)
   add_custom_command(

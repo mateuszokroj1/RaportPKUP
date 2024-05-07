@@ -5,6 +5,8 @@
 
 #include <include/ICommand.hpp>
 
+#include "InputDataState.hpp"
+
 namespace RaportPKUP
 {
 class Command : public QObject, public RaportGen::ICommand
