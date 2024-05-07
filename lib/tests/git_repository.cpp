@@ -25,17 +25,17 @@ class Lib_GitRepository : public testing::Test
 
 TEST_F(Lib_GitRepository, checkIsValidPath_whenPutCurrentDirectory_shouldReturnTrue)
 {
-	ASSERT_TRUE(RaportGen::GitRepository::checkIsValidPath(valid_path));
+	ASSERT_TRUE(RaportPKUP::GitRepository::checkIsValidPath(valid_path));
 }
 
 TEST_F(Lib_GitRepository, checkIsValidPath_whenPutBadPath_shouldReturnFalse)
 {
-	ASSERT_FALSE(RaportGen::GitRepository::checkIsValidPath(invalid_path));
+	ASSERT_FALSE(RaportPKUP::GitRepository::checkIsValidPath(invalid_path));
 }
 
 TEST_F(Lib_GitRepository, getSystemConfigAuthor_shouldReturnValid)
 {
-	const auto result = RaportGen::GitRepository::getSystemConfigAuthor();
+	const auto result = RaportPKUP::GitRepository::getSystemConfigAuthor();
 	ASSERT_FALSE(result.name.empty());
 	ASSERT_FALSE(result.email.empty());
 
@@ -44,7 +44,7 @@ TEST_F(Lib_GitRepository, getSystemConfigAuthor_shouldReturnValid)
 
 TEST_F(Lib_GitRepository, getCommits_shouldReturnValid)
 {
-	RaportGen::GitRepository repo(valid_path);
+	RaportPKUP::GitRepository repo(valid_path);
 	const std::chrono::year_month_day ymd(std::chrono::year(2023), std::chrono::month(1), std::chrono::day(1));
 	const auto vec = repo.getCommitsFromTimeRange(std::chrono::sys_days(ymd), std::chrono::system_clock::now(),
 												  {L"Mateusz Okrój", L"mateuszokroj1@gmail.com"});

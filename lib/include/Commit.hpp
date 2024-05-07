@@ -5,7 +5,7 @@
 #include "Author.hpp"
 #include "base.hpp"
 
-namespace RaportGen
+namespace RaportPKUP
 {
 struct Commit
 {
@@ -14,4 +14,4 @@ struct Commit
 	std::string id;
 	Author author;
 };
-} // namespace RaportGen
+} // namespace RaportPKUP

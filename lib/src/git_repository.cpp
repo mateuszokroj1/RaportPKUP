@@ -10,7 +10,7 @@
 
 #include "process_runner.hpp"
 
-namespace RaportGen
+namespace RaportPKUP
 {
 constexpr wchar_t log_column_separator_w = L'|';
 constexpr char log_column_separator = '|';
@@ -142,4 +142,4 @@ std::shared_ptr<std::vector<Commit>> GitRepository::getCommitsFromTimeRange(
 
 	return vector;
 }
-} // namespace RaportGen
+} // namespace RaportPKUP

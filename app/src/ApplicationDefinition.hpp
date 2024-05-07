@@ -8,9 +8,7 @@
 
 #include <include/base.hpp>
 
-using namespace RaportGen;
-
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
 class ApplicationBuilder;
 class Application;
@@ -83,4 +81,4 @@ class ApplicationDefinition
 
 	friend class ApplicationBuilder;
 };
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

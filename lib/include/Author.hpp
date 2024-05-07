@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace RaportGen
+namespace RaportPKUP
 {
 struct Author
 {
@@ -14,4 +14,4 @@ struct Author
 	std::wstring name;
 	std::wstring email;
 };
-} // namespace RaportGen
+} // namespace RaportPKUP

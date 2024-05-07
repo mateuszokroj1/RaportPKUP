@@ -5,9 +5,9 @@
 
 #include <include/ICommand.hpp>
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
-class Command : public QObject, public RaportGen::ICommand
+class Command : public QObject, public RaportPKUP::ICommand
 {
 	Q_OBJECT
 	Q_PROPERTY(bool canExecute READ canExecute WRITE setCanExecute NOTIFY canExecuteChanged DESIGNABLE true FINAL)
@@ -32,4 +32,4 @@ class Command : public QObject, public RaportGen::ICommand
   private:
 	Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(Command, bool, _canExecute, true, &Command::canExecuteChanged)
 };
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

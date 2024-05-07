@@ -1,21 +1,6 @@
 exclude: '.qmlproject$'
 
 repos:
-
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: 0d20f18212d68260c0c3600d0d94587d9ead20e5
-      hooks:
-        - id: check-case-conflict
-        - id: check-yaml
-        - id: check-json
-        - id: check-xml
-        - id: pretty-format-json
-          args: [
-            '--autofix'
-          ]
-        - id: end-of-file-fixer
-        - id: mixed-line-ending
-
     - repo: https://github.com/pre-commit/mirrors-clang-format
       rev: ad270fb9db427f956ce8eb50c74617ed117b9bfc
       hooks:
@@ -32,3 +17,17 @@ repos:
       hooks:
         - id: qmlfmt
           entry: qmlformat -n -i
+
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: 0d20f18212d68260c0c3600d0d94587d9ead20e5
+      hooks:
+        - id: check-case-conflict
+        - id: check-yaml
+        - id: check-json
+        - id: check-xml
+        - id: pretty-format-json
+          args: [
+            '--autofix'
+          ]
+        - id: end-of-file-fixer
+        - id: mixed-line-ending

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace RaportGen
+namespace RaportPKUP
 {
 class IProcess
 {
@@ -30,4 +30,4 @@ class IProcessFactory : public ICastable
 	virtual std::shared_ptr<IProcess> createNew(const std::wstring &command,
 												const std::wstring &working_directory = {}) = 0;
 };
-} // namespace RaportGen
+} // namespace RaportPKUP

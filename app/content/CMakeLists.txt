@@ -8,17 +8,12 @@ qt6_add_qml_module(
   "content"
   VERSION
   1.0
+  IMPORTS
+  shared
   RESOURCE_PREFIX
   "/qt/qml"
-  RESOURCES
-  fonts/fonts.txt
   QML_FILES
   App.qml
-  MainWindowView.ui.qml
-  MainWindowSideButton.ui.qml
   DataInputStepView.qml
   DataFilteringStepView.qml
-  ReportingStepView.qml
-  UIButton.qml
-  QML_FILES
-  UIText.qml)
+  ReportingStepView.qml)

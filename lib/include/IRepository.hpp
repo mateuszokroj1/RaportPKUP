@@ -7,7 +7,7 @@
 
 #include "Commit.hpp"
 
-namespace RaportGen
+namespace RaportPKUP
 {
 class IRepository
 {
@@ -25,4 +25,4 @@ class IRepository
 		const std::chrono::time_point<std::chrono::system_clock> &from,
 		const std::chrono::time_point<std::chrono::system_clock> &to, const Author &author) const = 0;
 };
-} // namespace RaportGen
+} // namespace RaportPKUP

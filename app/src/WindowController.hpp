@@ -6,7 +6,7 @@
 #include "MainViewItem.hpp"
 #include "include/IProcess.hpp"
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
 class WindowController : public QObject
 {
@@ -33,4 +33,4 @@ class WindowController : public QObject
 	QQmlListProperty<MainViewItem> _items;
 	std::shared_ptr<IProcessFactory> _process_factory;
 };
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

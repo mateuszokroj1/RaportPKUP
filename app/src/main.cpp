@@ -3,6 +3,7 @@
 #include "include/IProcess.hpp"
 
 using namespace RaportPKUP;
+using namespace RaportPKUP::UI;
 
 #ifdef WIN32
 
@@ -20,7 +21,7 @@ int main(int argc, char *argv[])
 
 	ApplicationDefinition definition;
 
-	definition.registerController<RaportGen::IProcessFactory, RaportPKUP::ProcessFactory>();
+	definition.registerController<IProcessFactory, ProcessFactory>();
 
 	Application app;
 	ApplicationBuilder::build(std::move(definition), app);

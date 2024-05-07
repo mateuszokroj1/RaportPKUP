@@ -3,7 +3,7 @@
 #include <chrono>
 #include <type_traits>
 
-namespace RaportGen
+namespace RaportPKUP
 {
 template <class DerivedType, class BaseType>
 concept Derived = std::is_base_of_v<BaseType, DerivedType>;
@@ -21,4 +21,4 @@ class ICastable
   public:
 	virtual ~ICastable() = default;
 };
-} // namespace RaportGen
+} // namespace RaportPKUP

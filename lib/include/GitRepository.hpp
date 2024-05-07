@@ -3,13 +3,13 @@
 #include <filesystem>
 #include <future>
 
-#include <raportgencore_export.h>
+#include <raportpkup.core_export.h>
 
 #include "IRepository.hpp"
 
-namespace RaportGen
+namespace RaportPKUP
 {
-class RAPORTGENCORE_EXPORT GitRepository : public IRepository
+class RAPORTPKUP_CORE_EXPORT GitRepository : public IRepository
 {
   public:
 	explicit GitRepository(const std::filesystem::path &);
@@ -30,4 +30,4 @@ class RAPORTGENCORE_EXPORT GitRepository : public IRepository
 		const std::chrono::time_point<std::chrono::system_clock> &from,
 		const std::chrono::time_point<std::chrono::system_clock> &to, const Author &author) const override;
 };
-} // namespace RaportGen
+} // namespace RaportPKUP
