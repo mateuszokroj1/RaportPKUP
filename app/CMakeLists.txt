@@ -28,7 +28,8 @@ qt_add_executable(
   src/window_controller.cpp
   src/WindowController.hpp
   src/Application.cpp
-  src/process.cpp)
+  src/process.cpp
+  src/Command.cpp)
 target_include_directories(${executable_name}
                            PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 

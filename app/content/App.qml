@@ -11,7 +11,7 @@ import app
 Window {
     id: mainWindow
 
-    color: Theme.windowBackground
+    color: Theme.menuBackground
     height: 480
     title: "Generator raportów PKUP"
     visible: true
@@ -20,18 +20,5 @@ Window {
     MainWindowView {
         anchors.fill: parent
         items: controller.items
-        //items#: [
-        //    MainWindowItem {
-        //        header: "Wprowadzanie danych"
-
-        //        content: ColumnLayout {
-        //            anchors.fill: parent
-
-        //            Text {
-        //                text: "Text"
-        //            }
-        //        }
-        //    }
-        //]
     }
 }

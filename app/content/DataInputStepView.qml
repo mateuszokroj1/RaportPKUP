@@ -1,31 +1,35 @@
 import QtQuick 6.2
 import QtQuick.Layouts
 
+import content
+
 ColumnLayout {
+    id: root
+
     antialiasing: true
     spacing: 0
 
     RowLayout {
-        anchors.left: parent.left
-        anchors.right: parent.right
+        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+        Layout.fillWidth: true
         spacing: 0
 
         Rectangle {
-            anchors.fill: parent
+            Layout.fillHeight: true
+            Layout.fillWidth: true
             color: "gray"
             z: -1
         }
-        Text {
+        UIText {
             text: "Zapisane presety:"
         }
         TextInput {
             id: textInput
 
             font.pixelSize: 12
-            height: 20
-            renderType: Text.NativeRendering
             text: qsTr("Text Input")
-            width: 80
+        }
+        UIButton {
         }
     }
 }
