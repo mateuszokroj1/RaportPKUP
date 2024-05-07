@@ -5,10 +5,8 @@
 #include "Application.hpp"
 #include <include/IProcess.hpp>
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
-using namespace RaportGen;
-
 class Process final : public IProcess
 {
   public:
@@ -42,4 +40,4 @@ class ProcessFactory final : public IProcessFactory
   private:
 	std::weak_ptr<Application> _app;
 };
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

@@ -7,6 +7,9 @@
 #include "import_qml_components_plugins.h"
 #include "import_qml_plugins.h"
 
+#include "include/EmptyDeleter.hpp"
+#include "include/SessionSetter.hpp"
+
 #include "Application.hpp"
 #include "WindowController.hpp"
 
@@ -20,7 +23,7 @@ void SignalHandler(int signal)
 #endif
 } // namespace
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
 void ApplicationBuilder::build(ApplicationDefinition &&definition, Application &application)
 {
@@ -81,4 +84,4 @@ int Application::run(int argc, char *argv[])
 		return app->exec();
 	}
 }
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

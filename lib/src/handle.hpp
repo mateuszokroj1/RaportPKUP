@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-namespace RaportGen
+namespace RaportPKUP
 {
 class Handle
 {
@@ -35,4 +35,4 @@ class Handle
 		return _val;
 	}
 };
-} // namespace RaportGen
+} // namespace RaportPKUP

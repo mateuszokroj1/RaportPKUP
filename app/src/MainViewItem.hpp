@@ -6,15 +6,11 @@
 #include <QtQuick/QQuickItem>
 #include <qstringliteral.h>
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
 class MainViewItem : public QObject
 {
   public:
-	static constexpr QStringView NAME_PROPERTY = u"name";
-	static constexpr QStringView CONTENT_PROPERTY = u"content";
-	static constexpr QStringView IS_ENABLED_PROPERTY = u"isEnabled";
-
 	Q_OBJECT
 	QML_ELEMENT
 
@@ -51,4 +47,4 @@ class MainViewItem : public QObject
 	Q_OBJECT_BINDABLE_PROPERTY(MainViewItem, QQuickItem *, _content, &MainViewItem::contentChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(MainViewItem, bool, _is_enabled, &MainViewItem::isEnabledChanged)
 };
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

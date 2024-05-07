@@ -1,6 +1,6 @@
 #pragma once
 
-namespace RaportGen
+namespace RaportPKUP
 {
 class ICommand
 {
@@ -12,4 +12,4 @@ class ICommand
 	virtual void setCanExecute(bool) const = 0;
 	virtual void emitCanExecuteChanged() const = 0;
 };
-} // namespace RaportGen
+} // namespace RaportPKUP

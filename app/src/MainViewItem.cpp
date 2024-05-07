@@ -1,6 +1,6 @@
 #include "MainViewItem.hpp"
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
 QString MainViewItem::name() const
 {
@@ -40,4 +40,4 @@ QBindable<bool> MainViewItem::bindableIsEnabled() const
 {
 	return &_is_enabled;
 }
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

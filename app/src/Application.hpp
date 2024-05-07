@@ -9,7 +9,7 @@
 
 #include "ApplicationDefinition.hpp"
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
 class Application final
 {
@@ -89,4 +89,4 @@ class ApplicationBuilder
   public:
 	static void build(ApplicationDefinition &&, Application &);
 };
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

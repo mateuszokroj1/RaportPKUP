@@ -2,7 +2,7 @@
 
 #include "process_runner.hpp"
 
-namespace RaportGen
+namespace RaportPKUP
 {
 std::stringstream process_runner(std::wstring &command_line, const std::wstring &working_directory, DWORD &last_error,
 								 bool use_default_streams)
@@ -72,4 +72,4 @@ std::stringstream process_runner(std::wstring &command_line, const std::wstring 
 
 	return output;
 }
-} // namespace RaportGen
+} // namespace RaportPKUP

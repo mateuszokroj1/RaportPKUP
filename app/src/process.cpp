@@ -1,9 +1,7 @@
 #include "Process.hpp"
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
-using namespace RaportGen;
-
 Process::Process(QObject *parent, QString &&command, QString &&working_directory) : _process(parent)
 {
 	_process.setWorkingDirectory(std::move(working_directory));
@@ -67,4 +65,4 @@ std::shared_ptr<IProcess> ProcessFactory::createNew(const std::wstring &command,
 
 	return {};
 }
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

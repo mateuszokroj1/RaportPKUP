@@ -3,7 +3,7 @@
 
 using namespace Qt::Literals::StringLiterals;
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
 WindowController::WindowController(std::weak_ptr<Application> app) : _application(app)
 {
@@ -73,4 +73,4 @@ void WindowController::creatingSteps(QQmlApplicationEngine *qml)
 	_items = QQmlListProperty<MainViewItem>(this, &_qlist);
 	emit itemsChanged();
 }
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI

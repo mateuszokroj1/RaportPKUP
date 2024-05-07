@@ -1,16 +1,17 @@
 #pragma once
 
 #include <QMetaEnum>
+#include <QObject>
+#include <QtQml/qqmlregistration.h>
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
-class InputDataState final : public QObject
+class InputDataState
 {
+	Q_GADGET
+	QML_VALUE_TYPE(inputDataState)
+
   public:
-	InputDataState(QObject *parent = nullptr) : QObject(parent)
-	{
-	}
-
 	enum States : char
 	{
 		Indeterminate = 0,
@@ -20,4 +21,10 @@ class InputDataState final : public QObject
 
 	Q_ENUM(States)
 };
-} // namespace RaportPKUP
+
+namespace Qt
+{
+Q_NAMESPACE
+QML_NAMED_ELEMENT(InputDataState)
+} // namespace Qt
+} // namespace RaportPKUP::UI
