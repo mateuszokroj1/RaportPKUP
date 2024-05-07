@@ -19,4 +19,6 @@ qt6_add_qml_module(
   DataInputStepView.qml
   DataFilteringStepView.qml
   ReportingStepView.qml
-  UIButton.qml)
+  UIButton.qml
+  QML_FILES
+  UIText.qml)

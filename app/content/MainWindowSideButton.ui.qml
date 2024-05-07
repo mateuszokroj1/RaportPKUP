@@ -37,10 +37,12 @@ T.Button {
         Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
+            antialiasing: true
             color: backgroundLayout.backgroundColor
         }
         Shape {
             Layout.fillHeight: true
+            antialiasing: true
 
             ShapePath {
                 id: arrowShape

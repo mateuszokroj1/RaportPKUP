@@ -15,11 +15,12 @@ ColumnLayout {
         spacing: 0
 
         Rectangle {
-            anchors.fill: parent
+            Layout.fillHeight: true
+            Layout.fillWidth: true
             color: "gray"
             z: -1
         }
-        Text {
+        UIText {
             text: "Zapisane presety:"
         }
         TextInput {
