@@ -10,8 +10,6 @@ import QtQuick.Layouts
 import QtQuick.Shapes
 import QtQuick.Templates as T
 
-import app
-
 T.Button {
     id: control
 

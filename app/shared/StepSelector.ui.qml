@@ -2,9 +2,6 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
-import Main
-import app
-
 RowLayout {
     id: root
 
@@ -23,7 +20,7 @@ RowLayout {
             model: root.items
             width: 280
 
-            MainWindowSideButton {
+            StepSelectorButton {
                 required property int index
                 required property bool isEnabled
                 required property string name

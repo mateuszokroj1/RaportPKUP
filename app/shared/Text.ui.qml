@@ -1,7 +1,6 @@
-import QtQuick 6.2
-import app
+import QtQuick 6.2 as SYS
 
-Text {
+SYS.Text {
     color: Theme.windowText
     font.family: Theme.fontFamily
     font.pointSize: Theme.fontSize

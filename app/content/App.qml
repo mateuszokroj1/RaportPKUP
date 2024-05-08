@@ -5,18 +5,19 @@ import QtQuick 6.2
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.5
 import QtQuick.Shapes
-import Main
+
+import shared as UI
 
 Window {
     id: mainWindow
 
-    color: Theme.menuBackground
+    color: UI.Theme.menuBackground
     height: 480
     title: "Generator raportów PKUP"
     visible: true
     width: 640
 
-    MainWindowView {
+    UI.StepSelector {
         anchors.fill: parent
         items: controller.items
     }

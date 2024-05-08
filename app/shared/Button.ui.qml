@@ -2,8 +2,6 @@ import QtQuick 6.2
 import QtQuick.Layouts
 import QtQuick.Templates as T
 
-import app
-
 T.Button {
     id: root
 
@@ -60,10 +58,10 @@ T.Button {
         }
     ]
 
-    onClicked: {
-        if (command != null && command.canExecute)
-            command.execute();
-    }
+    //   onClicked: {
+    //       if (command != null && command.canExecute)
+    //           command.execute();
+    //   }
 
     StateGroup {
         id: stateGroup

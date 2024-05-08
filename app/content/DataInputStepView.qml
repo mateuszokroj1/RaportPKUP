@@ -1,7 +1,7 @@
 import QtQuick 6.2
 import QtQuick.Layouts
 
-import content
+import shared as UI
 
 ColumnLayout {
     id: root
@@ -20,16 +20,18 @@ ColumnLayout {
             color: "gray"
             z: -1
         }
-        UIText {
+        UI.Text {
             text: "Zapisane presety:"
         }
-        TextInput {
+        UI.InputField {
             id: textInput
 
             font.pixelSize: 12
             text: qsTr("Text Input")
         }
-        UIButton {
+        UI.Button {
+        }
+        UI.Button {
         }
     }
 }

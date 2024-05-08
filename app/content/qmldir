@@ -1,8 +1,0 @@
-Module content
-
-import shared
-
-DataFilteringStepView 1.0 DataFilteringStepView.qml
-DataInputStepView 1.0 DataInputStepView.qml
-ReportingStepView 1.0 ReportingStepView.qml
-App 1.0 App.qml
