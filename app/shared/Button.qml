@@ -6,20 +6,23 @@ T.Button {
     id: root
 
     property QtObject command
-    property double radius: 10
 
     checkable: false
     enabled: command != null ? command.canExecute : true
-    font.family: Theme.fontFamily
-    font.pointSize: Theme.fontSize
+    font: Theme.defaultFont
+    implicitHeight: implicitContentHeight + topPadding + bottomPadding
+    implicitWidth: implicitContentWidth + leftPadding + rightPadding
+    padding: Theme.defaultPadding
     text: "Button"
 
     background: Rectangle {
         id: rectangle
 
         anchors.fill: root
+        border.color: Theme.windowText
+        border.width: 1
         color: Theme.controlBackground
-        radius: root.radius
+        radius: Theme.radius
     }
     contentItem: RowLayout {
         anchors.fill: root
@@ -42,6 +45,10 @@ T.Button {
                 color: "#00ffffff"
                 target: rectangle
             }
+            PropertyChanges {
+                border.width: 0
+                target: rectangle
+            }
         },
         State {
             name: "highlight"
@@ -55,13 +62,23 @@ T.Button {
                 color: Theme.activatedElementText
                 target: content
             }
+        },
+        State {
+            name: "disabledNonFlat"
+            when: root.highlighted && !root.flat
+
+            PropertyChanges {
+                border.color: Theme.disabledText
+                color: Theme.disabledBackground
+                target: rectangle
+            }
         }
     ]
 
-    //   onClicked: {
-    //       if (command != null && command.canExecute)
-    //           command.execute();
-    //   }
+    onClicked: {
+        if (command != null && command.canExecute)
+            command.execute();
+    }
 
     StateGroup {
         id: stateGroup
@@ -72,7 +89,7 @@ T.Button {
                 when: !root.enabled
 
                 PropertyChanges {
-                    color: "#757575"
+                    color: Theme.disabledText
                     target: content
                 }
             }

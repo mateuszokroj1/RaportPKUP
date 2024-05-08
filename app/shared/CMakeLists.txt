@@ -16,7 +16,7 @@ qt6_add_qml_module(
   Fonts.qml
   Theme.qml
   Text.ui.qml
-  Button.ui.qml
+  Button.qml
   ToolBar.ui.qml
   InputField.ui.qml
   StepSelectorButton.ui.qml

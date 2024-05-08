@@ -7,8 +7,7 @@ TextField {
 
     //  property InputDataState dataState: InputDataState.Indeterminate
 
-    font.family: Theme.fontFamily
-    font.pointSize: Theme.fontSize
+    font: Theme.defaultFont
     horizontalAlignment: "AlignLeft"
     implicitHeight: contentHeight + topPadding + bottomPadding
     implicitWidth: 100
@@ -22,14 +21,6 @@ TextField {
         border.color: Theme.activatedElementBackground
         border.width: 1
         color: Theme.windowBackground
+        radius: Theme.radius
     }
-    states: [
-        State {
-            name: ""
-
-            PropertyChanges {
-                target: object
-            }
-        }
-    ]
 }

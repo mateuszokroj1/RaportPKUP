@@ -5,33 +5,48 @@ import QtQuick.Controls 2.15
 RowLayout {
     id: root
 
+    property double arrowsWidth: 35
     default required property list<MainViewItem> items
 
-    spacing: 25
+    implicitHeight: menu.implicitHeight + 100
+    implicitWidth: menu.width + contentStack.implicitWidth
+    spacing: 0
 
-    ColumnLayout {
-        id: menu
-
-        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+    Item {
         Layout.fillHeight: true
-        width: 280
+        implicitHeight: menu.implicitHeight
+        implicitWidth: menu.implicitWidth
 
-        Repeater {
-            model: root.items
-            width: 280
+        Rectangle {
+            anchors.fill: parent
+            anchors.rightMargin: arrowsWidth
+            color: Theme.menuBackground
+            z: -1
+        }
+        ColumnLayout {
+            id: menu
 
-            StepSelectorButton {
-                required property int index
-                required property bool isEnabled
-                required property string name
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.topMargin: Theme.defaultPadding
 
-                anchors.left: menu.left
-                anchors.right: menu.right
-                checked: contentStack.currentIndex === index
-                enabled: isEnabled
-                text: name
+            Repeater {
+                model: root.items
 
-                onClicked: contentStack.currentIndex = enabled ? index : contentStack.currentIndex
+                StepSelectorButton {
+                    required property int index
+                    required property bool isEnabled
+                    required property string name
+
+                    Layout.preferredWidth: 300
+                    arrowWidth: arrowsWidth
+                    checked: contentStack.currentIndex === index
+                    enabled: isEnabled
+                    padding: 20
+                    text: name
+
+                    onClicked: contentStack.currentIndex = enabled ? index : contentStack.currentIndex
+                }
             }
         }
     }
@@ -42,8 +57,6 @@ RowLayout {
         Layout.fillWidth: true
 
         Repeater {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
             model: root.items
 
             Item {
@@ -52,6 +65,8 @@ RowLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 children: [content]
+                implicitHeight: content.implicitHeight
+                implicitWidth: content.implicitWidth
             }
         }
     }

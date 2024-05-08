@@ -9,7 +9,7 @@ Project {
     }
 
     QmlFiles {
-        directory: "imports"
+        directory: "shared"
     }
 
     JavaScriptFiles {
@@ -17,15 +17,11 @@ Project {
     }
 
     JavaScriptFiles {
-        directory: "imports"
+        directory: "shared"
     }
 
     ImageFiles {
         directory: "content"
-    }
-
-    ImageFiles {
-        directory: "asset_imports"
     }
 
     Files {
@@ -58,16 +54,6 @@ Project {
         filter: "*.qsb"
     }
 
-    Files {
-        filter: "*.mesh"
-        directory: "asset_imports"
-    }
-
-    Files {
-        filter: "*.qml"
-        directory: "asset_imports"
-    }
-
     Environment {
         QT_QUICK_CONTROLS_CONF: "qtquickcontrols2.conf"
         QT_AUTO_SCREEN_SCALE_FACTOR: "1"
@@ -85,7 +71,7 @@ Project {
     qt6Project: true
 
     /* List of plugin directories passed to QML runtime */
-    importPaths: [ "imports", "asset_imports" ]
+    importPaths: [ "shared", "content" ]
 
     /* Required for deployment */
     targetDirectory: "/opt/app"
@@ -110,4 +96,6 @@ Project {
     supportedLanguages: ["pl"]
     primaryLanguage: "pl"
 
+
+    mainUiFile: "shared/Button.qml"
 }

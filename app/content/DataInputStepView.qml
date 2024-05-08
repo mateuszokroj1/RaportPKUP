@@ -1,7 +1,7 @@
 import QtQuick 6.2
 import QtQuick.Layouts
 
-import shared as UI
+import "../shared" as UI
 
 ColumnLayout {
     id: root

@@ -3,7 +3,7 @@ Module shared
 singleton Theme 1.0 Theme.qml
 singleton Fonts 1.0 Fonts.qml
 
-Button 1.0 Button.ui.qml
+Button 1.0 Button.qml
 Text 1.0 Text.ui.qml
 InputField 1.0 InputField.ui.qml
 StepSelectorButton 1.0 StepSelectorButton.ui.qml
