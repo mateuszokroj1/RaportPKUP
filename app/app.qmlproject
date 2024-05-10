@@ -95,7 +95,4 @@ Project {
     multilanguageSupport: false
     supportedLanguages: ["pl"]
     primaryLanguage: "pl"
-
-
-    mainUiFile: "shared/Button.qml"
 }

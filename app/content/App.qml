@@ -6,12 +6,10 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.5
 import QtQuick.Shapes
 
-import "../shared" as UI
-
 Window {
     id: mainWindow
 
-    color: UI.Theme.windowBackground
+    color: Theme.windowBackground
     height: 600
     minimumHeight: content.implicitHeight
     minimumWidth: content.implicitWidth
@@ -19,7 +17,7 @@ Window {
     visible: true
     width: 800
 
-    UI.StepSelector {
+    StepSelector {
         id: content
 
         anchors.fill: parent

@@ -7,10 +7,10 @@ QtObject {
     readonly property color activatedElementText: "white"
     readonly property color controlBackground: "#ededed"
     readonly property font defaultFont: Fonts.font_FiraSans
-    readonly property double defaultPadding: 25
+    readonly property double defaultPadding: 15
     readonly property color disabledBackground: "#c6c6c6"
     readonly property color disabledText: "#8a8a8a"
-    readonly property double fontSize: 14
+    readonly property double fontSize: 12
     readonly property color highlightedElementBackground: "white"
     readonly property color invalidAccentBorderColor: "#f00000"
     readonly property color menuBackground: "#e5e5e5"

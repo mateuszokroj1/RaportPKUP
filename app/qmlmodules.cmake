@@ -5,7 +5,6 @@ qt6_add_qml_module(
   VERSION
   1.0
   IMPORTS
-  sharedplugin
   contentplugin
   RESOURCE_PREFIX
   "/qt/qml"
@@ -13,7 +12,6 @@ qt6_add_qml_module(
   QML_FILES
   main.qml)
 
-add_subdirectory(shared)
 add_subdirectory(content)
 
-target_link_libraries(${executable_name} PRIVATE sharedplugin contentplugin)
+target_link_libraries(${executable_name} PRIVATE contentplugin)

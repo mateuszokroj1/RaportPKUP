@@ -1,7 +1,6 @@
 import QtQuick 6.2
 import QtQuick.Layouts
-
-import "../shared" as UI
+import QtQuick.Controls
 
 ColumnLayout {
     id: root
@@ -9,29 +8,31 @@ ColumnLayout {
     antialiasing: true
     spacing: 0
 
+    //  Item {
+    //      Layout.alignment: Qt.AlignTop
+    //     Layout.fillWidth: true
+    //
+    //      implicitWidth: topMenu.implicitWidth
+    //       implicitHeight: topMenu.implicitHeight
+
+    //      Rectangle
+    //      {
+    //          anchors.fill: parent
+    //          z: -1
+    //           color: UI.Theme.menuBackground
+    //      }
+
     RowLayout {
-        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-        Layout.fillWidth: true
-        spacing: 0
+        id: topMenu
 
-        Rectangle {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            color: "gray"
-            z: -1
-        }
-        UI.Text {
-            text: "Zapisane presety:"
-        }
-        UI.InputField {
-            id: textInput
+        spacing: Theme.defaultPadding
 
-            font.pixelSize: 12
-            text: qsTr("Text Input")
-        }
-        UI.Button {
-        }
-        UI.Button {
+        Text {
+            Layout.margins: Theme.defaultPadding
+            color: Theme.windowText
+            font: Theme.defaultFont
+            text: "Ustawienia wstępne:"
         }
     }
+    //  }
 }

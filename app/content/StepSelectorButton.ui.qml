@@ -71,7 +71,6 @@ T.Button {
 
             color: Theme.windowText
             font: Theme.defaultFont
-            //font.pointSize: Theme.fontSize - 1
             horizontalAlignment: Text.AlignLeft
             text: control.text
             verticalAlignment: Text.AlignVCenter
