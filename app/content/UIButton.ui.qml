@@ -1,8 +1,8 @@
 import QtQuick 6.2
 import QtQuick.Layouts
-import QtQuick.Templates as T
+import QtQuick.Controls
 
-T.Button {
+Button {
     id: root
 
     property QtObject command
@@ -10,8 +10,8 @@ T.Button {
     checkable: false
     enabled: command != null ? command.canExecute : true
     font: Theme.defaultFont
-    implicitHeight: implicitContentHeight + topPadding + bottomPadding
-    implicitWidth: implicitContentWidth + leftPadding + rightPadding
+    implicitHeight: implicitContentHeight + topPadding + bottomPadding + 2
+    implicitWidth: implicitContentWidth + leftPadding + rightPadding + 2
     padding: Theme.defaultPadding
     text: "Button"
 
@@ -24,17 +24,12 @@ T.Button {
         color: Theme.controlBackground
         radius: Theme.radius
     }
-    contentItem: RowLayout {
-        anchors.fill: root
+    contentItem: Text {
+        id: content
 
-        Text {
-            id: content
-
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            color: Theme.windowText
-            font: root.font
-            text: root.text
-        }
+        color: Theme.windowText
+        font: root.font
+        text: root.text
     }
     states: [
         State {
@@ -42,7 +37,7 @@ T.Button {
             when: root.flat
 
             PropertyChanges {
-                color: "#00ffffff"
+                color: "transparent"
                 target: rectangle
             }
             PropertyChanges {
@@ -75,11 +70,6 @@ T.Button {
         }
     ]
 
-    onClicked: {
-        if (command != null && command.canExecute)
-            command.execute();
-    }
-
     StateGroup {
         id: stateGroup
 
@@ -94,5 +84,13 @@ T.Button {
                 }
             }
         ]
+    }
+    Connections {
+        function onClicked() {
+            if (command != null && command.canExecute)
+                command.execute();
+        }
+
+        target: root
     }
 }

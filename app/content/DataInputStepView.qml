@@ -3,36 +3,69 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 ColumnLayout {
-    id: root
+    Item {
+        id: toolbar
 
-    antialiasing: true
-    spacing: 0
+        implicitHeight: toolbarLayout.implicitHeight
+        implicitWidth: toolbarLayout.implicitWidth
 
-    //  Item {
-    //      Layout.alignment: Qt.AlignTop
-    //     Layout.fillWidth: true
-    //
-    //      implicitWidth: topMenu.implicitWidth
-    //       implicitHeight: topMenu.implicitHeight
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.menuBackground
+            z: -1
+        }
+        RowLayout {
+            id: toolbarLayout
 
-    //      Rectangle
-    //      {
-    //          anchors.fill: parent
-    //          z: -1
-    //           color: UI.Theme.menuBackground
-    //      }
+            spacing: Theme.defaultPadding
 
-    RowLayout {
-        id: topMenu
+            UIText {
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                text: "Wstępnie zdefiniowane ustawienia:"
+            }
+            ComboBox {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.margins: Theme.defaultPadding
+                editable: true
+            }
+            UIButton {
+                id: savePresetCmd
 
-        spacing: Theme.defaultPadding
+                padding: Theme.defaultPadding
+                text: "Zapisz jako"
 
-        Text {
-            Layout.margins: Theme.defaultPadding
-            color: Theme.windowText
-            font: Theme.defaultFont
-            text: "Ustawienia wstępne:"
+                onClicked: {
+                    savedPresetCmd.text = "s";
+                }
+            }
+            UIButton {
+                id: renamePresetCmd
+
+                text: "Zmień nazwę"
+            }
+            UIButton {
+                id: deletePresetCmd
+
+                text: "Usuń"
+            }
         }
     }
-    //  }
+    ColumnLayout {
+        RowLayout {
+            InputField {
+                Layout.fillWidth: true
+            }
+            UIButton {
+                text: "Wybierz folder"
+            }
+            UIButton {
+                text: "Dodaj"
+            }
+        }
+        ListView {
+            Layout.fillWidth: true
+            Layout.minimumHeight: 100
+        }
+    }
 }

@@ -2,25 +2,23 @@ import QtQuick 2.15
 import QtQuick.Controls
 import QtQuick.Layouts
 
-Item {
-    height: 100
-    width: 100
+FormItemBase {
+    implicitHeight: textField.implicitHeight
+    implicitWidth: textField.implicitWidth
 
     TextField {
-        id: root
+        id: textField
 
-        property int dataState: InputDataState.Indeterminate
-
+        anchors.fill: parent
         font: Theme.defaultFont
         horizontalAlignment: "AlignLeft"
         padding: Theme.defaultPadding
         placeholderText: "Text Box"
-        text: "t"
 
         background: Rectangle {
             id: backRect
 
-            anchors.fill: root
+            anchors.fill: textField
             border.color: Theme.activatedElementBackground
             border.width: 1
             color: Theme.windowBackground

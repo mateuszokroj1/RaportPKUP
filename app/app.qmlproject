@@ -95,4 +95,6 @@ Project {
     multilanguageSupport: false
     supportedLanguages: ["pl"]
     primaryLanguage: "pl"
+
+    mainUiFile: "content/App.qml"
 }
