@@ -26,6 +26,7 @@ set(ENABLE_TESTS
 project(RaportPKUP)
 
 find_package(TBB CONFIG REQUIRED)
+find_package(unofficial-libgit2 CONFIG REQUIRED)
 
 include(config/Version.cmake)
 configure_file(config/Version.h.in ${CMAKE_CURRENT_LIST_DIR}/config/Version.h

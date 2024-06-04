@@ -1,6 +1,6 @@
 project(RaportPKUP.Core)
 
-set(PRIVATE_LIBS)
+set(PRIVATE_LIBS unofficial::libgit2::libgit2)
 
 set(PUBLIC_LIBS)
 
@@ -13,7 +13,7 @@ set(PUBLIC_HEADERS
     GitRepository.hpp
     ICommand.hpp)
 
-set(SOURCES process_runner.cpp git_repository.cpp)
+set(SOURCES process_runner.cpp git_repository.cpp libgit.cpp)
 
 set(TESTS git_repository.cpp)
 
