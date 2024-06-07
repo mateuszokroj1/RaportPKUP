@@ -21,4 +21,14 @@ class ICastable
   public:
 	virtual ~ICastable() = default;
 };
+
+template <typename ReturnedItemType> class IEnumerator
+{
+  public:
+	virtual ~IEnumerator() = default;
+
+	virtual std::optional<ReturnedItemType> next() = 0;
+};
+
+#define COPY_CONSTRUCTOR(Type) Type(const Type &)
 } // namespace RaportPKUP
