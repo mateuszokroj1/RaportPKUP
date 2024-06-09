@@ -15,15 +15,15 @@ QBindable<QString> MainViewItem::bindableName() const
 	return &_name;
 }
 
-QQuickItem *MainViewItem::content() const
+QQuickItem* MainViewItem::content() const
 {
 	return _content.value();
 }
-void MainViewItem::setContent(QQuickItem *new_value)
+void MainViewItem::setContent(QQuickItem* new_value)
 {
 	_content.setValue(new_value);
 }
-QBindable<QQuickItem *> MainViewItem::bindableContent() const
+QBindable<QQuickItem*> MainViewItem::bindableContent() const
 {
 	return &_content;
 }

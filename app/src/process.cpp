@@ -2,7 +2,7 @@
 
 namespace RaportPKUP::UI
 {
-Process::Process(QObject *parent, QString &&command, QString &&working_directory) : _process(parent)
+Process::Process(QObject* parent, QString&& command, QString&& working_directory) : _process(parent)
 {
 	_process.setWorkingDirectory(std::move(working_directory));
 }
@@ -45,12 +45,12 @@ std::wstring Process::getWorkingDirectory() const
 	return {};
 }
 
-bool Process::waitForFinished(const std::chrono::milliseconds &timeout)
+bool Process::waitForFinished(const std::chrono::milliseconds& timeout)
 {
 	return _process.waitForFinished(timeout.count());
 }
 
-std::shared_ptr<IProcess> ProcessFactory::createNew(const std::wstring &command, const std::wstring &working_directory)
+std::shared_ptr<IProcess> ProcessFactory::createNew(const std::wstring& command, const std::wstring& working_directory)
 {
 	if (auto application = _app.lock())
 		if (auto qapp = application->getQApplication())

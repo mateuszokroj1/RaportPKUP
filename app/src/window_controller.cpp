@@ -18,7 +18,7 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 	}
 }
 
-void WindowController::creatingSteps(QQmlApplicationEngine *qml)
+void WindowController::creatingSteps(QQmlApplicationEngine* qml)
 {
 	auto item = new MainViewItem(this);
 	{
@@ -27,7 +27,7 @@ void WindowController::creatingSteps(QQmlApplicationEngine *qml)
 
 		const QUrl url(u"qrc:/qt/qml/content/DataInputStepView.qml"_qs);
 		QQmlComponent component(qml, url, item);
-		auto view = qobject_cast<QQuickItem *>(component.create());
+		auto view = qobject_cast<QQuickItem*>(component.create());
 		auto errors = component.errors();
 
 		if (!view || !errors.empty())
@@ -45,7 +45,7 @@ void WindowController::creatingSteps(QQmlApplicationEngine *qml)
 
 		const QUrl url(u"qrc:/qt/qml/content/DataFilteringStepView.qml"_qs);
 		QQmlComponent component(qml, url, item);
-		auto view = qobject_cast<QQuickItem *>(component.create());
+		auto view = qobject_cast<QQuickItem*>(component.create());
 		if (!view)
 			return;
 
@@ -61,7 +61,7 @@ void WindowController::creatingSteps(QQmlApplicationEngine *qml)
 
 		const QUrl url(u"qrc:/qt/qml/content/ReportingStepView.qml"_qs);
 		QQmlComponent component(qml, url, item);
-		auto view = qobject_cast<QQuickItem *>(component.create());
+		auto view = qobject_cast<QQuickItem*>(component.create());
 		if (!view)
 			return;
 

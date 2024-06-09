@@ -30,5 +30,5 @@ template <typename ReturnedItemType> class IEnumerator
 	virtual std::optional<ReturnedItemType> next() = 0;
 };
 
-#define COPY_CONSTRUCTOR(Type) Type(const Type &)
+#define COPY_CONSTRUCTOR(Type) Type(const Type&)
 } // namespace RaportPKUP

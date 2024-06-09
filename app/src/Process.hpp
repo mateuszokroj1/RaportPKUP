@@ -10,7 +10,7 @@ namespace RaportPKUP::UI
 class Process final : public IProcess
 {
   public:
-	Process(QObject *parent, QString &&command, QString &&working_directory);
+	Process(QObject* parent, QString&& command, QString&& working_directory);
 	~Process() noexcept override;
 
 	void start() override;
@@ -20,7 +20,7 @@ class Process final : public IProcess
 	std::wstring readError() override;
 	std::vector<std::wstring> getArguments() const override;
 	std::wstring getWorkingDirectory() const override;
-	bool waitForFinished(const std::chrono::milliseconds &) override;
+	bool waitForFinished(const std::chrono::milliseconds&) override;
 
   private:
 	QProcess _process;
@@ -34,8 +34,8 @@ class ProcessFactory final : public IProcessFactory
 	{
 	}
 
-	std::shared_ptr<IProcess> createNew(const std::wstring &command,
-										const std::wstring &working_directory = {}) override;
+	std::shared_ptr<IProcess> createNew(const std::wstring& command,
+										const std::wstring& working_directory = {}) override;
 
   private:
 	std::weak_ptr<Application> _app;

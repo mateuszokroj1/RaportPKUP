@@ -15,7 +15,7 @@ namespace RaportPKUP
 constexpr wchar_t log_column_separator_w = L'|';
 constexpr char log_column_separator = '|';
 
-GitRepository::GitRepository(const std::filesystem::path &path) : _dir(path)
+GitRepository::GitRepository(const std::filesystem::path& path) : _dir(path)
 {
 	if (!checkIsValidPath(path))
 		throw std::invalid_argument("path");
@@ -25,8 +25,8 @@ GitRepository::~GitRepository()
 {
 }
 
-std::vector<std::string> GitRepository::getLog(const std::wstring &path, const std::string &from, const std::string &to,
-											   const std::wstring &author)
+std::vector<std::string> GitRepository::getLog(const std::wstring& path, const std::string& from, const std::string& to,
+											   const std::wstring& author)
 {
 	// git log --all --no-decorate --author=mateuszokroj1@gmail.com
 	// --since='1-Jan-2023' --until='22-Feb-2024' --format='%h|~|~|%ci|~|~|%s'
@@ -60,7 +60,7 @@ std::vector<std::string> GitRepository::getLog(const std::wstring &path, const s
 	return lines;
 }
 
-bool GitRepository::checkIsValidPath(const std::filesystem::path &path)
+bool GitRepository::checkIsValidPath(const std::filesystem::path& path)
 {
 	DWORD err = 0;
 	std::wstring cmd(L"git.exe status");
@@ -103,8 +103,8 @@ Author GitRepository::getSystemConfigAuthor()
 }
 
 std::shared_ptr<std::vector<Commit>> GitRepository::getCommitsFromTimeRange(
-	const std::chrono::time_point<std::chrono::system_clock> &from,
-	const std::chrono::time_point<std::chrono::system_clock> &to, const Author &author) const
+	const std::chrono::time_point<std::chrono::system_clock>& from,
+	const std::chrono::time_point<std::chrono::system_clock>& to, const Author& author) const
 {
 	time_t from_t = std::chrono::system_clock::to_time_t(from);
 	time_t to_t = std::chrono::system_clock::to_time_t(to);
@@ -115,7 +115,7 @@ std::shared_ptr<std::vector<Commit>> GitRepository::getCommitsFromTimeRange(
 		getLog(_dir, from_str.substr(0, from_str.size() - 1), to_str.substr(0, to_str.size() - 1), author.email);
 
 	auto vector = std::make_shared<std::vector<Commit>>();
-	for (const auto &line : commits)
+	for (const auto& line : commits)
 	{
 		Commit c;
 		std::stringstream stream(line);

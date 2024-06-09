@@ -26,10 +26,10 @@ class WindowController : public QObject
 	void itemsChanged();
 
   private:
-	void creatingSteps(QQmlApplicationEngine *qml);
+	void creatingSteps(QQmlApplicationEngine* qml);
 
 	std::weak_ptr<Application> _application;
-	QList<MainViewItem *> _qlist;
+	QList<MainViewItem*> _qlist;
 	QQmlListProperty<MainViewItem> _items;
 	std::shared_ptr<IProcessFactory> _process_factory;
 };

@@ -15,7 +15,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	auto argv = __argv;
 #else
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #endif
 

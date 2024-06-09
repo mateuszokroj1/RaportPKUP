@@ -25,7 +25,7 @@ class Handle
 		}
 	}
 
-	HANDLE *ptr()
+	HANDLE* ptr()
 	{
 		return &_val;
 	}
