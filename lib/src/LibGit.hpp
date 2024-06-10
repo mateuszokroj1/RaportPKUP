@@ -137,7 +137,7 @@ class LibGit_Repository
 	Author getAuthorFromConfig() const;
 
   private:
-	LibGit_Repository(LibGit&);
+	LibGit_Repository(const LibGit&);
 	COPY_CONSTRUCTOR(LibGit_Repository) = delete;
 
 	git_repository* _handle = nullptr;

@@ -180,7 +180,7 @@ LibGit_Remote::~LibGit_Remote() noexcept
 	_handle = nullptr;
 }
 
-LibGit_Repository::LibGit_Repository(LibGit&)
+LibGit_Repository::LibGit_Repository(const LibGit&)
 {
 }
 
@@ -217,19 +217,41 @@ std::list<LibGit_Ref> LibGit_Repository::enumerateAllRemoteBranches() const
 
 std::list<LibGit_Remote> LibGit_Repository::enumerateRemotes() const
 {
+	git_strarray arr;
+	git_remote_list(&arr, _handle);
+
+	std::list<LibGit_Remote> remotes;
+
+	for (size_t i = 0; i < arr.count; ++i)
+	{
+		git_remote* remote = nullptr;
+		git_remote_lookup(&remote, _handle, arr.strings[i]);
+
+		if (remote)
+			remotes.emplace_back(remote);
+
+		delete[] arr.strings[i]; // TODO probably bug
+	}
+
+	delete[] arr.strings;
 }
 
 LibGit_RevisionWalker::Ptr LibGit_Repository::createWalker() const
 {
+	return std::make_shared<LibGit_RevisionWalker>(*this);
 }
 
 Author LibGit_Repository::getAuthorFromConfig() const
 {
 	git_signature* result = nullptr;
-	if (git_signature_default(&result, _handle) != 0)
+	if (git_signature_default(&result, _handle) != 0 || !result)
 		return {};
 
-	// TODO
+	const LibGit_Signature signature(result);
+	Author author;
+	author.name = signature.getName();
+	author.email = signature.getEmail();
+	return author;
 }
 
 LibGit::LibGit()
@@ -242,11 +264,48 @@ LibGit::~LibGit() noexcept
 	git_libgit2_shutdown();
 }
 
-bool LibGit::checkRepositoryIsValid(const std::filesystem::path&) const
+char* getText(const std::wstring& string)
 {
+	char* buf = new char[(string.size() + 1) * 2];
+	wchar_t* src = const_cast<wchar_t*>(string.data());
+
+	std::mbstate_t state;
+	const size_t size = std::wcsrtombs(buf, &src, string.size(), &state);
+
+	if (size < 1)
+	{
+		delete[] buf;
+		return {};
+	}
+
+	char* result = new char[size];
+	std::memcpy(result, buf, size);
+
+	delete[] buf;
+	return result;
 }
 
-LibGit_Repository::Ptr LibGit::openRepository(const std::filesystem::path&) const
+bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
 {
+	const auto str = path.generic_string();
+	const auto result = git_repository_open_ext(nullptr, str.c_str(), 0, nullptr);
+
+	if (result == 0)
+		return true;
+
+	if (result == GIT_ENOTFOUND)
+		return false;
+
+	assert(result != 0, "Error while opening repository.");
+}
+
+LibGit_Repository::Ptr LibGit::openRepository(const std::filesystem::path& path) const
+{
+	auto repo = std::make_shared<LibGit_Repository>(*this);
+
+	if (!repo->tryOpen(path))
+		return {};
+
+	return repo;
 }
 } // namespace RaportPKUP
