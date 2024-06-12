@@ -151,7 +151,7 @@ class LibGit_Repository
 
 	std::vector<LibGit_Ref::Ptr> enumerateAllLocalBranches() const;
 	std::vector<LibGit_Ref::Ptr> enumerateAllRemoteBranches() const;
-	std::list<LibGit_Remote> enumerateRemotes() const;
+	std::vector<LibGit_Remote::Ptr> enumerateRemotes() const;
 
 	LibGit_RevisionWalker::Ptr createWalker() const;
 

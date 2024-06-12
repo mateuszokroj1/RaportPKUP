@@ -18,9 +18,11 @@ class Process final : public IProcess
 	int exitCode() const override;
 	std::wstring readOutput() override;
 	std::wstring readError() override;
-	std::vector<std::wstring> getArguments() const override;
+	std::wstring getCommand() const override;
 	std::wstring getWorkingDirectory() const override;
-	bool waitForFinished(const std::chrono::milliseconds&) override;
+	bool waitForFinished(std::chrono::milliseconds = 30s) override;
+	bool isFinished() const override;
+	bool isError() const override;
 
   private:
 	QProcess _process;

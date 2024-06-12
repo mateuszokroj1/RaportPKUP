@@ -22,7 +22,7 @@ namespace
 std::wstring getWStringFromMBPtr(const char* ptr)
 {
 	const size_t target_size = std::strlen(ptr) + 1;
-	auto name_wstr = std::make_unique<wchar_t>(target_size);
+	auto name_wstr = std::unique_ptr<wchar_t[]>(new wchar_t[target_size]);
 
 	const size_t converted_chars = std::mbstowcs(name_wstr.get(), ptr, target_size);
 
@@ -258,12 +258,12 @@ std::vector<LibGit_Ref::Ptr> LibGit_Repository::enumerateAllRemoteBranches() con
 	return enumerateBranches(*this, GIT_BRANCH_REMOTE);
 }
 
-std::list<LibGit_Remote> LibGit_Repository::enumerateRemotes() const
+std::vector<LibGit_Remote::Ptr> LibGit_Repository::enumerateRemotes() const
 {
 	git_strarray arr;
 	git_remote_list(&arr, _handle);
 
-	std::list<LibGit_Remote> remotes;
+	std::vector<LibGit_Remote::Ptr> remotes;
 
 	for (size_t i = 0; i < arr.count; ++i)
 	{
@@ -271,7 +271,7 @@ std::list<LibGit_Remote> LibGit_Repository::enumerateRemotes() const
 		git_remote_lookup(&remote, _handle, arr.strings[i]);
 
 		if (remote)
-			remotes.emplace_back(remote);
+			remotes.emplace_back(new LibGit_Remote(remote));
 	}
 
 	git_strarray_dispose(&arr);
@@ -322,7 +322,7 @@ bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
 
 LibGit_Repository::Ptr LibGit::openRepository(const std::filesystem::path& path) const
 {
-	auto repo = std::make_shared<LibGit_Repository>(*this);
+	LibGit_Repository::Ptr repo(new LibGit_Repository(*this));
 
 	if (!repo->tryOpen(path))
 		return {};
