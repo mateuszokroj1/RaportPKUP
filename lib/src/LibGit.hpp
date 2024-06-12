@@ -47,6 +47,7 @@ class LibGit_Commit
 
   private:
 	LibGit_Commit(git_commit*);
+	COPY_CONSTRUCTOR(LibGit_Commit) = delete;
 	LibGit_Commit(const LibGit_Repository&, const ::git_oid);
 
 	git_commit* _handle = nullptr;
@@ -55,6 +56,8 @@ class LibGit_Commit
 
 class LibGit_Ref
 {
+	friend class LibGit_BranchIterator;
+
   public:
 	using Ptr = std::shared_ptr<LibGit_Ref>;
 
@@ -71,7 +74,7 @@ class LibGit_Ref
 	git_reference* _handle = nullptr;
 };
 
-class LibGit_RevisionWalker : public IEnumerator<LibGit_Commit>
+class LibGit_RevisionWalker : public IEnumerator<LibGit_Commit::Ptr>
 {
   public:
 	friend class LibGit_Repository;
@@ -85,13 +88,30 @@ class LibGit_RevisionWalker : public IEnumerator<LibGit_Commit>
 	void reset();
 	void setReference(const LibGit_Ref&);
 
-	std::optional<LibGit_Commit> next() override;
+	std::optional<LibGit_Commit::Ptr> next() override;
 
   private:
 	COPY_CONSTRUCTOR(LibGit_RevisionWalker) = delete;
 
 	const LibGit_Repository& _repository;
 	git_revwalk* _handle = nullptr;
+};
+
+class LibGit_BranchIterator : public IEnumerator<LibGit_Ref::Ptr>
+{
+  public:
+	using Ptr = std::shared_ptr<LibGit_BranchIterator>;
+
+	~LibGit_BranchIterator() noexcept override;
+	LibGit_BranchIterator() = delete;
+	LibGit_BranchIterator(const LibGit_Repository&, git_branch_t filter_by_type = git_branch_t::GIT_BRANCH_ALL);
+
+	std::optional<LibGit_Ref::Ptr> next() override;
+
+  private:
+	COPY_CONSTRUCTOR(LibGit_BranchIterator) = delete;
+
+	git_branch_iterator* _handle = nullptr;
 };
 
 class LibGit_Remote
@@ -117,6 +137,7 @@ class LibGit_Repository
 	friend class LibGit_Commit;
 	friend class LibGit_Ref;
 	friend class LibGit_RevisionWalker;
+	friend class LibGit_BranchIterator;
 
   public:
 	using Ptr = std::shared_ptr<LibGit_Repository>;
@@ -128,8 +149,8 @@ class LibGit_Repository
 	bool fetch(const LibGit_Remote&);
 	bool prune(const LibGit_Remote&);
 
-	std::list<LibGit_Ref> enumerateAllLocalBranches() const;
-	std::list<LibGit_Ref> enumerateAllRemoteBranches() const;
+	std::vector<LibGit_Ref::Ptr> enumerateAllLocalBranches() const;
+	std::vector<LibGit_Ref::Ptr> enumerateAllRemoteBranches() const;
 	std::list<LibGit_Remote> enumerateRemotes() const;
 
 	LibGit_RevisionWalker::Ptr createWalker() const;
@@ -153,5 +174,6 @@ class LibGit
 	bool checkRepositoryIsValid(const std::filesystem::path&) const;
 
 	LibGit_Repository::Ptr openRepository(const std::filesystem::path&) const;
+	std::optional<std::filesystem::path> detectRepositoryRootPath(const std::filesystem::path&) const;
 };
 } // namespace RaportPKUP

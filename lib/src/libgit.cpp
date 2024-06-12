@@ -156,16 +156,41 @@ void LibGit_RevisionWalker::reset()
 
 void LibGit_RevisionWalker::setReference(const LibGit_Ref& reference)
 {
+	reset();
 	git_revwalk_push_ref(_handle, reference.name().c_str());
 }
 
-std::optional<LibGit_Commit> LibGit_RevisionWalker::next()
+std::optional<LibGit_Commit::Ptr> LibGit_RevisionWalker::next()
 {
 	git_oid id;
 	if (git_revwalk_next(&id, _handle) == 0)
 		return {};
 
-	return LibGit_Commit(_repository, id);
+	return LibGit_Commit::Ptr(new LibGit_Commit(_repository, id));
+}
+
+LibGit_BranchIterator::LibGit_BranchIterator(const LibGit_Repository& repository, git_branch_t filter_by_type)
+{
+	assert(git_branch_iterator_new(&_handle, repository._handle, filter_by_type) == 0,
+		   "Error while creating LibGit branch iterator.");
+}
+
+LibGit_BranchIterator::~LibGit_BranchIterator() noexcept
+{
+	if (_handle)
+		git_branch_iterator_free(_handle);
+
+	_handle = nullptr;
+}
+
+std::optional<LibGit_Ref::Ptr> LibGit_BranchIterator::next()
+{
+	git_reference* ref;
+	git_branch_t type;
+	if (git_branch_next(&ref, &type, _handle) != 0)
+		return {};
+
+	return LibGit_Ref::Ptr(new LibGit_Ref(ref));
 }
 
 LibGit_Remote::LibGit_Remote(git_remote* handle) : _handle(handle)
@@ -177,10 +202,11 @@ LibGit_Remote::~LibGit_Remote() noexcept
 {
 	if (_handle)
 		git_remote_free(_handle);
+
 	_handle = nullptr;
 }
 
-LibGit_Repository::LibGit_Repository(const LibGit&)
+LibGit_Repository::LibGit_Repository(const LibGit& /* unused */)
 {
 }
 
@@ -207,12 +233,29 @@ bool LibGit_Repository::prune(const LibGit_Remote& remote)
 	return git_remote_prune(remote._handle, nullptr) == 0;
 }
 
-std::list<LibGit_Ref> LibGit_Repository::enumerateAllLocalBranches() const
+namespace
 {
+std::vector<LibGit_Ref::Ptr> enumerateBranches(const LibGit_Repository& repository, git_branch_t filter_by_type)
+{
+	std::vector<LibGit_Ref::Ptr> result;
+	LibGit_BranchIterator iterator(repository, filter_by_type);
+
+	while (auto ptr = iterator.next())
+		if (ptr->operator bool())
+			result.push_back(*ptr);
+
+	return result;
+}
+} // namespace
+
+std::vector<LibGit_Ref::Ptr> LibGit_Repository::enumerateAllLocalBranches() const
+{
+	return enumerateBranches(*this, GIT_BRANCH_LOCAL);
 }
 
-std::list<LibGit_Ref> LibGit_Repository::enumerateAllRemoteBranches() const
+std::vector<LibGit_Ref::Ptr> LibGit_Repository::enumerateAllRemoteBranches() const
 {
+	return enumerateBranches(*this, GIT_BRANCH_REMOTE);
 }
 
 std::list<LibGit_Remote> LibGit_Repository::enumerateRemotes() const
@@ -229,11 +272,10 @@ std::list<LibGit_Remote> LibGit_Repository::enumerateRemotes() const
 
 		if (remote)
 			remotes.emplace_back(remote);
-
-		delete[] arr.strings[i]; // TODO probably bug
 	}
 
-	delete[] arr.strings;
+	git_strarray_dispose(&arr);
+	return remotes;
 }
 
 LibGit_RevisionWalker::Ptr LibGit_Repository::createWalker() const
@@ -264,27 +306,6 @@ LibGit::~LibGit() noexcept
 	git_libgit2_shutdown();
 }
 
-char* getText(const std::wstring& string)
-{
-	char* buf = new char[(string.size() + 1) * 2];
-	wchar_t* src = const_cast<wchar_t*>(string.data());
-
-	std::mbstate_t state;
-	const size_t size = std::wcsrtombs(buf, &src, string.size(), &state);
-
-	if (size < 1)
-	{
-		delete[] buf;
-		return {};
-	}
-
-	char* result = new char[size];
-	std::memcpy(result, buf, size);
-
-	delete[] buf;
-	return result;
-}
-
 bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
 {
 	const auto str = path.generic_string();
@@ -307,5 +328,24 @@ LibGit_Repository::Ptr LibGit::openRepository(const std::filesystem::path& path)
 		return {};
 
 	return repo;
+}
+
+std::optional<std::filesystem::path> LibGit::detectRepositoryRootPath(const std::filesystem::path& path) const
+{
+	git_buf buf{0};
+	if (git_repository_discover(&buf, path.generic_string().c_str(), NULL, nullptr) != 0)
+		return {};
+
+	if (buf.size < 2)
+	{
+		git_buf_free(&buf);
+		return {};
+	}
+
+	std::string str(buf.ptr, buf.size);
+
+	git_buf_dispose(&buf);
+
+	return str;
 }
 } // namespace RaportPKUP
