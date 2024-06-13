@@ -10,6 +10,8 @@ set(PUBLIC_HEADERS
     Author.hpp
     Commit.hpp
     IRepository.hpp
+    IRepositoryDetector.hpp
+    IRepositoryAccessor.hpp
     GitRepository.hpp
     ICommand.hpp)
 

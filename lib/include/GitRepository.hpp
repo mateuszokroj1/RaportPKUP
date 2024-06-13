@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <future>
 
 #include <raportpkup.core_export.h>
 
@@ -24,10 +23,9 @@ class RAPORTPKUP_CORE_EXPORT GitRepository : public IRepository
 										   const std::wstring& author);
 
   public:
-	static bool checkIsValidPath(const std::filesystem::path&);
-	static Author getSystemConfigAuthor();
-	std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(
-		const std::chrono::time_point<std::chrono::system_clock>& from,
-		const std::chrono::time_point<std::chrono::system_clock>& to, const Author& author) const override;
+	std::optional<Author> getDefaultAuthor() const override;
+	std::vector<Commit> getCommitsFromTimeRange(const std::chrono::time_point<std::chrono::system_clock>& from,
+												const std::chrono::time_point<std::chrono::system_clock>& to,
+												const Author& author) const override;
 };
 } // namespace RaportPKUP

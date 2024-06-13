@@ -1,28 +1,25 @@
 #pragma once
 
-#include <chrono>
-#include <memory>
-#include <optional>
-#include <vector>
-
-#include "Commit.hpp"
+#include <future>
+#include <list>
+#include <stop_token>
 
 namespace RaportPKUP
 {
+class Commit;
+class Author;
+
 class IRepository
 {
-  protected:
-	IRepository() = default;
-
   public:
-	IRepository(const IRepository&) = delete;
-	IRepository(IRepository&&) = delete;
-	virtual ~IRepository()
-	{
-	}
+	virtual ~IRepository() = default;
 
-	virtual std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(
-		const std::chrono::time_point<std::chrono::system_clock>& from,
-		const std::chrono::time_point<std::chrono::system_clock>& to, const Author& author) const = 0;
+	virtual std::wstring path() const = 0;
+
+	virtual std::optional<Author> getDefaultAuthor() const = 0;
+
+	virtual std::future<std::list<Commit>> getCommitsFromTimeRange(
+		const std::chrono::utc_clock::time_point& from, const std::chrono::utc_clock::time_point& to,
+		const Author& author, std::optional<std::stop_token> stop_token = {}) const = 0;
 };
 } // namespace RaportPKUP
