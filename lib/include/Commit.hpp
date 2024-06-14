@@ -9,9 +9,10 @@ namespace RaportPKUP
 {
 struct Commit
 {
-	std::string message;
+	std::wstring message;
 	DateTime datetime;
 	std::string id;
+	std::string branch_name;
 	Author author;
 };
 } // namespace RaportPKUP

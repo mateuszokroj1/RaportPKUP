@@ -158,6 +158,7 @@ void LibGit_RevisionWalker::setReference(const LibGit_Ref& reference)
 {
 	reset();
 	git_revwalk_push_ref(_handle, reference.name().c_str());
+	git_revwalk_sorting(_handle, git_sort_t::GIT_SORT_TIME | git_sort_t::GIT_SORT_REVERSE);
 }
 
 std::optional<LibGit_Commit::Ptr> LibGit_RevisionWalker::next()

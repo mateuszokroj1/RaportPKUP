@@ -12,10 +12,11 @@ set(PUBLIC_HEADERS
     IRepository.hpp
     IRepositoryDetector.hpp
     IRepositoryAccessor.hpp
+    GitRepositoryDetector.hpp
     GitRepository.hpp
     ICommand.hpp)
 
-set(SOURCES process_runner.cpp git_repository.cpp libgit.cpp)
+set(SOURCES git_repository.cpp libgit.cpp repository_detector_git.cpp)
 
 set(TESTS git_repository.cpp)
 

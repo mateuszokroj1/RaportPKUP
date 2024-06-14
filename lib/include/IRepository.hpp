@@ -19,7 +19,7 @@ class IRepository
 	virtual std::optional<Author> getDefaultAuthor() const = 0;
 
 	virtual std::future<std::list<Commit>> getCommitsFromTimeRange(
-		const std::chrono::utc_clock::time_point& from, const std::chrono::utc_clock::time_point& to,
+		const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to_exclude,
 		const Author& author, std::optional<std::stop_token> stop_token = {}) const = 0;
 };
 } // namespace RaportPKUP

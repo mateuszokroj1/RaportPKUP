@@ -14,7 +14,7 @@ concept Abstract = std::is_abstract_v<AbstractType>;
 template <class Type>
 concept Final = std::is_final_v<Type>;
 
-using DateTime = std::chrono::time_point<std::chrono::system_clock>;
+using DateTime = std::chrono::utc_clock::time_point;
 
 class ICastable
 {
@@ -31,4 +31,12 @@ template <typename ReturnedItemType> class IEnumerator
 };
 
 #define COPY_CONSTRUCTOR(Type) Type(const Type&)
+
+class CanceledOperationException : public std::exception
+{
+  public:
+	CanceledOperationException() : std::exception("Cancellation requested.")
+	{
+	}
+};
 } // namespace RaportPKUP

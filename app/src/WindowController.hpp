@@ -17,6 +17,11 @@ class WindowController : public QObject
 
 	Q_PROPERTY(QQmlListProperty<MainViewItem> items READ items NOTIFY itemsChanged)
 
+	Q_PROPERTY(QString authorName READ authorName WRITE setAuthorName BINDABLE bindableAuthorName)
+	Q_PROPERTY(QString authorEmail READ authorEmail WRITE setAuthorEmail BINDABLE bindableAuthorEmail)
+
+	Q_PROPERTY(QQmlListProperty<>)
+
 	QQmlListProperty<MainViewItem> items() const
 	{
 		return _items;

@@ -1,145 +1,121 @@
-#include <chrono>
-#include <codecvt>
-#include <locale>
-#include <regex>
-#include <stdexcept>
-#include <windows.h>
+#include "Commit.hpp"
+#include "LibGit.hpp"
+#include "base.hpp"
+#include <tbb/tbb.h>
 
-#include <GitRepository.hpp>
-#include <base.hpp>
-
-#include "process_runner.hpp"
+#include "GitRepository.hpp"
 
 namespace RaportPKUP
 {
-constexpr wchar_t log_column_separator_w = L'|';
-constexpr char log_column_separator = '|';
-
-GitRepository::GitRepository(const std::filesystem::path& path) : _dir(path)
-{
-	if (!checkIsValidPath(path))
-		throw std::invalid_argument("path");
-}
-
-GitRepository::~GitRepository()
+GitRepository::GitRepository(const LibGit& libgit) : _libgit(libgit)
 {
 }
 
-std::vector<std::string> GitRepository::getLog(const std::wstring& path, const std::string& from, const std::string& to,
-											   const std::wstring& author)
+std::optional<Author> GitRepository::getDefaultAuthor() const
 {
-	// git log --all --no-decorate --author=mateuszokroj1@gmail.com
-	// --since='1-Jan-2023' --until='22-Feb-2024' --format='%h|~|~|%ci|~|~|%s'
-	std::wstring cmd = L"git.exe log --all --no-decorate";
-	cmd.append(L" --author=").append(author);
-	cmd.append(L" --format=%h").append(L"|").append(L"%cs").append(L"|").append(L"%s");
-	// cmd.append(L" --since='").append(std::move(std::wstring(from.cbegin(),
-	// from.cend()))).append(L"'"); cmd.append(L"
-	// --until='").append(std::move(std::wstring(to.cbegin(),
-	// to.cend()))).append(L"'");
-
-	DWORD last_error = 0;
-	auto output = process_runner(cmd, path, last_error);
-
-	if (last_error != 0)
-	{
-		return {};
-	}
-
-	std::vector<std::string> lines;
-	std::string line;
-
-	do
-	{
-		std::getline(output, line);
-
-		if (!line.empty())
-			lines.push_back(line);
-	} while (!line.empty());
-
-	return lines;
-}
-
-bool GitRepository::checkIsValidPath(const std::filesystem::path& path)
-{
-	DWORD err = 0;
-	std::wstring cmd(L"git.exe status");
-	auto output = process_runner(cmd, path.wstring(), err);
-
-	if (err != 0)
+	if (!_repository)
 		return {};
 
-	std::string line;
-	std::getline(output, line);
-	return line.starts_with("On branch");
+	return _repository->getAuthorFromConfig();
 }
 
-Author GitRepository::getSystemConfigAuthor()
+std::future<std::list<Commit>> GitRepository::getCommitsFromTimeRange(const std::chrono::utc_clock::time_point& from,
+																	  const std::chrono::utc_clock::time_point& to,
+																	  const Author& author,
+																	  std::optional<std::stop_token> stop_token) const
 {
-	// git config --global user.email; git config --global user.name
-
-	DWORD err = 0;
-	std::wstring cmd(L"git.exe config --global user.email");
-
-	auto output = process_runner(cmd, {}, err);
-
-	if (err != 0)
-		return {};
-
-	std::string email;
-	output >> email;
-
-	cmd = L"git config --global user.name";
-	output = process_runner(cmd, {}, err);
-
-	if (err != 0)
-		return {};
-
-	std::string name;
-	std::getline(output,
-				 name); // TODO implement conversion UTF-8 to wchar, try WinAPI
-
-	return {std::wstring(name.cbegin(), name.cend()), std::wstring(email.cbegin(), email.cend())};
+	return std::async(getCommitsFromTimeRangeImpl, this, from, to, author, stop_token);
 }
 
-std::shared_ptr<std::vector<Commit>> GitRepository::getCommitsFromTimeRange(
-	const std::chrono::time_point<std::chrono::system_clock>& from,
-	const std::chrono::time_point<std::chrono::system_clock>& to, const Author& author) const
+namespace
 {
-	time_t from_t = std::chrono::system_clock::to_time_t(from);
-	time_t to_t = std::chrono::system_clock::to_time_t(to);
-	std::string from_str = std::ctime(&from_t);
-	std::string to_str = std::ctime(&to_t);
+template <typename ValueType> bool _isInRange(const ValueType& value, const ValueType& from, const ValueType& to)
+{
+	return value >= from && value <= to;
+}
+} // namespace
 
-	const auto commits =
-		getLog(_dir, from_str.substr(0, from_str.size() - 1), to_str.substr(0, to_str.size() - 1), author.email);
+bool isInDateRange(const std::chrono::system_clock::time_point& value,
+				   const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to)
+{
+	const std::chrono::year_month_day value_ymd(std::chrono::floor<std::chrono::days>(value));
+	const std::chrono::year_month_day from_ymd(std::chrono::floor<std::chrono::days>(from));
+	const std::chrono::year_month_day to_ymd(std::chrono::floor<std::chrono::days>(to));
 
-	auto vector = std::make_shared<std::vector<Commit>>();
-	for (const auto& line : commits)
-	{
-		Commit c;
-		std::stringstream stream(line);
+	return _isInRange(value_ymd.year(), from_ymd.year(), to_ymd.year()) &&
+		   _isInRange(value_ymd.month(), from_ymd.month(), to_ymd.month()) &&
+		   _isInRange(value_ymd.day(), from_ymd.day(), to_ymd.day());
+}
 
-		{
-			std::string id;
-			std::getline(stream, id, '|');
-			c.id = id;
-		}
-		{
-			std::string datetime;
-			std::getline(stream, datetime, '|');
-			std::istringstream stream_date(datetime);
+std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::system_clock::time_point& from,
+															 const std::chrono::system_clock::time_point& to,
+															 const Author& author,
+															 std::optional<std::stop_token> stop_token) const
+{
+	const auto branches = _repository->enumerateAllRemoteBranches();
 
-			std::chrono::from_stream(stream_date, "%Y-%m-%d", c.datetime);
-		}
+	if (stop_token && stop_token->stop_requested())
+		throw CanceledOperationException();
 
-		std::getline(stream, c.message);
+	std::unique_ptr<std::mutex> mutex;
+	std::list<Commit> list;
 
-		c.author = author;
+	tbb::parallel_for_each(branches.cbegin(), branches.cend(),
+						   [this, stop_token, author, from, to, &mutex, &list](const LibGit_Ref::Ptr ref)
+						   {
+							   auto walker = _repository->createWalker();
+							   if (!walker)
+								   return;
 
-		vector->push_back(std::move(c));
-	}
+							   walker->setReference(*ref);
 
-	return vector;
+							   if (stop_token && stop_token->stop_requested())
+							   {
+								   tbb::task::current_context()->cancel_group_execution();
+								   return;
+							   }
+
+							   while (const auto opt = walker->next())
+							   {
+								   if (const auto commit = *opt)
+								   {
+									   if (stop_token && stop_token->stop_requested())
+									   {
+										   tbb::task::current_context()->cancel_group_execution();
+										   return;
+									   }
+
+									   Commit result;
+									   result.branch_name = ref->name();
+									   const auto time = commit->getTime();
+
+									   if (!isInDateRange(time, from, to))
+										   return;
+
+									   result.author = commit->getAuthor();
+
+									   if (author.email != result.author.email)
+										   continue;
+
+									   result.datetime = std::chrono::clock_cast<std::chrono::utc_clock>(time);
+									   result.message = commit->getShortMessage();
+
+									   auto buf = std::unique_ptr<char[]>(new char[8]);
+									   const auto id = commit->id();
+									   git_oid_tostr(buf.get(), 8, &id);
+									   result.id = {buf.get()};
+
+									   std::unique_lock locker(*mutex);
+									   list.push_back(std::move(result));
+								   }
+							   }
+						   });
+
+	if (stop_token && stop_token->stop_requested())
+		throw CanceledOperationException();
+
+	std::sort(list.begin(), list.end(), [](const Commit& c1, const Commit& c2) { return c1.datetime > c2.datetime; });
+
+	return list;
 }
 } // namespace RaportPKUP
