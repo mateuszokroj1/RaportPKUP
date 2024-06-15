@@ -5,11 +5,13 @@
 #include <memory>
 #include <stop_token>
 
+#include "base.hpp"
+
 namespace RaportPKUP
 {
 class IRepository;
 
-class IRepositoryAccessor
+class IRepositoryAccessor : public ICastable
 {
   public:
 	virtual ~IRepositoryAccessor() = default;

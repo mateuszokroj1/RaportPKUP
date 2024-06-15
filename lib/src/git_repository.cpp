@@ -1,3 +1,5 @@
+#include <filesystem>
+
 #include "Commit.hpp"
 #include "LibGit.hpp"
 #include "base.hpp"
@@ -7,7 +9,8 @@
 
 namespace RaportPKUP
 {
-GitRepository::GitRepository(const LibGit& libgit) : _libgit(libgit)
+GitRepository::GitRepository(const LibGit& libgit, std::shared_ptr<LibGit_Repository> repo, const std::wstring& path)
+	: _libgit(libgit), _repository(repo), _path(path)
 {
 }
 
@@ -19,12 +22,12 @@ std::optional<Author> GitRepository::getDefaultAuthor() const
 	return _repository->getAuthorFromConfig();
 }
 
-std::future<std::list<Commit>> GitRepository::getCommitsFromTimeRange(const std::chrono::utc_clock::time_point& from,
-																	  const std::chrono::utc_clock::time_point& to,
+std::future<std::list<Commit>> GitRepository::getCommitsFromTimeRange(const std::chrono::system_clock::time_point& from,
+																	  const std::chrono::system_clock::time_point& to,
 																	  const Author& author,
 																	  std::optional<std::stop_token> stop_token) const
 {
-	return std::async(getCommitsFromTimeRangeImpl, this, from, to, author, stop_token);
+	return std::async(&GitRepository::getCommitsFromTimeRangeImpl, this, from, to, author, stop_token);
 }
 
 namespace
@@ -100,10 +103,8 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 									   result.datetime = std::chrono::clock_cast<std::chrono::utc_clock>(time);
 									   result.message = commit->getShortMessage();
 
-									   auto buf = std::unique_ptr<char[]>(new char[8]);
 									   const auto id = commit->id();
-									   git_oid_tostr(buf.get(), 8, &id);
-									   result.id = {buf.get()};
+									   git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
 
 									   std::unique_lock locker(*mutex);
 									   list.push_back(std::move(result));
@@ -114,7 +115,7 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 	if (stop_token && stop_token->stop_requested())
 		throw CanceledOperationException();
 
-	std::sort(list.begin(), list.end(), [](const Commit& c1, const Commit& c2) { return c1.datetime > c2.datetime; });
+	// sort
 
 	return list;
 }

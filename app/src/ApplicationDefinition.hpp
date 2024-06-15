@@ -34,7 +34,7 @@ class ApplicationDefinition
 {
   public:
 	template <Abstract InterfaceType, Controller<InterfaceType> ControllerType>
-	ApplicationDefinition* registerController()
+	ApplicationDefinition& registerController()
 	{
 		if (std::any_of(_factories.cbegin(), _factories.cend(),
 						[](const FactoryInfo& info) { return info.interface == typeid(InterfaceType); }))
@@ -73,7 +73,7 @@ class ApplicationDefinition
 
 		_factories.emplace_back(typeid(InterfaceType), typeid(ControllerType), *factory);
 
-		return this;
+		return *this;
 	}
 
   private:

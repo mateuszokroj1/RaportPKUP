@@ -12,6 +12,8 @@ class Author;
 class IRepository
 {
   public:
+	using Ptr = std::shared_ptr<IRepository>;
+
 	virtual ~IRepository() = default;
 
 	virtual std::wstring path() const = 0;

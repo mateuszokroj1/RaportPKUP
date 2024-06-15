@@ -11,7 +11,10 @@ struct Commit
 {
 	std::wstring message;
 	DateTime datetime;
-	std::string id;
+
+	// NULL-terminated SHA string
+	char id[8];
+
 	std::string branch_name;
 	Author author;
 };

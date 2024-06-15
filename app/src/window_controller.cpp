@@ -15,6 +15,8 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 
 		if (auto qml_engine = app_ptr->getQmlEngine())
 			creatingSteps(qml_engine);
+
+		_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
 	}
 }
 

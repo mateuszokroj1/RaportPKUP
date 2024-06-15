@@ -4,11 +4,13 @@
 #include <future>
 #include <optional>
 
+#include "base.hpp"
+
 namespace RaportPKUP
 {
 class IRepositoryAccessor;
 
-class IRepositoryDetector
+class IRepositoryDetector : public ICastable
 {
   public:
 	virtual ~IRepositoryDetector() = default;

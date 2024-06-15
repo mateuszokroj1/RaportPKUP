@@ -164,12 +164,12 @@ class LibGit_Repository
 	git_repository* _handle = nullptr;
 };
 
-class LibGit
+class LibGit : public ICastable
 {
   public:
 	LibGit();
 
-	~LibGit() noexcept;
+	~LibGit() noexcept override;
 
 	bool checkRepositoryIsValid(const std::filesystem::path&) const;
 

@@ -5,8 +5,6 @@
 #include <memory>
 #include <optional>
 
-#include <raportpkup.core_export.h>
-
 #include "IRepository.hpp"
 
 namespace RaportPKUP
@@ -15,16 +13,11 @@ class LibGit;
 class LibGit_Repository;
 class GitRepositoryAccessor;
 
-class RAPORTPKUP_CORE_EXPORT GitRepository : public IRepository
+class GitRepository : public IRepository
 {
-	friend class GitRepositoryAccessor;
-
-  protected:
-	GitRepository(const LibGit&);
-
-	bool tryLoad(const std::filesystem::path&);
-
   public:
+	GitRepository(const LibGit&, std::shared_ptr<LibGit_Repository>, const std::wstring& path);
+
 	std::wstring path() const override
 	{
 		return _path;
