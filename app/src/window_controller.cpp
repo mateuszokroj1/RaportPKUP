@@ -9,14 +9,14 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 {
 	if (auto app_ptr = _application.lock())
 	{
-		auto weak = app_ptr->get<IProcessFactory>();
-		if (!(_process_factory = weak.lock()))
-			return;
+		// auto weak = app_ptr->get<IProcessFactory>();
+		// if (!(_process_factory = weak.lock()))
+		//	return;
 
 		if (auto qml_engine = app_ptr->getQmlEngine())
-			creatingSteps(qml_engine);
+			creatingSteps(*qml_engine);
 
-		_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
+		//_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
 	}
 }
 
@@ -32,12 +32,12 @@ void WindowController::creatingSteps(QQmlApplicationEngine* qml)
 		auto view = qobject_cast<QQuickItem*>(component.create());
 		auto errors = component.errors();
 
-		if (!view || !errors.empty())
-			return;
+		if (view && errors.empty())
+		{
+			item->setContent(view);
 
-		item->setContent(view);
-
-		_qlist.push_back(item);
+			_qlist.push_back(item);
+		}
 	}
 
 	{
@@ -48,12 +48,14 @@ void WindowController::creatingSteps(QQmlApplicationEngine* qml)
 		const QUrl url(u"qrc:/qt/qml/content/DataFilteringStepView.qml"_qs);
 		QQmlComponent component(qml, url, item);
 		auto view = qobject_cast<QQuickItem*>(component.create());
-		if (!view)
-			return;
+		auto errors = component.errors();
 
-		item->setContent(view);
+		if (view && errors.empty())
+		{
+			item->setContent(view);
 
-		_qlist.push_back(item);
+			_qlist.push_back(item);
+		}
 	}
 
 	{
@@ -64,12 +66,14 @@ void WindowController::creatingSteps(QQmlApplicationEngine* qml)
 		const QUrl url(u"qrc:/qt/qml/content/ReportingStepView.qml"_qs);
 		QQmlComponent component(qml, url, item);
 		auto view = qobject_cast<QQuickItem*>(component.create());
-		if (!view)
-			return;
+		auto errors = component.errors();
 
-		item->setContent(view);
+		if (view && errors.empty())
+		{
+			item->setContent(view);
 
-		_qlist.push_back(item);
+			_qlist.push_back(item);
+		}
 	}
 
 	_items = QQmlListProperty<MainViewItem>(this, &_qlist);

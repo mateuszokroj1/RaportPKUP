@@ -44,7 +44,6 @@ T.Button {
                 id: arrowShape
 
                 fillColor: backgroundLayout.backgroundColor
-                //                fillRule: ShapePath.
                 startX: 0
                 startY: 0
                 strokeColor: "#00ffffff"

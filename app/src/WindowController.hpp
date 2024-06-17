@@ -38,7 +38,7 @@ class WindowController : public QObject
 	std::weak_ptr<Application> _application;
 	QList<MainViewItem*> _qlist;
 	QQmlListProperty<MainViewItem> _items;
-	std::shared_ptr<IProcessFactory> _process_factory;
-	std::shared_ptr<IRepositoryDetector> _repository_detector;
+	// std::shared_ptr<IProcessFactory> _process_factory;
+	// std::shared_ptr<IRepositoryDetector> _repository_detector;
 };
 } // namespace RaportPKUP::UI

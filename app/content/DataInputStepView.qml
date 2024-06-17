@@ -34,10 +34,6 @@ ColumnLayout {
 
                 padding: Theme.defaultPadding
                 text: "Zapisz jako"
-
-                onClicked: {
-                    savedPresetCmd.text = "s";
-                }
             }
             UIButton {
                 id: renamePresetCmd

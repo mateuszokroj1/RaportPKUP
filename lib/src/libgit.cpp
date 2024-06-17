@@ -7,13 +7,15 @@ namespace RaportPKUP
 {
 LibGit_Signature::LibGit_Signature(const git_signature* handle) : _handle(handle)
 {
-	assert(!handle, "Handle cannot be nullptr.");
+	if (!handle)
+		throw std::invalid_argument("Handle cannot be nullptr.");
 }
 
 LibGit_Signature::~LibGit_Signature() noexcept
 {
 	if (_handle)
 		git_signature_free(const_cast<git_signature*>(_handle));
+
 	_handle = nullptr;
 }
 
@@ -53,7 +55,8 @@ std::wstring LibGit_Signature::getEmail() const
 
 LibGit_Commit::LibGit_Commit(git_commit* handle) : _handle(handle)
 {
-	assert(!handle, "Handle cannot be nullptr.");
+	if (!handle)
+		throw std::invalid_argument("Handle cannot be nullptr.");
 
 	const auto id_ptr = git_commit_id(handle);
 	_id = *id_ptr;
@@ -115,7 +118,8 @@ std::chrono::system_clock::time_point LibGit_Commit::getTime() const
 
 LibGit_Ref::LibGit_Ref(git_reference* handle) : _handle(handle)
 {
-	assert(!handle, "Handle cannot be nullptr.");
+	if (!handle)
+		throw std::invalid_argument("Handle cannot be nullptr.");
 }
 
 LibGit_Ref::~LibGit_Ref() noexcept
@@ -138,7 +142,16 @@ std::string LibGit_Ref::name() const
 
 LibGit_RevisionWalker::LibGit_RevisionWalker(const LibGit_Repository& repository) : _repository(repository)
 {
-	assert(git_revwalk_new(&_handle, repository._handle) == 0, "Error while creating LibGit revision walker.");
+	if (git_revwalk_new(&_handle, repository._handle) != 0)
+	{
+		auto err = git_error_last();
+		if (!err)
+			throw LibGit_Exception("", 0);
+
+		const std::string msg(err->message);
+
+		throw LibGit_Exception(msg, err->klass);
+	}
 }
 
 LibGit_RevisionWalker::~LibGit_RevisionWalker() noexcept
@@ -151,21 +164,63 @@ LibGit_RevisionWalker::~LibGit_RevisionWalker() noexcept
 
 void LibGit_RevisionWalker::reset()
 {
-	git_revwalk_reset(_handle);
+	if (git_revwalk_reset(_handle) != 0)
+	{
+		auto err = git_error_last();
+		if (!err)
+			throw LibGit_Exception("", 0);
+
+		const std::string msg(err->message);
+
+		throw LibGit_Exception(msg, err->klass);
+	}
 }
 
 void LibGit_RevisionWalker::setReference(const LibGit_Ref& reference)
 {
 	reset();
-	git_revwalk_push_ref(_handle, reference.name().c_str());
-	git_revwalk_sorting(_handle, git_sort_t::GIT_SORT_TIME | git_sort_t::GIT_SORT_REVERSE);
+
+	if (git_revwalk_push_ref(_handle, reference.name().c_str()) != 0)
+	{
+		auto err = git_error_last();
+		if (!err)
+			throw LibGit_Exception("", 0);
+
+		const std::string msg(err->message);
+
+		throw LibGit_Exception(msg, err->klass);
+	}
+
+	if (git_revwalk_sorting(_handle, git_sort_t::GIT_SORT_TIME | git_sort_t::GIT_SORT_REVERSE) != 0)
+	{
+		auto err = git_error_last();
+		if (!err)
+			throw LibGit_Exception("", 0);
+
+		const std::string msg(err->message);
+
+		throw LibGit_Exception(msg, err->klass);
+	}
 }
 
 std::optional<LibGit_Commit::Ptr> LibGit_RevisionWalker::next()
 {
 	git_oid id;
-	if (git_revwalk_next(&id, _handle) == 0)
+	const auto result = git_revwalk_next(&id, _handle);
+
+	if (result == GIT_ITEROVER)
 		return {};
+
+	if (result != 0)
+	{
+		auto err = git_error_last();
+		if (!err)
+			throw LibGit_Exception("", 0);
+
+		const std::string msg(err->message);
+
+		throw LibGit_Exception(msg, err->klass);
+	}
 
 	return LibGit_Commit::Ptr(new LibGit_Commit(_repository, id));
 }
@@ -188,15 +243,30 @@ std::optional<LibGit_Ref::Ptr> LibGit_BranchIterator::next()
 {
 	git_reference* ref;
 	git_branch_t type;
-	if (git_branch_next(&ref, &type, _handle) != 0)
+
+	const auto result = git_branch_next(&ref, &type, _handle);
+
+	if (result == GIT_ITEROVER)
 		return {};
+
+	if (result != 0)
+	{
+		auto err = git_error_last();
+		if (!err)
+			throw LibGit_Exception("", 0);
+
+		const std::string msg(err->message);
+
+		throw LibGit_Exception(msg, err->klass);
+	}
 
 	return LibGit_Ref::Ptr(new LibGit_Ref(ref));
 }
 
 LibGit_Remote::LibGit_Remote(git_remote* handle) : _handle(handle)
 {
-	assert(!handle, "Handle cannot be nullptr.");
+	if (!handle)
+		throw std::invalid_argument("Handle cannot be nullptr.");
 }
 
 LibGit_Remote::~LibGit_Remote() noexcept
@@ -221,7 +291,10 @@ LibGit_Repository::~LibGit_Repository() noexcept
 
 bool LibGit_Repository::tryOpen(const std::filesystem::path& dir) noexcept
 {
-	return git_repository_open(&_handle, dir.generic_string().c_str()) == 0;
+	if (_handle)
+		return false;
+
+	return git_repository_open(&_handle, dir.generic_string().c_str()) == 0 && _handle;
 }
 
 bool LibGit_Repository::fetch(const LibGit_Remote& remote)

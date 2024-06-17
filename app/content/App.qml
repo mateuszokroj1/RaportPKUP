@@ -6,7 +6,7 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.5
 import QtQuick.Shapes
 
-WindowUIText {
+Window {
     id: mainWindow
 
     color: Theme.windowBackground
@@ -17,7 +17,7 @@ WindowUIText {
     visible: true
     width: 800
 
-    StepSelectorUIText {
+    StepSelector {
         id: content
 
         anchors.fill: parent

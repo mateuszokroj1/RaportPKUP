@@ -7,7 +7,7 @@ namespace RaportPKUP
 class GitRepositoryDetectorDI final : public GitRepositoryDetector
 {
   public:
-	GitRepositoryDetectorDI(UI::Application&);
+	GitRepositoryDetectorDI(std::weak_ptr<UI::Application> app);
 
   private:
 	const GitRepositoryAccessor& getAccessorImpl() const override

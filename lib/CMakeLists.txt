@@ -1,8 +1,8 @@
 project(RaportPKUP.Core)
 
-set(PRIVATE_LIBS unofficial::libgit2::libgit2 TBB::tbb)
+set(PRIVATE_LIBS TBB::tbb)
 
-set(PUBLIC_LIBS)
+set(PUBLIC_LIBS unofficial::libgit2::libgit2)
 
 set(PUBLIC_HEADERS
     base.hpp

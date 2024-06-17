@@ -9,6 +9,15 @@
 
 namespace RaportPKUP
 {
+class LibGit_Exception : public std::runtime_error
+{
+  public:
+	LibGit_Exception(const std::string& message, int error_code);
+
+  private:
+	int error_code;
+};
+
 class LibGit_Signature
 {
   public:

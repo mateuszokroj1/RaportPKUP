@@ -16,6 +16,7 @@ qt6_add_qml_module(
   fonts/FiraSans-Regular.ttf
   QML_FILES
   Fonts.qml
+  FormField.ui.qml
   Theme.qml
   UIText.ui.qml
   UIButton.ui.qml

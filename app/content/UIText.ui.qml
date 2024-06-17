@@ -1,6 +1,6 @@
-import QtQuick 6.2 as SYS
+import QtQuick 6.2
 
-SYS.Text {
+Text {
     id: contentItem
 
     color: Theme.windowText

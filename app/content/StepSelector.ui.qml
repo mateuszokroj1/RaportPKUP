@@ -65,8 +65,8 @@ RowLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 children: [content]
-                implicitHeight: content.implicitHeight
-                implicitWidth: content.implicitWidth
+                //implicitHeight: content.implicitHeight
+                //implicitWidth: content.implicitWidth
             }
         }
     }

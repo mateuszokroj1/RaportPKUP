@@ -7,9 +7,13 @@
 
 namespace RaportPKUP
 {
-GitRepositoryDetectorDI::GitRepositoryDetectorDI(UI::Application& app)
+GitRepositoryDetectorDI::GitRepositoryDetectorDI(std::weak_ptr<UI::Application> app)
 {
-	if (auto ptr = app.get<GitRepositoryAccessor>().lock())
+	auto application = app.lock();
+	if (!application)
+		throw std::exception("");
+
+	if (auto ptr = application->get<GitRepositoryAccessor>().lock())
 	{
 		_accessor = ptr;
 	}
