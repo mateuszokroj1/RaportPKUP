@@ -25,7 +25,7 @@ void SignalHandler(int signal)
 
 namespace RaportPKUP::UI
 {
-void ApplicationBuilder::build(ApplicationDefinition &&definition, Application &application)
+void ApplicationBuilder::build(ApplicationDefinition&& definition, Application& application)
 {
 	application._factories = std::move(definition._factories);
 
@@ -36,7 +36,7 @@ Application::Application() : _ptr(this, EmptyDeleter<Application>{})
 {
 }
 
-int Application::run(int argc, char *argv[])
+int Application::run(int argc, char* argv[])
 {
 	if (!_is_built || _is_running)
 		return -1;
@@ -53,7 +53,7 @@ int Application::run(int argc, char *argv[])
 		const QUrl url(u"qrc:/qt/qml/Main/main.qml"_qs);
 		QObject::connect(
 			_qml.get(), &QQmlApplicationEngine::objectCreated, app,
-			[url](QObject *obj, const QUrl &objUrl)
+			[url](QObject* obj, const QUrl& objUrl)
 			{
 				if (!obj && url == objUrl)
 					QCoreApplication::exit(-1);

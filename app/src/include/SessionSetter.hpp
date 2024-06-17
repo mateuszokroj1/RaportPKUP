@@ -5,7 +5,7 @@ namespace RaportPKUP::UI
 template <typename T, T start_value, T end_value> class SessionSetter final
 {
   public:
-	SessionSetter(T *value_ptr) : _ptr(value_ptr)
+	SessionSetter(T* value_ptr) : _ptr(value_ptr)
 	{
 		if (value_ptr)
 			*value_ptr = start_value;
@@ -18,6 +18,6 @@ template <typename T, T start_value, T end_value> class SessionSetter final
 	}
 
   private:
-	T *_ptr = nullptr;
+	T* _ptr = nullptr;
 };
 } // namespace RaportPKUP::UI

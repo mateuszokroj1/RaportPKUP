@@ -1,35 +1,67 @@
 import QtQuick 6.2
 import QtQuick.Layouts
-
-import content
+import QtQuick.Controls
 
 ColumnLayout {
-    id: root
+    Item {
+        id: toolbar
 
-    antialiasing: true
-    spacing: 0
-
-    RowLayout {
-        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-        Layout.fillWidth: true
-        spacing: 0
+        implicitHeight: toolbarLayout.implicitHeight
+        implicitWidth: toolbarLayout.implicitWidth
 
         Rectangle {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            color: "gray"
+            anchors.fill: parent
+            color: Theme.menuBackground
             z: -1
         }
-        UIText {
-            text: "Zapisane presety:"
-        }
-        TextInput {
-            id: textInput
+        RowLayout {
+            id: toolbarLayout
 
-            font.pixelSize: 12
-            text: qsTr("Text Input")
+            spacing: Theme.defaultPadding
+
+            UIText {
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                text: "Wstępnie zdefiniowane ustawienia:"
+            }
+            ComboBox {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.margins: Theme.defaultPadding
+                editable: true
+            }
+            UIButton {
+                id: savePresetCmd
+
+                padding: Theme.defaultPadding
+                text: "Zapisz jako"
+            }
+            UIButton {
+                id: renamePresetCmd
+
+                text: "Zmień nazwę"
+            }
+            UIButton {
+                id: deletePresetCmd
+
+                text: "Usuń"
+            }
         }
-        UIButton {
+    }
+    ColumnLayout {
+        RowLayout {
+            InputField {
+                Layout.fillWidth: true
+            }
+            UIButton {
+                text: "Wybierz folder"
+            }
+            UIButton {
+                text: "Dodaj"
+            }
+        }
+        ListView {
+            Layout.fillWidth: true
+            Layout.minimumHeight: 100
         }
     }
 }

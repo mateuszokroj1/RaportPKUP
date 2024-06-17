@@ -3,5 +3,6 @@ BasedOnStyle: Microsoft
 TabWidth: '4'
 UseTab: Always
 BreakBeforeBraces: Allman
+PointerAlignment: Left
 
 ...

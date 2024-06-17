@@ -10,19 +10,15 @@ import QtQuick.Layouts
 import QtQuick.Shapes
 import QtQuick.Templates as T
 
-import app
-
 T.Button {
     id: control
 
     property double arrowWidth: 25
 
-    anchors.margins: 0
     antialiasing: true
-    display: AbstractButton.TextOnly
     implicitHeight: implicitContentHeight + topPadding + bottomPadding
     implicitWidth: implicitContentWidth + leftPadding + rightPadding + arrowWidth
-    padding: 10
+    padding: Theme.defaultPadding
     text: "My Button"
 
     background: RowLayout {
@@ -48,9 +44,9 @@ T.Button {
                 id: arrowShape
 
                 fillColor: backgroundLayout.backgroundColor
-                fillRule: ShapePath.WindingFill
                 startX: 0
                 startY: 0
+                strokeColor: "#00ffffff"
                 strokeWidth: 0
 
                 PathLine {
@@ -72,9 +68,8 @@ T.Button {
         Text {
             id: textItem
 
-            color: "black"
-            font.family: "Calibri"
-            font.pointSize: 12
+            color: Theme.windowText
+            font: Theme.defaultFont
             horizontalAlignment: Text.AlignLeft
             text: control.text
             verticalAlignment: Text.AlignVCenter
@@ -86,7 +81,7 @@ T.Button {
             when: control.hovered && !control.checked && control.enabled
 
             PropertyChanges {
-                backgroundColor: "white"
+                backgroundColor: Theme.highlightedElementBackground
                 target: backgroundLayout
             }
             PropertyChanges {
@@ -105,7 +100,7 @@ T.Button {
             PropertyChanges {
                 color: Theme.highlightedElementBackground
                 font.bold: true
-                font.pointSize: 14
+                font.pointSize: Theme.fontSize + 1
                 target: textItem
             }
         },
@@ -114,7 +109,7 @@ T.Button {
             when: !control.enabled
 
             PropertyChanges {
-                color: "gray"
+                color: Theme.disabledText
                 target: textItem
             }
         }

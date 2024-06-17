@@ -1,39 +1,35 @@
 import QtQuick 6.2
 import QtQuick.Layouts
-import QtQuick.Templates as T
+import QtQuick.Controls
 
-import app
-
-T.Button {
+Button {
     id: root
 
     property QtObject command
-    property double radius: 10
 
     checkable: false
     enabled: command != null ? command.canExecute : true
-    font.family: Theme.fontFamily
-    font.pointSize: Theme.fontSize
+    font: Theme.defaultFont
+    implicitHeight: implicitContentHeight + topPadding + bottomPadding + 2
+    implicitWidth: implicitContentWidth + leftPadding + rightPadding + 2
+    padding: Theme.defaultPadding
     text: "Button"
 
     background: Rectangle {
         id: rectangle
 
         anchors.fill: root
+        border.color: Theme.windowText
+        border.width: 1
         color: Theme.controlBackground
-        radius: root.radius
+        radius: Theme.radius
     }
-    contentItem: RowLayout {
-        anchors.fill: root
+    contentItem: Text {
+        id: content
 
-        Text {
-            id: content
-
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            color: Theme.windowText
-            font: root.font
-            text: root.text
-        }
+        color: Theme.windowText
+        font: root.font
+        text: root.text
     }
     states: [
         State {
@@ -41,7 +37,11 @@ T.Button {
             when: root.flat
 
             PropertyChanges {
-                color: "#00ffffff"
+                color: "transparent"
+                target: rectangle
+            }
+            PropertyChanges {
+                border.width: 0
                 target: rectangle
             }
         },
@@ -57,13 +57,18 @@ T.Button {
                 color: Theme.activatedElementText
                 target: content
             }
+        },
+        State {
+            name: "disabledNonFlat"
+            when: root.highlighted && !root.flat
+
+            PropertyChanges {
+                border.color: Theme.disabledText
+                color: Theme.disabledBackground
+                target: rectangle
+            }
         }
     ]
-
-    onClicked: {
-        if (command != null && command.canExecute)
-            command.execute();
-    }
 
     StateGroup {
         id: stateGroup
@@ -74,10 +79,18 @@ T.Button {
                 when: !root.enabled
 
                 PropertyChanges {
-                    color: "#757575"
+                    color: Theme.disabledText
                     target: content
                 }
             }
         ]
+    }
+    Connections {
+        function onClicked() {
+            if (command != null && command.canExecute)
+                command.execute();
+        }
+
+        target: root
     }
 }

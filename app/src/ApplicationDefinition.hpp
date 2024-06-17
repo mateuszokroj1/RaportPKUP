@@ -17,7 +17,7 @@ struct FactoryInfo
 {
 	using Factory = std::function<std::shared_ptr<ICastable>(std::weak_ptr<Application>)>;
 
-	FactoryInfo(std::type_index interface, std::type_index controller, const Factory &factory)
+	FactoryInfo(std::type_index interface, std::type_index controller, const Factory& factory)
 		: factory(factory), interface(interface), controller(controller)
 	{
 	}
@@ -34,16 +34,16 @@ class ApplicationDefinition
 {
   public:
 	template <Abstract InterfaceType, Controller<InterfaceType> ControllerType>
-	ApplicationDefinition *registerController()
+	ApplicationDefinition& registerController()
 	{
 		if (std::any_of(_factories.cbegin(), _factories.cend(),
-						[](const FactoryInfo &info) { return info.interface == typeid(InterfaceType); }))
+						[](const FactoryInfo& info) { return info.interface == typeid(InterfaceType); }))
 		{
 			throw std::exception("Currently one instance for interface is supported.");
 		}
 
 		if (std::any_of(_factories.cbegin(), _factories.cend(),
-						[](const FactoryInfo &info) { return info.controller == typeid(ControllerType); }))
+						[](const FactoryInfo& info) { return info.controller == typeid(ControllerType); }))
 		{
 			throw std::exception("Already registered.");
 		}
@@ -54,7 +54,7 @@ class ApplicationDefinition
 		{
 			factory = [](std::weak_ptr<Application> app)
 			{
-				ControllerType *new_instance = new ControllerType(app);
+				ControllerType* new_instance = new ControllerType(app);
 				return std::shared_ptr<ICastable>(new_instance);
 			};
 		}
@@ -63,7 +63,7 @@ class ApplicationDefinition
 		{
 			factory = [](std::weak_ptr<Application>)
 			{
-				ControllerType *new_instance = new ControllerType;
+				ControllerType* new_instance = new ControllerType;
 				return std::shared_ptr<ICastable>(new_instance);
 			};
 		}
@@ -73,7 +73,7 @@ class ApplicationDefinition
 
 		_factories.emplace_back(typeid(InterfaceType), typeid(ControllerType), *factory);
 
-		return this;
+		return *this;
 	}
 
   private:

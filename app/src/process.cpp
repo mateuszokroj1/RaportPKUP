@@ -2,7 +2,7 @@
 
 namespace RaportPKUP::UI
 {
-Process::Process(QObject *parent, QString &&command, QString &&working_directory) : _process(parent)
+Process::Process(QObject* parent, QString&& command, QString&& working_directory) : _process(parent)
 {
 	_process.setWorkingDirectory(std::move(working_directory));
 }
@@ -27,17 +27,23 @@ int Process::exitCode() const
 
 std::wstring Process::readOutput()
 {
-	return {};
+	const auto arr = _process.readAllStandardOutput();
+	const QString string(arr);
+
+	return string.toStdWString();
 }
 
 std::wstring Process::readError()
 {
-	return {};
+	const auto arr = _process.readAllStandardError();
+	const QString string(arr);
+
+	return string.toStdWString();
 }
 
-std::vector<std::wstring> Process::getArguments() const
+std::wstring Process::getCommand() const
 {
-	return {};
+	return _command.toStdWString();
 }
 
 std::wstring Process::getWorkingDirectory() const
@@ -45,12 +51,22 @@ std::wstring Process::getWorkingDirectory() const
 	return {};
 }
 
-bool Process::waitForFinished(const std::chrono::milliseconds &timeout)
+bool Process::waitForFinished(std::chrono::milliseconds timeout)
 {
 	return _process.waitForFinished(timeout.count());
 }
 
-std::shared_ptr<IProcess> ProcessFactory::createNew(const std::wstring &command, const std::wstring &working_directory)
+bool Process::isFinished() const
+{
+	return _process.state() == QProcess::NotRunning;
+}
+
+bool Process::isError() const
+{
+	return _process.exitStatus() == QProcess::ExitStatus::CrashExit;
+}
+
+std::shared_ptr<IProcess> ProcessFactory::createNew(const std::wstring& command, const std::wstring& working_directory)
 {
 	if (auto application = _app.lock())
 		if (auto qapp = application->getQApplication())

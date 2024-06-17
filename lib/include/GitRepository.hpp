@@ -1,33 +1,41 @@
 #pragma once
 
+#include <chrono>
 #include <filesystem>
-#include <future>
-
-#include <raportpkup.core_export.h>
+#include <memory>
+#include <optional>
 
 #include "IRepository.hpp"
 
 namespace RaportPKUP
 {
-class RAPORTPKUP_CORE_EXPORT GitRepository : public IRepository
+class LibGit;
+class LibGit_Repository;
+class GitRepositoryAccessor;
+
+class GitRepository : public IRepository
 {
   public:
-	explicit GitRepository(const std::filesystem::path &);
-	~GitRepository() override;
+	GitRepository(const LibGit&, std::shared_ptr<LibGit_Repository>, const std::wstring& path);
+
+	std::wstring path() const override
+	{
+		return _path;
+	}
+
+	std::optional<Author> getDefaultAuthor() const override;
+
+	std::future<std::list<Commit>> getCommitsFromTimeRange(
+		const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to,
+		const Author& author, std::optional<std::stop_token> stop_token = {}) const override;
 
   private:
-	GitRepository() = default;
+	std::list<Commit> getCommitsFromTimeRangeImpl(const std::chrono::system_clock::time_point& from,
+												  const std::chrono::system_clock::time_point& to, const Author& author,
+												  std::optional<std::stop_token> stop_token) const;
 
-	const std::filesystem::path _dir;
-
-	static std::vector<std::string> getLog(const std::wstring &path, const std::string &from, const std::string &to,
-										   const std::wstring &author);
-
-  public:
-	static bool checkIsValidPath(const std::filesystem::path &);
-	static Author getSystemConfigAuthor();
-	std::shared_ptr<std::vector<Commit>> getCommitsFromTimeRange(
-		const std::chrono::time_point<std::chrono::system_clock> &from,
-		const std::chrono::time_point<std::chrono::system_clock> &to, const Author &author) const override;
+	std::wstring _path;
+	std::shared_ptr<LibGit_Repository> _repository;
+	const LibGit& _libgit;
 };
 } // namespace RaportPKUP

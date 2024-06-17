@@ -18,7 +18,7 @@ class Application final
 
 	Application();
 
-	int run(int argc, char *argv[]);
+	int run(int argc, char* argv[]);
 
 	QPointer<QQmlApplicationEngine> getQmlEngine() const
 	{
@@ -42,7 +42,7 @@ class Application final
 			if (_active_controllers.contains(search_index))
 				return std::dynamic_pointer_cast<DependencyType>(_active_controllers[search_index]);
 
-			iterator = std::find_if(_factories.begin(), _factories.end(), [&search_index](const FactoryInfo &pair)
+			iterator = std::find_if(_factories.begin(), _factories.end(), [&search_index](const FactoryInfo& pair)
 									{ return pair.interface == search_index || pair.controller == search_index; });
 
 			if (iterator == _factories.cend())
@@ -66,8 +66,8 @@ class Application final
 	}
 
   private:
-	Application(const Application &) = delete;
-	Application(Application &&) = delete;
+	Application(const Application&) = delete;
+	Application(Application&&) = delete;
 
 	bool _is_built = false;
 	bool _is_running = false;
@@ -83,10 +83,10 @@ class ApplicationBuilder
 {
   private:
 	ApplicationBuilder() = delete;
-	ApplicationBuilder(const ApplicationBuilder &) = delete;
-	ApplicationBuilder(ApplicationBuilder &&) = delete;
+	ApplicationBuilder(const ApplicationBuilder&) = delete;
+	ApplicationBuilder(ApplicationBuilder&&) = delete;
 
   public:
-	static void build(ApplicationDefinition &&, Application &);
+	static void build(ApplicationDefinition&&, Application&);
 };
 } // namespace RaportPKUP::UI

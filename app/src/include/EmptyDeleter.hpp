@@ -4,7 +4,7 @@ namespace RaportPKUP::UI
 {
 template <typename T> struct EmptyDeleter
 {
-	void operator()(T *)
+	void operator()(T*)
 	{
 	}
 };

@@ -1,8 +1,8 @@
 project(RaportPKUP.Core)
 
-set(PRIVATE_LIBS)
+set(PRIVATE_LIBS TBB::tbb)
 
-set(PUBLIC_LIBS)
+set(PUBLIC_LIBS unofficial::libgit2::libgit2)
 
 set(PUBLIC_HEADERS
     base.hpp
@@ -10,10 +10,13 @@ set(PUBLIC_HEADERS
     Author.hpp
     Commit.hpp
     IRepository.hpp
-    GitRepository.hpp
+    IRepositoryDetector.hpp
+    IRepositoryAccessor.hpp
+    GitRepositoryAccessor.hpp
+    GitRepositoryDetector.hpp
     ICommand.hpp)
 
-set(SOURCES process_runner.cpp git_repository.cpp)
+set(SOURCES git_repository.cpp libgit.cpp repository_detector_git.cpp)
 
 set(TESTS git_repository.cpp)
 

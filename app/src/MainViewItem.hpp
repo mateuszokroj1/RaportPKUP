@@ -15,13 +15,13 @@ class MainViewItem : public QObject
 	QML_ELEMENT
 
 	Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged BINDABLE bindableName DESIGNABLE true REQUIRED)
-	Q_PROPERTY(QQuickItem *content READ content WRITE setContent NOTIFY contentChanged BINDABLE bindableContent
+	Q_PROPERTY(QQuickItem* content READ content WRITE setContent NOTIFY contentChanged BINDABLE bindableContent
 				   DESIGNABLE true)
 	Q_PROPERTY(
 		bool isEnabled READ isEnabled WRITE enable NOTIFY isEnabledChanged BINDABLE bindableIsEnabled DESIGNABLE true)
 
   public:
-	MainViewItem(QObject *parent = nullptr) : QObject(parent)
+	MainViewItem(QObject* parent = nullptr) : QObject(parent)
 	{
 	}
 
@@ -29,9 +29,9 @@ class MainViewItem : public QObject
 	void setName(QString new_name);
 	QBindable<QString> bindableName() const;
 
-	QQuickItem *content() const;
-	void setContent(QQuickItem *new_value);
-	QBindable<QQuickItem *> bindableContent() const;
+	QQuickItem* content() const;
+	void setContent(QQuickItem* new_value);
+	QBindable<QQuickItem*> bindableContent() const;
 
 	bool isEnabled() const;
 	void enable(bool new_value);
@@ -44,7 +44,7 @@ class MainViewItem : public QObject
 
   private:
 	Q_OBJECT_BINDABLE_PROPERTY(MainViewItem, QString, _name, &MainViewItem::nameChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(MainViewItem, QQuickItem *, _content, &MainViewItem::contentChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(MainViewItem, QQuickItem*, _content, &MainViewItem::contentChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(MainViewItem, bool, _is_enabled, &MainViewItem::isEnabledChanged)
 };
 } // namespace RaportPKUP::UI
