@@ -4,7 +4,10 @@
 #include <regex>
 #include <source_location>
 
+#include <Author.hpp>
+#include <Commit.hpp>
 #include <GitRepository.hpp>
+#include <LibGit.hpp>
 
 using namespace std::filesystem;
 

@@ -1,7 +1,7 @@
 #include <cassert>
 #include <filesystem>
 
-#include "LibGit.hpp"
+#include <LibGit.hpp>
 
 namespace RaportPKUP
 {
@@ -227,8 +227,16 @@ std::optional<LibGit_Commit::Ptr> LibGit_RevisionWalker::next()
 
 LibGit_BranchIterator::LibGit_BranchIterator(const LibGit_Repository& repository, git_branch_t filter_by_type)
 {
-	assert(git_branch_iterator_new(&_handle, repository._handle, filter_by_type) == 0,
-		   "Error while creating LibGit branch iterator.");
+	if (git_branch_iterator_new(&_handle, repository._handle, filter_by_type) != 0)
+	{
+		auto err = git_error_last();
+		if (!err)
+			throw LibGit_Exception("", 0);
+
+		const std::string msg(err->message);
+
+		throw LibGit_Exception(msg, err->klass);
+	}
 }
 
 LibGit_BranchIterator::~LibGit_BranchIterator() noexcept
@@ -391,7 +399,13 @@ bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
 	if (result == GIT_ENOTFOUND)
 		return false;
 
-	assert(result != 0, "Error while opening repository.");
+	auto err = git_error_last();
+	if (!err)
+		throw LibGit_Exception("", 0);
+
+	const std::string msg(err->message);
+
+	throw LibGit_Exception(msg, err->klass);
 }
 
 LibGit_Repository::Ptr LibGit::openRepository(const std::filesystem::path& path) const
