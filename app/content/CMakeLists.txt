@@ -30,6 +30,10 @@ qt6_add_qml_module(
   SOURCES
   ../src/MainViewItem.hpp
   ../src/MainViewItem.cpp
+  ../src/CommitItem.hpp
+  ../src/commit_item.cpp
+  ../src/RepositoryListItem.hpp
+  ../src/repository_list_item.cpp
   ../src/Command.hpp
   ../src/Command.cpp
   ../src/InputDataState.hpp)

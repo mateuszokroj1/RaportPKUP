@@ -9,14 +9,14 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 {
 	if (auto app_ptr = _application.lock())
 	{
-		// auto weak = app_ptr->get<IProcessFactory>();
-		// if (!(_process_factory = weak.lock()))
-		//	return;
+		auto weak = app_ptr->get<IProcessFactory>();
+		if (!(_process_factory = weak.lock()))
+			return;
 
 		if (auto qml_engine = app_ptr->getQmlEngine())
-			creatingSteps(*qml_engine);
+			creatingSteps(qml_engine);
 
-		//_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
+		_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
 	}
 }
 

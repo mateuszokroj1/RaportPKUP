@@ -26,6 +26,10 @@ qt_add_executable(
   src/main.cpp
   src/window_controller.cpp
   src/WindowController.hpp
+  src/CommitItem.hpp
+  src/commit_item.cpp
+  src/RepositoryListItem.hpp
+  src/repository_list_item.cpp
   src/Application.cpp
   src/process.cpp)
 
