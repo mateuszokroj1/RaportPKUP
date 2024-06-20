@@ -19,6 +19,7 @@ class WindowController : public QObject
 
   public:
 	WindowController(std::weak_ptr<Application> app);
+	~WindowController() noexcept override;
 
 	Q_PROPERTY(QQmlListProperty<MainViewItem> items READ items NOTIFY itemsChanged)
 
@@ -39,8 +40,7 @@ class WindowController : public QObject
 				   bindableCanFetchBefore)
 
 	/* Filtering */
-	Q_PROPERTY(bool isFilteringEnabled READ isFilteringEnabled NOTIFY isFilteringEnabledChanged BINDABLE
-				   bindableIsFilteringEnabled)
+	Q_PROPERTY(bool isFilteringEnabled READ isFilteringEnabled NOTIFY isFilteringEnabledChanged)
 	Q_PROPERTY(QQmlListProperty<CommitItem> commits READ commits NOTIFY commitsChanged)
 
 	QQmlListProperty<MainViewItem> items() const
@@ -48,8 +48,8 @@ class WindowController : public QObject
 		return _items;
 	}
 
-	QQmlListProperty<RepositoryListItem> repositories() const;
-	QQmlListProperty<CommitItem> commits() const;
+	QQmlListProperty<RepositoryListItem> repositories();
+	QQmlListProperty<CommitItem> commits();
 
 	QString authorName() const;
 	QString authorEmail() const;
@@ -59,6 +59,8 @@ class WindowController : public QObject
 	bool canFetchBefore() const;
 
 	bool isFilteringEnabled() const;
+
+	QString raportFileName() const;
 
 	void setAuthorName(QString);
 	void setAuthorEmail(QString);
@@ -73,7 +75,6 @@ class WindowController : public QObject
 	QBindable<QDate> bindableToDay() const;
 	QBindable<QDir> bindableRepositoryPath() const;
 	QBindable<bool> bindableCanFetchBefore() const;
-	QBindable<bool> bindableIsFilteringEnabled() const;
 
   signals:
 	void itemsChanged();
@@ -86,19 +87,27 @@ class WindowController : public QObject
 	void canFetchBeforeChanged();
 
 	void isFilteringEnabledChanged();
-
 	void commitsChanged();
 
+  public:
+	Q_INVOKABLE void browseForRepository();
 	Q_INVOKABLE void addRepository();
+	Q_INVOKABLE void removeRepository(RepositoryListItem*);
+	Q_INVOKABLE void clearRepositories();
 
 	Q_INVOKABLE void searchForCommits();
+	Q_INVOKABLE void removeCommit(CommitItem*);
+
+	Q_INVOKABLE void saveRaportToFile();
 
   private:
 	void creatingSteps(QQmlApplicationEngine* qml);
 
 	std::weak_ptr<Application> _application;
-	QList<MainViewItem*> _qlist;
+	QList<MainViewItem*> _items_list;
 	QQmlListProperty<MainViewItem> _items;
+	QList<RepositoryListItem*> _repositories;
+	QList<CommitItem*> _commits;
 	std::shared_ptr<IProcessFactory> _process_factory;
 	std::shared_ptr<IRepositoryDetector> _repository_detector;
 
@@ -107,7 +116,6 @@ class WindowController : public QObject
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _fromDay, &fromDayChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _toDay, &toDayChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDir, _repositoryPath, &repositoriesChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, bool, _canFetchBefore, &canFetchBeforeChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, bool, _isFilteringEnabled, &isFilteringEnabledChanged)
+	Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(WindowController, bool, _canFetchBefore, true, &canFetchBeforeChanged)
 };
 } // namespace RaportPKUP::UI
