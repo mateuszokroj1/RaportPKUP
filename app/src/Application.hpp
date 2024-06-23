@@ -43,7 +43,7 @@ class Application final
 				return std::dynamic_pointer_cast<DependencyType>(_active_controllers[search_index]);
 
 			iterator = std::find_if(_factories.begin(), _factories.end(), [&search_index](const FactoryInfo& pair)
-									{ return pair.interface == search_index || pair.controller == search_index; });
+									{ return pair.inter == search_index || pair.controller == search_index; });
 
 			if (iterator == _factories.cend())
 				return {};

@@ -90,9 +90,9 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 
 									   Commit result;
 									   result.branch_name = ref->name();
-									   const auto time = commit->getTime();
+									   result.datetime = commit->getTime();
 
-									   if (!isInDateRange(time, from, to))
+									   if (!isInDateRange(result.datetime, from, to))
 										   return;
 
 									   result.author = commit->getAuthor();
@@ -100,7 +100,6 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 									   if (author.email != result.author.email)
 										   continue;
 
-									   result.datetime = std::chrono::clock_cast<std::chrono::utc_clock>(time);
 									   result.message = commit->getShortMessage();
 
 									   const auto id = commit->id();

@@ -110,10 +110,12 @@ Author LibGit_Commit::getAuthor()
 	return author;
 }
 
-std::chrono::system_clock::time_point LibGit_Commit::getTime() const
+DateTime LibGit_Commit::getTime() const
 {
 	const auto git_time = git_commit_time(_handle);
-	return std::chrono::system_clock::from_time_t(git_time);
+	auto point = std::chrono::system_clock::from_time_t(git_time);
+
+	return std::chrono::time_point_cast<std::chrono::milliseconds>(point);
 }
 
 LibGit_Ref::LibGit_Ref(git_reference* handle) : _handle(handle)

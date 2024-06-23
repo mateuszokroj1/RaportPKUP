@@ -54,7 +54,7 @@ class LibGit_Commit
 	git_oid id() const;
 	std::wstring getShortMessage() const;
 	Author getAuthor();
-	std::chrono::system_clock::time_point getTime() const;
+	DateTime getTime() const;
 
   private:
 	LibGit_Commit(git_commit*);

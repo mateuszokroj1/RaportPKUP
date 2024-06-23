@@ -32,7 +32,7 @@ class WindowController : public QObject
 	Q_PROPERTY(QDate fromDay READ fromDay WRITE setFromDay NOTIFY fromDayChanged BINDABLE bindableFromDay)
 	Q_PROPERTY(QDate toDay READ toDay WRITE setToDay NOTIFY toDayChanged BINDABLE bindableToDay)
 
-	Q_PROPERTY(QDir repositoryPath READ repositoryPath WRITE setRepositoryPath NOTIFY repositoryPathChanged BINDABLE
+	Q_PROPERTY(QString repositoryPath READ repositoryPath WRITE setRepositoryPath NOTIFY repositoryPathChanged BINDABLE
 				   bindableRepositoryPath)
 	Q_PROPERTY(QQmlListProperty<RepositoryListItem> repositories READ repositories NOTIFY repositoriesChanged)
 
@@ -55,7 +55,7 @@ class WindowController : public QObject
 	QString authorEmail() const;
 	QDate fromDay() const;
 	QDate toDay() const;
-	QDir repositoryPath() const;
+	QString repositoryPath() const;
 	bool canFetchBefore() const;
 
 	bool isFilteringEnabled() const;
@@ -66,14 +66,14 @@ class WindowController : public QObject
 	void setAuthorEmail(QString);
 	void setFromDay(QDate);
 	void setToDay(QDate);
-	void setRepositoryPath(QDir);
+	void setRepositoryPath(QString);
 	void setCanFetchBefore(bool);
 
 	QBindable<QString> bindableAuthorName() const;
 	QBindable<QString> bindableAuthorEmail() const;
 	QBindable<QDate> bindableFromDay() const;
 	QBindable<QDate> bindableToDay() const;
-	QBindable<QDir> bindableRepositoryPath() const;
+	QBindable<QString> bindableRepositoryPath() const;
 	QBindable<bool> bindableCanFetchBefore() const;
 
   signals:
@@ -85,7 +85,6 @@ class WindowController : public QObject
 	void repositoriesChanged();
 	void repositoryPathChanged();
 	void canFetchBeforeChanged();
-
 	void isFilteringEnabledChanged();
 	void commitsChanged();
 
@@ -111,11 +110,12 @@ class WindowController : public QObject
 	std::shared_ptr<IProcessFactory> _process_factory;
 	std::shared_ptr<IRepositoryDetector> _repository_detector;
 
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _authorName, &authorNameChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _authorEmail, &authorEmailChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _fromDay, &fromDayChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _toDay, &toDayChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDir, _repositoryPath, &repositoriesChanged)
-	Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(WindowController, bool, _canFetchBefore, true, &canFetchBeforeChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _authorName, &WindowController::authorNameChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _authorEmail, &WindowController::authorEmailChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _fromDay, &WindowController::fromDayChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _toDay, &WindowController::toDayChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _repositoryPath, &WindowController::repositoriesChanged)
+	Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(WindowController, bool, _canFetchBefore, true,
+										 &WindowController::canFetchBeforeChanged)
 };
 } // namespace RaportPKUP::UI
