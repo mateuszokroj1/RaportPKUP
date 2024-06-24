@@ -12,7 +12,9 @@ namespace RaportPKUP
 class LibGit_Exception : public std::runtime_error
 {
   public:
-	LibGit_Exception(const std::string& message, int error_code);
+	LibGit_Exception(const std::string& message, int error_code) : std::runtime_error(message), error_code(error_code)
+	{
+	}
 
   private:
 	int error_code;
@@ -52,7 +54,7 @@ class LibGit_Commit
 	git_oid id() const;
 	std::wstring getShortMessage() const;
 	Author getAuthor();
-	std::chrono::system_clock::time_point getTime() const;
+	DateTime getTime() const;
 
   private:
 	LibGit_Commit(git_commit*);

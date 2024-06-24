@@ -11,7 +11,7 @@ project(
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Qml Quick)
+find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Qml Quick Widgets)
 qt_standard_project_setup()
 
 set(os_mode "")
@@ -26,6 +26,10 @@ qt_add_executable(
   src/main.cpp
   src/window_controller.cpp
   src/WindowController.hpp
+  src/CommitItem.hpp
+  src/commit_item.cpp
+  src/RepositoryListItem.hpp
+  src/repository_list_item.cpp
   src/Application.cpp
   src/process.cpp)
 

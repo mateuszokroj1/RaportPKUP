@@ -17,12 +17,12 @@ struct FactoryInfo
 {
 	using Factory = std::function<std::shared_ptr<ICastable>(std::weak_ptr<Application>)>;
 
-	FactoryInfo(std::type_index interface, std::type_index controller, const Factory& factory)
-		: factory(factory), interface(interface), controller(controller)
+	FactoryInfo(std::type_index inter, std::type_index controller, const Factory& factory)
+		: factory(factory), inter(inter), controller(controller)
 	{
 	}
 
-	std::type_index interface;
+	std::type_index inter;
 	std::type_index controller;
 	Factory factory;
 };
@@ -37,7 +37,7 @@ class ApplicationDefinition
 	ApplicationDefinition& registerController()
 	{
 		if (std::any_of(_factories.cbegin(), _factories.cend(),
-						[](const FactoryInfo& info) { return info.interface == typeid(InterfaceType); }))
+						[](const FactoryInfo& info) { return info.inter == typeid(InterfaceType); }))
 		{
 			throw std::exception("Currently one instance for interface is supported.");
 		}
