@@ -3,12 +3,7 @@
 #include <QQmlApplicationEngine>
 #include <qqmlcontext.h>
 
-#include "app_environment.h"
-#include "import_qml_components_plugins.h"
-#include "import_qml_plugins.h"
-
-#include "include/EmptyDeleter.hpp"
-#include "include/SessionSetter.hpp"
+#include "EmptyDeleter.hpp"
 
 #include "Application.hpp"
 #include "WindowController.hpp"
@@ -42,10 +37,6 @@ int Application::run(int argc, char* argv[])
 		return -1;
 
 	{
-		SessionSetter<bool, true, false> locker(&_is_running);
-
-		set_qt_environment();
-
 		auto app = new QGuiApplication(argc, argv);
 		_main_app.reset(app);
 
@@ -81,7 +72,11 @@ int Application::run(int argc, char* argv[])
 
 		controller.setParent(_qml->rootObjects().first());
 
-		return app->exec();
+		_is_running = true;
+		const auto result = app->exec();
+		_is_running = false;
+
+		return result;
 	}
 }
 } // namespace RaportPKUP::UI

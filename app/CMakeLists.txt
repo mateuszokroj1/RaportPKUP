@@ -11,7 +11,7 @@ project(
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Qml Quick Widgets)
+find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Qml Quick)
 qt_standard_project_setup()
 
 set(os_mode "")
@@ -20,30 +20,33 @@ if(WIN32)
   set(os_mode "WIN32")
 endif()
 
-qt_add_executable(
+qt_add_executable(${executable_name} ${os_mode} src/main.cpp)
+
+qt6_add_qml_module(
   ${executable_name}
-  ${os_mode}
-  src/main.cpp
-  src/window_controller.cpp
-  src/WindowController.hpp
-  src/CommitItem.hpp
-  src/commit_item.cpp
-  src/RepositoryListItem.hpp
-  src/repository_list_item.cpp
-  src/Application.cpp
-  src/process.cpp)
+  URI
+  "Main"
+  VERSION
+  1.0
+  IMPORTS
+  logic
+  content
+  RESOURCE_PREFIX
+  "/qt/qml"
+  NO_PLUGIN
+  QML_FILES
+  main.qml)
+
+target_link_libraries(
+  ${executable_name}
+  PRIVATE logic
+  PRIVATE content)
 
 target_include_directories(${executable_name}
                            PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
-if(WIN32)
-  configure_file(app.rc.in app.rc @ONLY)
-  target_sources(${executable_name} PUBLIC app.rc)
-endif()
-
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  target_compile_definitions(${executable_name} PRIVATE RAPORTPKUP_NOSIGNAL)
-endif()
+target_include_directories(${executable_name}
+                           PRIVATE "${CMAKE_SOURCE_DIR}/config/Version.h")
 
 qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES
                  qtquickcontrols2.conf)
@@ -52,6 +55,14 @@ target_link_libraries(${executable_name} PRIVATE Qt6::Core Qt6::Gui Qt6::Qml
                                                  Qt6::Quick)
 
 target_link_libraries(${executable_name} PUBLIC RaportPKUP.Core)
+if(WIN32)
+  configure_file(app.rc.in app.rc @ONLY)
+  target_sources(${executable_name} PUBLIC app.rc)
+endif()
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  target_compile_definitions(${executable_name} PRIVATE RAPORTPKUP_NOSIGNAL)
+endif()
 
 if(WIN32)
   add_custom_command(
@@ -65,21 +76,16 @@ if(WIN32)
   add_custom_command(
     TARGET ${executable_name}
     POST_BUILD
-    COMMAND ${windep} --qmldir ${CMAKE_CURRENT_LIST_DIR}
+    COMMAND ${windep} --qmldir ${CMAKE_SOURCE_DIR}
             $<TARGET_FILE_DIR:${executable_name}>)
 endif()
 
-target_include_directories(${executable_name}
-                           PRIVATE "${CMAKE_SOURCE_DIR}/config/Version.h")
-
 if(BUILD_QDS_COMPONENTS)
-  include(${CMAKE_CURRENT_SOURCE_DIR}/qmlcomponents)
+  include(qmlcomponents)
 endif()
 
-include(qmlmodules.cmake)
-
 if(LINK_INSIGHT)
-  include(${CMAKE_CURRENT_SOURCE_DIR}/insight)
+  include(insight)
 endif()
 
 install(
@@ -89,7 +95,7 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 if(WIN32)
-  install(CODE "set(_qmldir \"${CMAKE_CURRENT_LIST_DIR}\")")
+  install(CODE "set(_qmldir \"${CMAKE_SOURCE_DIR}\")")
 
   install(
     CODE [[
@@ -102,7 +108,6 @@ if(WIN32)
   ]])
 endif()
 
-# make IDEs aware of the QML import path
-set(QML_IMPORT_PATH
-    ${PROJECT_BINARY_DIR}/qml
-    CACHE PATH "Path to the custom QML components defined by the project")
+# make IDEs aware of the QML import path set(QML_IMPORT_PATH
+# ${PROJECT_BINARY_DIR}/qml CACHE PATH "Path to the custom QML components
+# defined by the project")

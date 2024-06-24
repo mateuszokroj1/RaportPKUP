@@ -2,7 +2,7 @@
 
 #include <QProcess>
 
-#include "Application.hpp"
+#include <Application.hpp>
 #include <include/IProcess.hpp>
 
 namespace RaportPKUP::UI

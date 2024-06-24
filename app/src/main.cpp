@@ -1,3 +1,7 @@
+#include "app_environment.h"
+#include "import_qml_components_plugins.h"
+#include "import_qml_plugins.h"
+
 #include "Application.hpp"
 #include "Process.hpp"
 #include "include/IProcess.hpp"
@@ -48,5 +52,6 @@ int main(int argc, char* argv[])
 	Application app;
 	ApplicationBuilder::build(std::move(definition), app);
 
+	set_qt_environment();
 	app.run(argc, argv);
 }

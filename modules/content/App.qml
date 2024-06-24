@@ -6,6 +6,8 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.5
 import QtQuick.Shapes
 
+import logic
+
 Window {
     id: mainWindow
 
