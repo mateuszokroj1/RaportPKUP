@@ -270,11 +270,19 @@ void WindowController::addRepository()
 	const auto wstr = repositoryPath().toStdWString();
 
 	// TODO find duplicate
-
+	std::optional<Author> author;
 	if (auto repo = accessor.openRepository(std::filesystem::path(std::move(wstr))).get())
 	{
+		author = repo->getDefaultAuthor();
+
 		_repositories.push_back(new RepositoryListItem(std::move(repo), this));
 		emit repositoriesChanged();
+	}
+
+	if (_repositories.count() == 1 && author)
+	{
+		setAuthorEmail(QString::fromStdWString(author->email));
+		setAuthorName(QString::fromStdWString(author->name));
 	}
 }
 
@@ -323,7 +331,7 @@ void WindowController::searchForCommits()
 		//					   });
 	}
 
-	std::unique(result.begin(), result.end(), [](const Commit& a, const Commit& b) { return a.id == b.id; });
+	// std::unique(result.begin(), result.end(), [](const Commit& a, const Commit& b) { return a.id == b.id; });
 
 	// std::sort(result.begin(), result.end(), [](const Commit& a, const Commit& b) { return a.datetime >= b.datetime;
 	// });

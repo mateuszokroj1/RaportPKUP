@@ -16,6 +16,7 @@ namespace RaportPKUP::UI
 class WindowController : public QObject
 {
 	Q_OBJECT
+	QML_ELEMENT
 
   public:
 	WindowController(std::weak_ptr<Application> app);
