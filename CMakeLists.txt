@@ -46,4 +46,9 @@ if(${ENABLE_TESTS})
 endif()
 
 add_subdirectory(lib)
+
+find_package(Qt6 6.7 REQUIRED COMPONENTS Core Quick)
+set(CMAKE_AUTOMOC true)
+add_subdirectory(modules/logic)
+add_subdirectory(modules/content)
 add_subdirectory(app)

@@ -1,27 +1,19 @@
 import QmlProject
 
 Project {
-    mainFile: "content/App.qml"
+    mainFile: "modules/content/App.qml"
 
     /* Include .qml, .js, and image files from current directory and subdirectories */
     QmlFiles {
-        directory: "content"
-    }
-
-    QmlFiles {
-        directory: "shared"
+        directory: "modules/content"
     }
 
     JavaScriptFiles {
-        directory: "content"
-    }
-
-    JavaScriptFiles {
-        directory: "shared"
+        directory: "modules/content"
     }
 
     ImageFiles {
-        directory: "content"
+        directory: "modules/content"
     }
 
     Files {
@@ -71,7 +63,7 @@ Project {
     qt6Project: true
 
     /* List of plugin directories passed to QML runtime */
-    importPaths: [ "shared", "content" ]
+    importPaths: [ "modules/logic", "modules/content" ]
 
     /* Required for deployment */
     targetDirectory: "/opt/app"
@@ -96,5 +88,5 @@ Project {
     supportedLanguages: ["pl"]
     primaryLanguage: "pl"
 
-    mainUiFile: "content/App.qml"
+    mainUiFile: "modules/content/App.qml"
 }

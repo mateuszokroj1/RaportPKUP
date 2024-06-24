@@ -3,7 +3,6 @@
 #include <QtCore/QUuid>
 #include <QtGui/QDesktopServices>
 #include <QtQml/qqmllist.h>
-// #include <QtWidgets/QFileDialog>
 
 // #include <tbb/tbb.h>
 
