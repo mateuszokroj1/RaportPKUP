@@ -23,6 +23,6 @@ Window {
         id: content
 
         anchors.fill: parent
-        items: controller.items
+        items: controller ? controller.items : null
     }
 }

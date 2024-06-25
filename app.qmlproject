@@ -63,7 +63,7 @@ Project {
     qt6Project: true
 
     /* List of plugin directories passed to QML runtime */
-    importPaths: [ "modules/logic", "modules/content" ]
+    importPaths: [ "modules", "out/build/modules" ]
 
     /* Required for deployment */
     targetDirectory: "/opt/app"
