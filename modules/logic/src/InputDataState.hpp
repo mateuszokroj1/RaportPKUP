@@ -9,7 +9,7 @@ namespace RaportPKUP::UI
 class InputDataState
 {
 	Q_GADGET
-	QML_VALUE_TYPE(inputDataState)
+	QML_VALUE_TYPE(InputDataState)
 
   public:
 	enum States : char

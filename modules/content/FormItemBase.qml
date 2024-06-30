@@ -5,4 +5,5 @@ import logic
 
 Item {
     property int dataState: InputDataState.Indeterminate
+    property string invalidateMessage
 }

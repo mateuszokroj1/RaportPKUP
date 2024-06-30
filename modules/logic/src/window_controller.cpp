@@ -2,6 +2,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUuid>
 #include <QtGui/QDesktopServices>
+#include <QtQml/QQmlContext>
 #include <QtQml/qqmllist.h>
 
 // #include <tbb/tbb.h>
@@ -9,6 +10,7 @@
 #include <include/IProcess.hpp>
 #include <include/IRepositoryAccessor.hpp>
 
+#include "InputDataState.hpp"
 #include "WindowController.hpp"
 
 using namespace Qt::Literals::StringLiterals;
@@ -36,7 +38,8 @@ class RepositoryVisitorImpl : public IRepositoryVisitor
 	std::list<Commit> commits;
 };
 
-WindowController::WindowController(std::weak_ptr<Application> app) : _application(app)
+WindowController::WindowController(std::weak_ptr<Application> app)
+	: _application(app), _addRepositoryCmd(new Command(this)), _searchForCommitsCmd(new Command(this))
 {
 	if (auto app_ptr = _application.lock())
 	{
@@ -53,6 +56,11 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 	const auto today = QDate::currentDate();
 	_fromDay.setValue(QDate(today.year(), today.month(), 1));
 	_toDay.setValue(QDate(today.year(), today.month(), today.daysInMonth()));
+
+	//_addRepositoryCmd->bindableCanExecute().setBinding([this](){ return !_repositoryPath.value().isEmpty(); });
+	connect(_addRepositoryCmd, &Command::onExecute, this, &WindowController::addRepository);
+
+	connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
 
 	connect(this, &WindowController::commitsChanged, this, &WindowController::isFilteringEnabledChanged);
 }
@@ -73,8 +81,13 @@ void WindowController::creatingSteps(QQmlApplicationEngine* qml)
 
 		const QUrl url(u"qrc:/qt/qml/content/DataInputStepView.qml"_qs);
 		QQmlComponent component(qml, url, item);
-		auto view = qobject_cast<QQuickItem*>(component.create());
+		// component. ->setContextProperty("controller", this);
+
+		auto view = qobject_cast<QQuickItem*>(component.create(qml->rootContext()));
 		auto errors = component.errors();
+
+		for (auto e : errors)
+			qFatal() << e.toString();
 
 		if (view && errors.empty())
 		{
@@ -144,6 +157,11 @@ QString WindowController::authorEmail() const
 	return _authorEmail.value();
 }
 
+QString WindowController::city() const
+{
+	return _city.value();
+}
+
 QDate WindowController::fromDay() const
 {
 	return _fromDay.value();
@@ -179,6 +197,11 @@ void WindowController::setAuthorEmail(QString value)
 	_authorEmail.setValue(std::move(value));
 }
 
+void WindowController::setCity(QString value)
+{
+	_city.setValue(std::move(value));
+}
+
 void WindowController::setFromDay(QDate value)
 {
 	if (value > _toDay.value())
@@ -201,10 +224,12 @@ void WindowController::setRepositoryPath(QString value)
 	if (!dir.exists())
 	{
 		_repositoryPath.setValue("");
+		_repositoryPath.notify();
 		return;
 	}
 
 	_repositoryPath.setValue(value);
+	_repositoryPath.notify();
 }
 
 void WindowController::setCanFetchBefore(bool value)
@@ -220,6 +245,11 @@ QBindable<QString> WindowController::bindableAuthorName() const
 QBindable<QString> WindowController::bindableAuthorEmail() const
 {
 	return &_authorEmail;
+}
+
+QBindable<QString> WindowController::bindableCity() const
+{
+	return &_city;
 }
 
 QBindable<QDate> WindowController::bindableFromDay() const

@@ -1,9 +1,9 @@
 import QtQuick 6.2
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 ColumnLayout {
-    Layout.alignment: Qt.AlignTop
     anchors.fill: parent
     spacing: 0
 
@@ -36,22 +36,25 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.margins: Theme.defaultPadding
                 editable: true
+                enabled: false
             }
             UIButton {
                 id: savePresetCmd
 
-                padding: Theme.defaultPadding
+                enabled: false
                 text: "Zapisz jako"
             }
             UIButton {
                 id: renamePresetCmd
 
+                enabled: false
                 text: "Zmień nazwę"
             }
             UIButton {
                 id: deletePresetCmd
 
                 Layout.rightMargin: Theme.defaultPadding
+                enabled: false
                 text: "Usuń"
             }
         }
@@ -68,57 +71,123 @@ ColumnLayout {
 
             InputField {
                 Layout.fillWidth: true
+                value: parent.controller.repositoryPath
             }
             UIButton {
                 text: "Wybierz folder"
+
+                onClicked: directoryDialog.open()
             }
             UIButton {
                 text: "Dodaj"
             }
         }
-        ScrollView {
+        FolderDialog {
+            id: directoryDialog
+
+            acceptLabel: "Wybierz"
+            modality: Qt.WindowModal
+            rejectLabel: "Anuluj"
+            title: "Wybierz folder repozytorium"
+
+            onAccepted: controller.setRepositoryPath(directoryDialog.folder)
+        }
+        ListView {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.margins: Theme.defaultPadding
-            Layout.minimumHeight: 300
+            model: controller.repositories
 
-            background: Rectangle {
-                border.color: "grey"
-                border.width: 1
-                color: "transparent"
-                radius: 5
-            }
+            delegate: Item {
+                id: repoList_item
 
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: Theme.defaultPadding
+                required property string path
 
-                Item {
-                    Rectangle {
-                        anchors.fill: parent
-                        z: -1
-                    }
-                    ColumnLayout {
-                        Layout.alignment: Qt.AlignTop
-                        anchors.fill: parent
+                anchors.left: parent.left
+                anchors.margins: 15
+                anchors.right: parent.right
+                implicitHeight: repoList_itemLayout.implicitHeight
+                implicitWidth: repoList_itemLayout.implicitWidth
 
-                        RowLayout {
-                            Layout.alignment: Qt.AlignTop
-                            Layout.fillWidth: true
-                            Layout.margins: 3
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#eeeeee"
+                }
+                RowLayout {
+                    id: repoList_itemLayout
 
-                            Text {
-                                id: name
+                    anchors.fill: parent
 
-                                Layout.fillWidth: true
-                                text: qsTr("text")
-                            }
-                            Button {
-                                text: "a"
-                            }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.margins: Theme.defaultPadding
+
+                        UIText {
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                            elide: Text.ElideMiddle
+                            text: path
+                            wrapMode: Text.NoWrap
                         }
                     }
+                    UIButton {
+                        Layout.alignment: Qt.AlignRight
+                        Layout.bottomMargin: Theme.defaultPadding
+                        Layout.rightMargin: Theme.defaultPadding
+                        Layout.topMargin: Theme.defaultPadding
+                        text: "Usuń"
+
+                        onClicked: controller.removeRepository(model)
+                    }
                 }
+            }
+        }
+        RowLayout {
+            Layout.alignment: Qt.AlignTop
+            Layout.fillWidth: true
+
+            FormField {
+                label: "Imię i nazwisko"
+
+                InputField {
+                    value: controller.authorName
+                }
+            }
+            FormField {
+                label: "Adres e-mail"
+
+                InputField {
+                    value: controller.authorEmail
+                }
+            }
+        }
+        ColumnLayout {
+            Layout.alignment: Qt.AlignTop
+            Layout.fillWidth: true
+
+            RowLayout {
+                InputField {
+                    value: controller.fromDay
+                }
+                InputField {
+                    value: controller.toDay
+                }
+            }
+            RowLayout {
+                InputField {
+                    placeholderText: "Miejscowość"
+                    value: controller.city
+                }
+                CheckBox {
+                    checked: controller.canFetchBefore
+                    text: "Pobierz informacje o zmianach przed przeszukaniem"
+                }
+            }
+        }
+        RowLayout {
+            UIButton {
+                Layout.alignment: Qt.AlignCenter
+                highlighted: true
+                text: "Przeszukaj repozytoria"
             }
         }
     }

@@ -21,7 +21,7 @@ class RepositoryListItem : public QObject, public IRepositoryVisitorAccept
 	{
 	}
 
-	Q_PROPERTY(QString path READ path STORED false)
+	Q_PROPERTY(QString path READ path STORED false CONSTANT)
 
 	QString path() const;
 	std::optional<Author> getDefaultAuthor() const
