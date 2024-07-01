@@ -9,7 +9,6 @@
 #include "Application.hpp"
 #include "Command.hpp"
 #include "CommitItem.hpp"
-#include "MainViewItem.hpp"
 #include "RepositoryListItem.hpp"
 
 namespace RaportPKUP::UI
@@ -22,8 +21,6 @@ class WindowController : public QObject
   public:
 	WindowController(std::weak_ptr<Application> app);
 	~WindowController() noexcept override;
-
-	Q_PROPERTY(QQmlListProperty<MainViewItem> items READ items NOTIFY itemsChanged)
 
 	/* Data input */
 	// Q_PROPERTY(QString presetSelectorText READ presetSelectorText WRITE setPresetSelectorText NOTIFY
@@ -54,11 +51,6 @@ class WindowController : public QObject
 	Q_PROPERTY(Command* addRepositoryCmd READ addRepositoryCmd CONSTANT)
 	Q_PROPERTY(Command* searchForCommitsCmd READ searchForCommitsCmd CONSTANT)
 
-	QQmlListProperty<MainViewItem> items() const
-	{
-		return _items;
-	}
-
 	QQmlListProperty<RepositoryListItem> repositories();
 	QQmlListProperty<CommitItem> commits();
 
@@ -76,13 +68,14 @@ class WindowController : public QObject
 
 	QString previewDocument() const
 	{
-		return {};
+		return {}; // TODO
 	}
 
 	Command* addRepositoryCmd() const
 	{
 		return _addRepositoryCmd;
 	}
+
 	Command* searchForCommitsCmd() const
 	{
 		return _searchForCommitsCmd;
@@ -130,11 +123,7 @@ class WindowController : public QObject
 	Q_INVOKABLE void saveRaportToFile();
 
   private:
-	void creatingSteps(QQmlApplicationEngine* qml);
-
 	std::weak_ptr<Application> _application;
-	QList<MainViewItem*> _items_list;
-	QQmlListProperty<MainViewItem> _items;
 	QList<RepositoryListItem*> _repositories;
 	QList<CommitItem*> _commits;
 	std::shared_ptr<IProcessFactory> _process_factory;
@@ -148,7 +137,7 @@ class WindowController : public QObject
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _city, &WindowController::cityChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _fromDay, &WindowController::fromDayChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _toDay, &WindowController::toDayChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _repositoryPath, &WindowController::repositoriesChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _repositoryPath, &WindowController::repositoryPathChanged)
 	Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(WindowController, bool, _canFetchBefore, true,
 										 &WindowController::canFetchBeforeChanged)
 };

@@ -10,8 +10,6 @@ qt_add_library(
   src/commit_item.cpp
   src/GitAccessImpl.hpp
   src/InputDataState.hpp
-  src/MainViewItem.hpp
-  src/main_view_item.cpp
   src/Process.hpp
   src/process.cpp
   src/RepositoryListItem.hpp
@@ -33,8 +31,6 @@ qt6_add_qml_module(
   src/CommitItem.hpp
   src/commit_item.cpp
   src/InputDataState.hpp
-  src/MainViewItem.hpp
-  src/main_view_item.cpp
   src/Process.hpp
   src/process.cpp
   src/RepositoryListItem.hpp

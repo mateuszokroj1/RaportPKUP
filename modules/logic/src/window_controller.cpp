@@ -48,9 +48,6 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 			return;
 
 		_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
-
-		if (auto qml_engine = app_ptr->getQmlEngine())
-			creatingSteps(qml_engine);
 	}
 
 	const auto today = QDate::currentDate();
@@ -67,74 +64,8 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 
 WindowController::~WindowController() noexcept
 {
-	qDeleteAll(_items_list);
 	qDeleteAll(_repositories);
 	qDeleteAll(_commits);
-}
-
-void WindowController::creatingSteps(QQmlApplicationEngine* qml)
-{
-	auto item = new MainViewItem(this);
-	{
-		item->setName(u"Wprowadzanie danych"_qs);
-		item->enable(true);
-
-		const QUrl url(u"qrc:/qt/qml/content/DataInputStepView.qml"_qs);
-		QQmlComponent component(qml, url, item);
-		// component. ->setContextProperty("controller", this);
-
-		auto view = qobject_cast<QQuickItem*>(component.create(qml->rootContext()));
-		auto errors = component.errors();
-
-		for (auto e : errors)
-			qFatal() << e.toString();
-
-		if (view && errors.empty())
-		{
-			item->setContent(view);
-
-			_items_list.push_back(item);
-		}
-	}
-
-	{
-		item = new MainViewItem(this);
-		item->setName(u"Uzupełnianie godzin"_qs);
-		item->enable(true);
-
-		const QUrl url(u"qrc:/qt/qml/content/DataFilteringStepView.qml"_qs);
-		QQmlComponent component(qml, url, item);
-		auto view = qobject_cast<QQuickItem*>(component.create());
-		auto errors = component.errors();
-
-		if (view && errors.empty())
-		{
-			item->setContent(view);
-
-			_items_list.push_back(item);
-		}
-	}
-
-	{
-		item = new MainViewItem(this);
-		item->setName(u"Generowanie raportu"_qs);
-		item->enable(true);
-
-		const QUrl url(u"qrc:/qt/qml/content/ReportingStepView.qml"_qs);
-		QQmlComponent component(qml, url, item);
-		auto view = qobject_cast<QQuickItem*>(component.create());
-		auto errors = component.errors();
-
-		if (view && errors.empty())
-		{
-			item->setContent(view);
-
-			_items_list.push_back(item);
-		}
-	}
-
-	_items = QQmlListProperty<MainViewItem>(this, &_items_list);
-	emit itemsChanged();
 }
 
 QQmlListProperty<RepositoryListItem> WindowController::repositories()
@@ -220,16 +151,18 @@ void WindowController::setToDay(QDate value)
 
 void WindowController::setRepositoryPath(QString value)
 {
-	QDir dir(value);
+	if (value.isEmpty())
+		return;
+
+	QUrl url(value);
+	QDir dir(url.toLocalFile());
 	if (!dir.exists())
 	{
 		_repositoryPath.setValue("");
-		_repositoryPath.notify();
 		return;
 	}
 
-	_repositoryPath.setValue(value);
-	_repositoryPath.notify();
+	_repositoryPath.setValue(url.toLocalFile());
 }
 
 void WindowController::setCanFetchBefore(bool value)

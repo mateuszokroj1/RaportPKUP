@@ -71,7 +71,7 @@ ColumnLayout {
 
             InputField {
                 Layout.fillWidth: true
-                value: parent.controller.repositoryPath
+                value: controller.repositoryPath
             }
             UIButton {
                 text: "Wybierz folder"
@@ -90,7 +90,7 @@ ColumnLayout {
             rejectLabel: "Anuluj"
             title: "Wybierz folder repozytorium"
 
-            onAccepted: controller.setRepositoryPath(directoryDialog.folder)
+            onAccepted: controller.setRepositoryPath(directoryDialog.selectedFolder)
         }
         ListView {
             Layout.fillHeight: true
