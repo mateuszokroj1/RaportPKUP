@@ -5,7 +5,7 @@ import QtQuick.Layouts
 import logic
 
 ColumnLayout {
-    default required property FormItemBase item
+    default property alias item: loader.sourceComponent
     property string label: "Field"
     property string messageOnInvalidate: "Invalid value"
 
@@ -18,10 +18,11 @@ ColumnLayout {
         text: label
     }
     Loader {
+        id: loader
+
         Layout.fillHeight: true
         Layout.fillWidth: true
         Layout.margins: Theme.defaultPadding
-        sourceComponent: item
     }
     UIText {
         Layout.alignment: Qt.AlignTop | Qt.AlignLeft

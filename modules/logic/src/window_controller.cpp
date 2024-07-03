@@ -64,8 +64,14 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 
 WindowController::~WindowController() noexcept
 {
+	qDeleteAll(_presets);
 	qDeleteAll(_repositories);
 	qDeleteAll(_commits);
+}
+
+QQmlListProperty<Preset> WindowController::presets()
+{
+	return QQmlListProperty<Preset>(this, &_presets);
 }
 
 QQmlListProperty<RepositoryListItem> WindowController::repositories()
@@ -113,11 +119,6 @@ bool WindowController::canFetchBefore() const
 	return _canFetchBefore.value();
 }
 
-bool WindowController::isFilteringEnabled() const
-{
-	return _commits.count();
-}
-
 void WindowController::setAuthorName(QString value)
 {
 	_authorName.setValue(std::move(value));
@@ -162,7 +163,15 @@ void WindowController::setRepositoryPath(QString value)
 		return;
 	}
 
-	_repositoryPath.setValue(url.toLocalFile());
+	if (!_repository_detector)
+		return;
+
+	const auto result = _repository_detector->detect(url.toLocalFile().toStdWString()).get();
+
+	if (!result)
+		return;
+
+	_repositoryPath.setValue(QString::fromStdWString(result->generic_wstring()));
 }
 
 void WindowController::setCanFetchBefore(bool value)
@@ -205,25 +214,48 @@ QBindable<bool> WindowController::bindableCanFetchBefore() const
 	return &_canFetchBefore;
 }
 
-void WindowController::browseForRepository()
-{ /*
-	QFileDialog dialog;
-	dialog.setAcceptMode(QFileDialog::AcceptOpen);
-	dialog.setFileMode(QFileDialog::Directory);
-	dialog.setViewMode(QFileDialog::ViewMode::List);
-	dialog.setOptions({QFileDialog::Option::ShowDirsOnly});
-	dialog.setModal(true);
+void WindowController::savePreset(const QString& name)
+{
+	Preset* preset = nullptr;
 
-	if (dialog.exec() != QDialog::DialogCode::Accepted)
+	for (auto item : _presets)
+	{
+		if (item->name == name)
+		{
+			preset = item;
+			break;
+		}
+	}
+
+	if (!preset)
+		preset = new Preset(this);
+
+	preset->authorName = _authorName.value();
+	preset->authorEmail = _authorEmail.value();
+	preset->city = _city.value();
+	preset->repositories.clear();
+
+	std::transform(_repositories.begin(), _repositories.end(), std::back_inserter(preset->repositories),
+				   [](RepositoryListItem* item) { return item->path(); });
+
+	_presets.push_back(preset);
+	emit presetsChanged();
+}
+
+void WindowController::deletePreset(int index)
+{
+	if (index < 0)
 		return;
 
-	const auto& accessor = _repository_detector->getAccessor();
+	_presets.removeAt(index);
+	emit presetsChanged();
+}
 
-	const auto dir = dialog.directory();
-	if (auto corrected_dir = _repository_detector->detect(dir.filesystemPath()).get())
-	{
-		setRepositoryPath(QString::fromStdWString(corrected_dir->generic_wstring()));
-	}*/
+void WindowController::recallPreset(int index)
+{
+	const auto preset = _presets.at(index);
+
+	// setAuthorName(); TODO
 }
 
 void WindowController::addRepository()
@@ -239,6 +271,7 @@ void WindowController::addRepository()
 
 		_repositories.push_back(new RepositoryListItem(std::move(repo), this));
 		emit repositoriesChanged();
+		_repositoryPath.setValue("");
 	}
 
 	if (_repositories.count() == 1 && author)
@@ -248,15 +281,13 @@ void WindowController::addRepository()
 	}
 }
 
-void WindowController::removeRepository(RepositoryListItem* ptr)
+void WindowController::removeRepository(int index)
 {
-	const auto index = _repositories.indexOf(ptr);
 	if (index < 0 || index >= _repositories.count())
 		return;
 
+	_repositories[index]->deleteLater();
 	_repositories.removeAt(index);
-	ptr->deleteLater();
-
 	emit repositoriesChanged();
 }
 
@@ -270,7 +301,7 @@ void WindowController::clearRepositories()
 
 void WindowController::searchForCommits()
 {
-	std::list<Commit> result;
+	std::vector<std::unique_ptr<Commit>> result;
 	const std::chrono::system_clock::time_point from = fromDay().toStdSysDays();
 	const std::chrono::system_clock::time_point to = toDay().toStdSysDays();
 	Author author;
@@ -289,20 +320,30 @@ void WindowController::searchForCommits()
 		repo->accept(visitor);
 
 		std::unique_lock locker(*mutex);
-		std::copy(visitor.commits.cbegin(), visitor.commits.cend(), std::back_inserter(result));
+		std::transform(visitor.commits.cbegin(), visitor.commits.cend(), std::back_inserter(result),
+					   [](Commit commit) { return std::make_unique<Commit>(commit); });
 		//					   });
 	}
 
-	// std::unique(result.begin(), result.end(), [](const Commit& a, const Commit& b) { return a.id == b.id; });
+	/*for (uint i = 0; i < result.size() - 1; ++i)
+	{
+		for (uint j = i; j < result.size(); ++j)
+		{
+			if (std::strcmp(result[i]->id, result[j]->id) == 0)
+				result.erase(result.begin() + j);
+			else if (result[j]->datetime > result[i]->datetime)
+				result[i].swap(result[j]);
 
-	// std::sort(result.begin(), result.end(), [](const Commit& a, const Commit& b) { return a.datetime >= b.datetime;
-	// });
+			i = -1;
+			break;
+		}
+	}*/
 
 	qDeleteAll(_commits);
 	_commits.clear();
 
-	std::transform(result.cbegin(), result.cend(), std::back_inserter(_commits),
-				   [this](const Commit& commit) { return new CommitItem(commit, this); });
+	std::transform(result.begin(), result.end(), std::back_inserter(_commits),
+				   [this](std::unique_ptr<Commit>& commit) { return new CommitItem(std::move(commit), this); });
 
 	emit commitsChanged();
 }
@@ -351,7 +392,7 @@ uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
 	return total_duration;
 }
 
-void WindowController::saveRaportToFile()
+void WindowController::saveRaportToFile(QString /* filename*/)
 {
 	//	QFileDialog dialog;
 	//	dialog.setAcceptMode(QFileDialog::AcceptSave);

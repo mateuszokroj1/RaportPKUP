@@ -31,4 +31,5 @@ qt6_add_qml_module(
   ReportingStepView.qml)
 
 target_link_libraries(content PUBLIC RaportPKUP.Core)
-target_link_libraries(content PRIVATE logic Qt6::Core Qt6::Qml Qt6::Quick)
+target_link_libraries(content PRIVATE logic logicplugin Qt6::Core Qt6::Qml
+                                      Qt6::Quick)

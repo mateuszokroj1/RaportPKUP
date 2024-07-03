@@ -14,9 +14,9 @@ LibGit_Signature::LibGit_Signature(const git_signature* handle) : _handle(handle
 LibGit_Signature::~LibGit_Signature() noexcept
 {
 	if (_handle)
-		git_signature_free(const_cast<git_signature*>(_handle));
+		//	git_signature_free(const_cast<git_signature*>(_handle));
 
-	_handle = nullptr;
+		_handle = nullptr;
 }
 
 namespace
@@ -60,7 +60,7 @@ LibGit_Commit::LibGit_Commit(git_commit* handle) : _handle(handle)
 
 	const auto id_ptr = git_commit_id(handle);
 	_id = *id_ptr;
-	delete id_ptr; // TODO probably bug
+	// delete id_ptr; // TODO probably bug
 }
 
 LibGit_Commit::LibGit_Commit(const LibGit_Repository& repository, const ::git_oid id)
@@ -74,9 +74,9 @@ LibGit_Commit::LibGit_Commit(const LibGit_Repository& repository, const ::git_oi
 LibGit_Commit::~LibGit_Commit() noexcept
 {
 	if (_handle)
-		git_commit_free(_handle);
+		//	git_commit_free(_handle);
 
-	_handle = nullptr;
+		_handle = nullptr;
 }
 
 ::git_oid LibGit_Commit::id() const
@@ -84,15 +84,17 @@ LibGit_Commit::~LibGit_Commit() noexcept
 	return _id;
 }
 
-std::wstring LibGit_Commit::getShortMessage() const
+std::string LibGit_Commit::getShortMessage() const
 {
 	const auto src_msg = git_commit_summary(_handle);
 	if (!src_msg)
 		return {};
 
-	const auto wstr = getWStringFromMBPtr(src_msg);
-	delete[] src_msg; // TODO probably bug
-	return wstr;
+	std::string s(src_msg);
+
+	// const auto wstr = getWStringFromMBPtr(src_msg);
+	//	delete[] src_msg; // TODO probably bug
+	return s;
 }
 
 Author LibGit_Commit::getAuthor()
@@ -287,6 +289,21 @@ LibGit_Remote::~LibGit_Remote() noexcept
 	_handle = nullptr;
 }
 
+std::string LibGit_Remote::remoteNameOnServer() const
+{
+	const char* url = git_remote_url(_handle);
+	if (!url)
+		return {};
+
+	std::string full_url(url);
+
+	const auto index = full_url.find_last_of('/');
+	if (index < 0 || index == full_url.length() - 1)
+		return full_url;
+
+	return full_url.substr(index + 1);
+}
+
 LibGit_Repository::LibGit_Repository(const LibGit& /* unused */)
 {
 }
@@ -304,7 +321,12 @@ bool LibGit_Repository::tryOpen(const std::filesystem::path& dir) noexcept
 	if (_handle)
 		return false;
 
-	return git_repository_open(&_handle, dir.generic_string().c_str()) == 0 && _handle;
+	int err = git_repository_open(&_handle, dir.generic_string().c_str());
+
+	auto e = git_error_last();
+	std::string s(e->message);
+
+	return err == 0 && _handle;
 }
 
 bool LibGit_Repository::fetch(const LibGit_Remote& remote)
@@ -387,7 +409,8 @@ LibGit::LibGit()
 
 LibGit::~LibGit() noexcept
 {
-	git_libgit2_shutdown();
+	return; // TODO
+			// git_libgit2_shutdown();
 }
 
 bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const

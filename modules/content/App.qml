@@ -28,11 +28,15 @@ Window {
             MainViewItem {
                 name: "Uzupełnianie godzin"
 
+                //isEnabled: controller.commits.length
+
                 DataFilteringStepView {
                 }
             },
             MainViewItem {
                 name: "Generowanie raportu"
+
+                //isEnabled: controller.commits.length
 
                 ReportingStepView {
                 }

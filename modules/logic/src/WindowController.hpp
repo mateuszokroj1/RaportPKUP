@@ -9,6 +9,7 @@
 #include "Application.hpp"
 #include "Command.hpp"
 #include "CommitItem.hpp"
+#include "Preset.hpp"
 #include "RepositoryListItem.hpp"
 
 namespace RaportPKUP::UI
@@ -17,14 +18,14 @@ class WindowController : public QObject
 {
 	Q_OBJECT
 	QML_ELEMENT
+	QML_UNCREATABLE("Object from app controller")
 
   public:
 	WindowController(std::weak_ptr<Application> app);
 	~WindowController() noexcept override;
 
 	/* Data input */
-	// Q_PROPERTY(QString presetSelectorText READ presetSelectorText WRITE setPresetSelectorText NOTIFY
-	// presetSelectorTextChanged) Q_PROPERTY(QQmlListProperty<Preset>)
+	Q_PROPERTY(QQmlListProperty<Preset> presets READ presets NOTIFY presetsChanged)
 
 	Q_PROPERTY(
 		QString authorName READ authorName WRITE setAuthorName NOTIFY authorNameChanged BINDABLE bindableAuthorName)
@@ -43,7 +44,6 @@ class WindowController : public QObject
 				   bindableCanFetchBefore)
 
 	/* Filtering */
-	Q_PROPERTY(bool isFilteringEnabled READ isFilteringEnabled NOTIFY isFilteringEnabledChanged)
 	Q_PROPERTY(QQmlListProperty<CommitItem> commits READ commits NOTIFY commitsChanged)
 
 	Q_PROPERTY(QString previewDocument READ previewDocument NOTIFY previewDocumentChanged)
@@ -51,6 +51,7 @@ class WindowController : public QObject
 	Q_PROPERTY(Command* addRepositoryCmd READ addRepositoryCmd CONSTANT)
 	Q_PROPERTY(Command* searchForCommitsCmd READ searchForCommitsCmd CONSTANT)
 
+	QQmlListProperty<Preset> presets();
 	QQmlListProperty<RepositoryListItem> repositories();
 	QQmlListProperty<CommitItem> commits();
 
@@ -61,8 +62,6 @@ class WindowController : public QObject
 	QDate toDay() const;
 	QString repositoryPath() const;
 	bool canFetchBefore() const;
-
-	bool isFilteringEnabled() const;
 
 	QString raportFileName() const;
 
@@ -99,6 +98,7 @@ class WindowController : public QObject
 
   signals:
 	void itemsChanged();
+	void presetsChanged();
 	void authorNameChanged();
 	void authorEmailChanged();
 	void cityChanged();
@@ -112,18 +112,22 @@ class WindowController : public QObject
 	void previewDocumentChanged();
 
   public:
-	Q_INVOKABLE void browseForRepository();
+	Q_INVOKABLE void savePreset(const QString&);
+	Q_INVOKABLE void deletePreset(int index);
+	Q_INVOKABLE void recallPreset(int index);
+
 	Q_INVOKABLE void addRepository();
-	Q_INVOKABLE void removeRepository(RepositoryListItem*);
+	Q_INVOKABLE void removeRepository(int index);
 	Q_INVOKABLE void clearRepositories();
 
 	Q_INVOKABLE void searchForCommits();
 	Q_INVOKABLE void removeCommit(CommitItem*);
 
-	Q_INVOKABLE void saveRaportToFile();
+	Q_INVOKABLE void saveRaportToFile(QString filename);
 
   private:
 	std::weak_ptr<Application> _application;
+	QList<Preset*> _presets;
 	QList<RepositoryListItem*> _repositories;
 	QList<CommitItem*> _commits;
 	std::shared_ptr<IProcessFactory> _process_factory;

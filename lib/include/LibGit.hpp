@@ -52,7 +52,7 @@ class LibGit_Commit
 	LibGit_Commit() = delete;
 
 	git_oid id() const;
-	std::wstring getShortMessage() const;
+	std::string getShortMessage() const;
 	Author getAuthor();
 	DateTime getTime() const;
 
@@ -134,6 +134,8 @@ class LibGit_Remote
 
 	~LibGit_Remote() noexcept;
 	LibGit_Remote() = delete;
+
+	std::string remoteNameOnServer() const;
 
   private:
 	LibGit_Remote(git_remote*);

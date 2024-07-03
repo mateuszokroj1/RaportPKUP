@@ -3,6 +3,8 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Dialogs
 
+import logic
+
 ColumnLayout {
     anchors.fill: parent
     spacing: 0
@@ -32,30 +34,32 @@ ColumnLayout {
                 text: "Wstępnie zdefiniowane ustawienia:"
             }
             ComboBox {
+                id: presetSelector
+
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.margins: Theme.defaultPadding
                 editable: true
-                enabled: false
+                model: controller.presets
+                textRole: "name"
+
+                onCurrentIndexChanged: controller.recallPreset(presetSelector.currentIndex)
             }
             UIButton {
                 id: savePresetCmd
 
-                enabled: false
-                text: "Zapisz jako"
-            }
-            UIButton {
-                id: renamePresetCmd
+                text: "Zapisz"
 
-                enabled: false
-                text: "Zmień nazwę"
+                onClicked: controller.savePreset(presetSelector.editText)
             }
             UIButton {
                 id: deletePresetCmd
 
                 Layout.rightMargin: Theme.defaultPadding
-                enabled: false
+                enabled: presetSelector.currentIndex >= 0
                 text: "Usuń"
+
+                onClicked: controller.deletePreset(presetSelector.currentIndex)
             }
         }
     }
@@ -80,6 +84,8 @@ ColumnLayout {
             }
             UIButton {
                 text: "Dodaj"
+
+                onClicked: controller.addRepository()
             }
         }
         FolderDialog {
@@ -101,6 +107,7 @@ ColumnLayout {
             delegate: Item {
                 id: repoList_item
 
+                required property int index
                 required property string path
 
                 anchors.left: parent.left
@@ -112,6 +119,7 @@ ColumnLayout {
                 Rectangle {
                     anchors.fill: parent
                     color: "#eeeeee"
+                    radius: 4
                 }
                 RowLayout {
                     id: repoList_itemLayout
@@ -136,13 +144,14 @@ ColumnLayout {
                         Layout.topMargin: Theme.defaultPadding
                         text: "Usuń"
 
-                        onClicked: controller.removeRepository(model)
+                        onClicked: controller.removeRepository(index)
                     }
                 }
             }
         }
         RowLayout {
             Layout.alignment: Qt.AlignTop
+            Layout.fillHeight: false
             Layout.fillWidth: true
 
             FormField {
@@ -162,6 +171,7 @@ ColumnLayout {
         }
         ColumnLayout {
             Layout.alignment: Qt.AlignTop
+            Layout.fillHeight: true
             Layout.fillWidth: true
 
             RowLayout {
@@ -184,10 +194,15 @@ ColumnLayout {
             }
         }
         RowLayout {
+            Layout.alignment: Qt.AlignBottom
+            Layout.fillWidth: true
+
             UIButton {
                 Layout.alignment: Qt.AlignCenter
                 highlighted: true
                 text: "Przeszukaj repozytoria"
+
+                onClicked: controller.searchForCommits()
             }
         }
     }
