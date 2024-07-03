@@ -9,13 +9,14 @@ namespace RaportPKUP
 {
 struct Commit
 {
-	std::wstring message;
+	std::string message;
 	DateTime datetime;
 
 	// NULL-terminated SHA string
 	char id[8];
 
 	std::string branch_name;
+	std::string repo_name;
 	Author author;
 };
 } // namespace RaportPKUP

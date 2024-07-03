@@ -12,7 +12,7 @@ RowLayout {
 
     implicitHeight: menu.implicitHeight + 100
     implicitWidth: menu.width + contentStack.implicitWidth
-    spacing: 0
+    spacing: Theme.defaultPadding
 
     Item {
         Layout.fillHeight: true
@@ -67,8 +67,8 @@ RowLayout {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 children: [content]
-                //implicitHeight: content.implicitHeight
-                //implicitWidth: content.implicitWidth
+                implicitHeight: content.implicitHeight
+                implicitWidth: content.implicitWidth
             }
         }
     }

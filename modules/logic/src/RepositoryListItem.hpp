@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qqmlintegration.h"
 #include <QtCore/QObject>
 
 #include <include/Author.hpp>
@@ -14,6 +15,8 @@ using IRepositoryVisitorAccept = IAcceptVisitor<const IRepository&>;
 class RepositoryListItem : public QObject, public IRepositoryVisitorAccept
 {
 	Q_OBJECT
+	QML_ELEMENT
+	QML_UNCREATABLE("From controller")
 
   public:
 	RepositoryListItem(std::shared_ptr<IRepository>&& repository, QObject* parent)
@@ -21,7 +24,7 @@ class RepositoryListItem : public QObject, public IRepositoryVisitorAccept
 	{
 	}
 
-	Q_PROPERTY(QString path READ path STORED false)
+	Q_PROPERTY(QString path READ path STORED false CONSTANT)
 
 	QString path() const;
 	std::optional<Author> getDefaultAuthor() const

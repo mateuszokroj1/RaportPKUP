@@ -2,6 +2,7 @@
 
 #include <future>
 #include <list>
+#include <optional>
 #include <stop_token>
 
 namespace RaportPKUP
@@ -19,6 +20,8 @@ class IRepository
 	virtual std::wstring path() const = 0;
 
 	virtual std::optional<Author> getDefaultAuthor() const = 0;
+
+	virtual std::string getNameOfRemoteRepository() const = 0;
 
 	virtual std::future<std::list<Commit>> getCommitsFromTimeRange(
 		const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to_exclude,

@@ -2,16 +2,18 @@ import QtQuick 6.2
 import QtQuick.Layouts
 import QtQuick.Controls
 
+import logic
+
 Button {
     id: root
 
-    property QtObject command
+    property Command command
 
     checkable: false
-    enabled: command != null ? command.canExecute : true
+    enabled: command ? command.canExecute : true
     font: Theme.defaultFont
-    implicitHeight: implicitContentHeight + topPadding + bottomPadding + 2
-    implicitWidth: implicitContentWidth + leftPadding + rightPadding + 2
+    implicitHeight: implicitContentHeight + topPadding + bottomPadding
+    implicitWidth: implicitContentWidth + leftPadding + rightPadding
     padding: Theme.defaultPadding
     text: "Button"
 
@@ -19,7 +21,7 @@ Button {
         id: rectangle
 
         anchors.fill: root
-        border.color: Theme.windowText
+        border.color: Theme.activatedElementBackground
         border.width: 1
         color: Theme.controlBackground
         radius: Theme.radius
@@ -87,8 +89,8 @@ Button {
     }
     Connections {
         function onClicked() {
-            if (command != null && command.canExecute)
-                command.execute();
+            if (root.command != null && root.command.canExecute)
+                root.command.execute();
         }
 
         target: root

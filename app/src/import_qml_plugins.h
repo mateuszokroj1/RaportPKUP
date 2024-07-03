@@ -5,4 +5,5 @@
 
 #include <QtQml/qqmlextensionplugin.h>
 
+Q_IMPORT_QML_PLUGIN(logicPlugin)
 Q_IMPORT_QML_PLUGIN(contentPlugin)

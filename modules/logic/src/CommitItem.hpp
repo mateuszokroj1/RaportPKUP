@@ -12,7 +12,7 @@ class CommitItem : public QObject
 	Q_OBJECT
 
   public:
-	CommitItem(const Commit&, QObject*);
+	CommitItem(std::unique_ptr<Commit>&&, QObject*);
 
 	Q_PROPERTY(QString id READ id STORED false)
 	Q_PROPERTY(QString message READ message STORED false)
@@ -22,12 +22,13 @@ class CommitItem : public QObject
 	QString id() const;
 	QString message() const;
 	QDateTime time() const;
+	QString repositoryName() const;
 
 	ushort duration;
 
 	Q_SIGNAL void durationChanged();
 
   private:
-	const Commit _commit;
+	std::unique_ptr<Commit> _commit;
 };
 } // namespace RaportPKUP::UI

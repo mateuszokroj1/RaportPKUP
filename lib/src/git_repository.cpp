@@ -30,6 +30,16 @@ std::future<std::list<Commit>> GitRepository::getCommitsFromTimeRange(const std:
 	return std::async(&GitRepository::getCommitsFromTimeRangeImpl, this, from, to, author, stop_token);
 }
 
+std::string GitRepository::getNameOfRemoteRepository() const
+{
+	auto list_of_remotes = _repository->enumerateRemotes();
+
+	if (list_of_remotes.empty() || !list_of_remotes.front())
+		return {};
+
+	return list_of_remotes.front()->remoteNameOnServer();
+}
+
 namespace
 {
 template <typename ValueType> bool _isInRange(const ValueType& value, const ValueType& from, const ValueType& to)
@@ -56,6 +66,7 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 															 std::optional<std::stop_token> stop_token) const
 {
 	const auto branches = _repository->enumerateAllRemoteBranches();
+	const auto repo_name = getNameOfRemoteRepository();
 
 	if (stop_token && stop_token->stop_requested())
 		throw CanceledOperationException();
@@ -63,58 +74,58 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 	std::unique_ptr<std::mutex> mutex;
 	std::list<Commit> list;
 
-	tbb::parallel_for_each(branches.cbegin(), branches.cend(),
-						   [this, stop_token, author, from, to, &mutex, &list](const LibGit_Ref::Ptr ref)
-						   {
-							   auto walker = _repository->createWalker();
-							   if (!walker)
-								   return;
+	for (auto branch : branches)
+	//	tbb::parallel_for_each(branches.cbegin(), branches.cend(),
+	//					   [this, &repo_name, stop_token, author, from, to, &mutex, &list](const LibGit_Ref::Ptr ref)
+	{
+		auto walker = _repository->createWalker();
+		if (!walker)
+			break;
 
-							   walker->setReference(*ref);
+		walker->setReference(*branch);
 
-							   if (stop_token && stop_token->stop_requested())
-							   {
-								   tbb::task::current_context()->cancel_group_execution();
-								   return;
-							   }
+		//   if (stop_token && stop_token->stop_requested())
+		//   {
+		//	   tbb::task::current_context()->cancel_group_execution();
+		//	   return;
+		//   }
 
-							   while (const auto opt = walker->next())
-							   {
-								   if (const auto commit = *opt)
-								   {
-									   if (stop_token && stop_token->stop_requested())
-									   {
-										   tbb::task::current_context()->cancel_group_execution();
-										   return;
-									   }
+		while (const auto opt = walker->next())
+		{
+			if (const auto commit = *opt)
+			{
+				//	   if (stop_token && stop_token->stop_requested())
+				//		   {
+				//			   tbb::task::current_context()->cancel_group_execution();
+				//			   return;
+				//		   }
 
-									   Commit result;
-									   result.branch_name = ref->name();
-									   result.datetime = commit->getTime();
+				Commit result;
+				result.branch_name = branch->name();
+				result.datetime = commit->getTime();
+				result.repo_name = repo_name;
 
-									   if (!isInDateRange(result.datetime, from, to))
-										   return;
+				// if (!isInDateRange(result.datetime, from, to))
+				//    return;
 
-									   result.author = commit->getAuthor();
+				// result.author = commit->getAuthor();
 
-									   if (author.email != result.author.email)
-										   continue;
+				// if (author.email != result.author.email)
+				//    continue;
 
-									   result.message = commit->getShortMessage();
+				result.message = commit->getShortMessage();
 
-									   const auto id = commit->id();
-									   git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
+				const auto id = commit->id();
+				git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
 
-									   std::unique_lock locker(*mutex);
-									   list.push_back(std::move(result));
-								   }
-							   }
-						   });
+				// std::unique_lock locker(*mutex);
+				list.push_back(std::move(result));
+			}
+		}
+	} //);
 
 	if (stop_token && stop_token->stop_requested())
 		throw CanceledOperationException();
-
-	// sort
 
 	return list;
 }

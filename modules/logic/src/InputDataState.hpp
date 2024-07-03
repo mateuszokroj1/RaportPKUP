@@ -2,6 +2,7 @@
 
 #include <QMetaEnum>
 #include <QObject>
+#include <QtQml/QQmlEngine>
 #include <QtQml/qqmlregistration.h>
 
 namespace RaportPKUP::UI
@@ -9,10 +10,11 @@ namespace RaportPKUP::UI
 class InputDataState
 {
 	Q_GADGET
-	QML_VALUE_TYPE(inputDataState)
+	QML_ELEMENT
+	QML_UNCREATABLE("Enum type")
 
   public:
-	enum States : char
+	enum States
 	{
 		Indeterminate = 0,
 		Valid = 1,
@@ -21,10 +23,6 @@ class InputDataState
 
 	Q_ENUM(States)
 };
-
-namespace Qt
-{
-Q_NAMESPACE
-QML_NAMED_ELEMENT(InputDataState)
-} // namespace Qt
 } // namespace RaportPKUP::UI
+
+Q_DECLARE_METATYPE(RaportPKUP::UI::InputDataState::States)

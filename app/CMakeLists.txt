@@ -37,10 +37,8 @@ qt6_add_qml_module(
   QML_FILES
   main.qml)
 
-target_link_libraries(
-  ${executable_name}
-  PRIVATE logic
-  PRIVATE content)
+target_link_libraries(${executable_name} PRIVATE logicplugin logic
+                                                 contentplugin content)
 
 target_include_directories(${executable_name}
                            PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)

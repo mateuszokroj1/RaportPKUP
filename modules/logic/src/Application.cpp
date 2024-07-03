@@ -58,8 +58,9 @@ int Application::run(int argc, char* argv[])
 		if (!context)
 			return -1;
 
-		WindowController controller(_ptr);
-		context->setContextProperty("controller", &controller);
+		auto controller = new WindowController(_ptr);
+
+		context->setContextProperty("controller", controller);
 
 		_qml->load(url);
 
@@ -70,7 +71,7 @@ int Application::run(int argc, char* argv[])
 		signal(SIGSEGV, SignalHandler);
 #endif
 
-		controller.setParent(_qml->rootObjects().first());
+		controller->setParent(_qml->rootObjects().first());
 
 		_is_running = true;
 		const auto result = app->exec();
