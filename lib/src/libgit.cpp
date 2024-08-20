@@ -11,14 +11,6 @@ LibGit_Signature::LibGit_Signature(const git_signature* handle) : _handle(handle
 		throw std::invalid_argument("Handle cannot be nullptr.");
 }
 
-LibGit_Signature::~LibGit_Signature() noexcept
-{
-	if (_handle)
-		//	git_signature_free(const_cast<git_signature*>(_handle));
-
-		_handle = nullptr;
-}
-
 namespace
 {
 std::wstring getWStringFromMBPtr(const char* ptr)
@@ -60,7 +52,6 @@ LibGit_Commit::LibGit_Commit(git_commit* handle) : _handle(handle)
 
 	const auto id_ptr = git_commit_id(handle);
 	_id = *id_ptr;
-	// delete id_ptr; // TODO probably bug
 }
 
 LibGit_Commit::LibGit_Commit(const LibGit_Repository& repository, const ::git_oid id)
@@ -74,9 +65,9 @@ LibGit_Commit::LibGit_Commit(const LibGit_Repository& repository, const ::git_oi
 LibGit_Commit::~LibGit_Commit() noexcept
 {
 	if (_handle)
-		//	git_commit_free(_handle);
+		git_commit_free(_handle);
 
-		_handle = nullptr;
+	_handle = nullptr;
 }
 
 ::git_oid LibGit_Commit::id() const
@@ -84,22 +75,19 @@ LibGit_Commit::~LibGit_Commit() noexcept
 	return _id;
 }
 
-std::string LibGit_Commit::getShortMessage() const
+std::wstring LibGit_Commit::getShortMessage() const
 {
 	const auto src_msg = git_commit_summary(_handle);
 	if (!src_msg)
 		return {};
 
-	std::string s(src_msg);
-
-	// const auto wstr = getWStringFromMBPtr(src_msg);
-	//	delete[] src_msg; // TODO probably bug
-	return s;
+	const auto wstr = getWStringFromMBPtr(src_msg);
+	return wstr;
 }
 
 Author LibGit_Commit::getAuthor()
 {
-	const auto ptr = git_commit_author(_handle);
+	auto ptr = git_commit_author(_handle);
 	if (!ptr)
 		return {};
 
@@ -207,7 +195,7 @@ void LibGit_RevisionWalker::setReference(const LibGit_Ref& reference)
 	}
 }
 
-std::optional<LibGit_Commit::Ptr> LibGit_RevisionWalker::next()
+std::optional<Ptr<LibGit_Commit>> LibGit_RevisionWalker::next()
 {
 	git_oid id;
 	const auto result = git_revwalk_next(&id, _handle);
@@ -226,7 +214,7 @@ std::optional<LibGit_Commit::Ptr> LibGit_RevisionWalker::next()
 		throw LibGit_Exception(msg, err->klass);
 	}
 
-	return LibGit_Commit::Ptr(new LibGit_Commit(_repository, id));
+	return Ptr<LibGit_Commit>(new LibGit_Commit(_repository, id));
 }
 
 LibGit_BranchIterator::LibGit_BranchIterator(const LibGit_Repository& repository, git_branch_t filter_by_type)
@@ -251,7 +239,7 @@ LibGit_BranchIterator::~LibGit_BranchIterator() noexcept
 	_handle = nullptr;
 }
 
-std::optional<LibGit_Ref::Ptr> LibGit_BranchIterator::next()
+std::optional<Ptr<LibGit_Ref>> LibGit_BranchIterator::next()
 {
 	git_reference* ref;
 	git_branch_t type;
@@ -272,7 +260,7 @@ std::optional<LibGit_Ref::Ptr> LibGit_BranchIterator::next()
 		throw LibGit_Exception(msg, err->klass);
 	}
 
-	return LibGit_Ref::Ptr(new LibGit_Ref(ref));
+	return Ptr<LibGit_Ref>(new LibGit_Ref(ref));
 }
 
 LibGit_Remote::LibGit_Remote(git_remote* handle) : _handle(handle)
@@ -302,10 +290,6 @@ std::string LibGit_Remote::remoteNameOnServer() const
 		return full_url;
 
 	return full_url.substr(index + 1);
-}
-
-LibGit_Repository::LibGit_Repository(const LibGit& /* unused */)
-{
 }
 
 LibGit_Repository::~LibGit_Repository() noexcept
@@ -341,9 +325,9 @@ bool LibGit_Repository::prune(const LibGit_Remote& remote)
 
 namespace
 {
-std::vector<LibGit_Ref::Ptr> enumerateBranches(const LibGit_Repository& repository, git_branch_t filter_by_type)
+std::vector<Ptr<LibGit_Ref>> enumerateBranches(const LibGit_Repository& repository, git_branch_t filter_by_type)
 {
-	std::vector<LibGit_Ref::Ptr> result;
+	std::vector<Ptr<LibGit_Ref>> result;
 	LibGit_BranchIterator iterator(repository, filter_by_type);
 
 	while (auto ptr = iterator.next())
@@ -354,22 +338,22 @@ std::vector<LibGit_Ref::Ptr> enumerateBranches(const LibGit_Repository& reposito
 }
 } // namespace
 
-std::vector<LibGit_Ref::Ptr> LibGit_Repository::enumerateAllLocalBranches() const
+std::vector<Ptr<LibGit_Ref>> LibGit_Repository::enumerateAllLocalBranches() const
 {
 	return enumerateBranches(*this, GIT_BRANCH_LOCAL);
 }
 
-std::vector<LibGit_Ref::Ptr> LibGit_Repository::enumerateAllRemoteBranches() const
+std::vector<Ptr<LibGit_Ref>> LibGit_Repository::enumerateAllRemoteBranches() const
 {
 	return enumerateBranches(*this, GIT_BRANCH_REMOTE);
 }
 
-std::vector<LibGit_Remote::Ptr> LibGit_Repository::enumerateRemotes() const
+std::vector<Ptr<LibGit_Remote>> LibGit_Repository::enumerateRemotes() const
 {
 	git_strarray arr;
 	git_remote_list(&arr, _handle);
 
-	std::vector<LibGit_Remote::Ptr> remotes;
+	std::vector<Ptr<LibGit_Remote>> remotes;
 
 	for (size_t i = 0; i < arr.count; ++i)
 	{
@@ -384,7 +368,7 @@ std::vector<LibGit_Remote::Ptr> LibGit_Repository::enumerateRemotes() const
 	return remotes;
 }
 
-LibGit_RevisionWalker::Ptr LibGit_Repository::createWalker() const
+Ptr<LibGit_RevisionWalker> LibGit_Repository::createWalker() const
 {
 	return std::make_shared<LibGit_RevisionWalker>(*this);
 }
@@ -399,6 +383,7 @@ Author LibGit_Repository::getAuthorFromConfig() const
 	Author author;
 	author.name = signature.getName();
 	author.email = signature.getEmail();
+	git_signature_free(result);
 	return author;
 }
 
@@ -409,8 +394,7 @@ LibGit::LibGit()
 
 LibGit::~LibGit() noexcept
 {
-	return; // TODO
-			// git_libgit2_shutdown();
+	git_libgit2_shutdown();
 }
 
 bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
@@ -433,9 +417,9 @@ bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
 	throw LibGit_Exception(msg, err->klass);
 }
 
-LibGit_Repository::Ptr LibGit::openRepository(const std::filesystem::path& path) const
+Ptr<LibGit_Repository> LibGit::openRepository(const std::filesystem::path& path) const
 {
-	LibGit_Repository::Ptr repo(new LibGit_Repository(*this));
+	auto repo = std::make_shared<LibGit_Repository>();
 
 	if (!repo->tryOpen(path))
 		return {};

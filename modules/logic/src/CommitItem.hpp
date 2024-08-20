@@ -24,7 +24,7 @@ class CommitItem : public QObject
 	QDateTime time() const;
 	QString repositoryName() const;
 
-	ushort duration;
+	ushort duration = 0;
 
 	Q_SIGNAL void durationChanged();
 

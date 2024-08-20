@@ -22,7 +22,7 @@ QString CommitItem::id() const
 
 QString CommitItem::message() const
 {
-	return QString::fromStdString(_commit->message);
+	return QString::fromStdWString(_commit->message);
 }
 
 QDateTime CommitItem::time() const

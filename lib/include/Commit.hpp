@@ -9,7 +9,7 @@ namespace RaportPKUP
 {
 struct Commit
 {
-	std::string message;
+	std::wstring message;
 	DateTime datetime;
 
 	// NULL-terminated SHA string

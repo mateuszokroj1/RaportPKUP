@@ -16,6 +16,8 @@ concept Final = std::is_final_v<Type>;
 
 using DateTime = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
+template <typename Type> using Ptr = std::shared_ptr<Type>;
+
 class ICastable
 {
   public:
