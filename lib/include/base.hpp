@@ -5,9 +5,6 @@
 
 namespace RaportPKUP
 {
-template <class DerivedType, class BaseType>
-concept Derived = std::is_base_of_v<BaseType, DerivedType>;
-
 template <class AbstractType>
 concept Abstract = std::is_abstract_v<AbstractType>;
 
