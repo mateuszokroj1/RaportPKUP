@@ -1,56 +1,100 @@
+#include <Author.hpp>
+#include <Commit.hpp>
+#include <GitRepository.hpp>
+#include <GitRepositoryAccessor.hpp>
+#include <GitRepositoryDetector.hpp>
+#include <LibGit.hpp>
+
 #include <filesystem>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <regex>
 #include <source_location>
-
-#include <Author.hpp>
-#include <Commit.hpp>
-#include <GitRepository.hpp>
-#include <LibGit.hpp>
+#include <sys/stat.h>
 
 using namespace std::filesystem;
+using namespace RaportPKUP;
 
-class Lib_GitRepository : public testing::Test
+constexpr wchar_t EMAIL_REGEX[] = L"^[\\w\\-\\.]+@([\\w\\-]+\\.)+[\\w\\-]{2,4}$";
+
+class DetectorMock : public GitRepositoryDetector
+{
+  public:
+	DetectorMock(GitRepositoryAccessor& accessor) : _accessor(accessor)
+	{
+	}
+
+  private:
+	GitRepositoryAccessor& _accessor;
+
+	const GitRepositoryAccessor& getAccessorImpl() const override
+	{
+		return _accessor;
+	}
+};
+
+class GitRepositoryTest : public testing::Test
 {
   protected:
-	Lib_GitRepository()
+	GitRepositoryTest() : accessor(std::make_shared<GitRepositoryAccessor>()), detector_mock(*accessor)
 	{
-		valid_path = path(std::source_location::current().file_name()).parent_path();
+		valid_path = path(GIT_REPOSITORY_ROOT);
 
 		invalid_path = valid_path.root_path();
+
+		repo = std::dynamic_pointer_cast<GitRepository>(accessor->openRepository(valid_path).get());
 	}
 
 	path valid_path;
 	path invalid_path;
-	std::regex re;
+	Ptr<GitRepository> repo;
+	Ptr<GitRepositoryAccessor> accessor;
+	DetectorMock detector_mock;
 };
 
-/* TEST_F(Lib_GitRepository, checkIsValidPath_whenPutCurrentDirectory_shouldReturnTrue)
+TEST_F(GitRepositoryTest, checkIsValidPath_whenValueIsValid_shouldReturnTrue)
 {
-	//ASSERT_TRUE(RaportPKUP::GitRepository::checkIsValidPath(valid_path));
+	const auto result = detector_mock.detect(valid_path).get();
+
+	ASSERT_TRUE(result.has_value());
+
+	struct stat s;
+	const auto result2 = stat(result->generic_string().c_str(), &s) == 0;
+
+	ASSERT_TRUE(result2);
+	ASSERT_TRUE(s.st_mode & S_IFDIR);
 }
 
-TEST_F(Lib_GitRepository, checkIsValidPath_whenPutBadPath_shouldReturnFalse)
+TEST_F(GitRepositoryTest, checkIsValidPath_whenValueIsInvalid_shouldReturnFalse)
 {
-	ASSERT_FALSE(RaportPKUP::GitRepository::checkIsValidPath(invalid_path));
+	const auto result = detector_mock.detect(invalid_path).get();
+	ASSERT_FALSE(result.has_value());
 }
 
-TEST_F(Lib_GitRepository, getSystemConfigAuthor_shouldReturnValid)
+TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
 {
-	const auto result = RaportPKUP::GitRepository::getSystemConfigAuthor();
-	ASSERT_FALSE(result.name.empty());
-	ASSERT_FALSE(result.email.empty());
+	const auto author = repo->getDefaultAuthor();
 
-	// EXPECT_THAT(result.email, L"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+	ASSERT_TRUE(author.has_value());
+	ASSERT_FALSE(author->email.empty());
+	ASSERT_FALSE(author->name.empty());
+
+	std::wregex test(EMAIL_REGEX);
+
+	ASSERT_TRUE(std::regex_match(author->email, test));
 }
 
-TEST_F(Lib_GitRepository, getCommits_shouldReturnValid)
+TEST_F(GitRepositoryTest, getNameOfRemoteRepo_shouldReturnGitHubName)
 {
-	RaportPKUP::GitRepository repo(valid_path);
+	ASSERT_STREQ(repo->getNameOfRemoteRepository().c_str(), "RaportPKUP");
+}
+
+TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
+{
 	const std::chrono::year_month_day ymd(std::chrono::year(2023), std::chrono::month(1), std::chrono::day(1));
-	const auto vec = repo.getCommitsFromTimeRange(std::chrono::sys_days(ymd), std::chrono::system_clock::now(),
-												  {L"Mateusz Okrój", L"mateuszokroj1@gmail.com"});
+	const auto vec = repo->getCommitsFromTimeRange(std::chrono::sys_days(ymd), std::chrono::system_clock::now(),
+												   {L"Mateusz Okrój", L"mateuszokroj1@gmail.com"})
+						 .get();
 
-	ASSERT_TRUE(vec->size() > 0);
-}*/
+	ASSERT_GT(vec.size(), 0);
+}

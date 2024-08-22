@@ -157,17 +157,4 @@ class LibGit_Repository
   private:
 	git_repository* _handle = nullptr;
 };
-
-class LibGit : public ICastable
-{
-  public:
-	LibGit();
-
-	~LibGit() noexcept override;
-
-	bool checkRepositoryIsValid(const std::filesystem::path&) const;
-
-	Ptr<LibGit_Repository> openRepository(const std::filesystem::path&) const;
-	std::optional<std::filesystem::path> detectRepositoryRootPath(const std::filesystem::path&) const;
-};
 } // namespace RaportPKUP

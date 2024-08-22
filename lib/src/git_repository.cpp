@@ -9,8 +9,8 @@
 
 namespace RaportPKUP
 {
-GitRepository::GitRepository(const LibGit& libgit, std::shared_ptr<LibGit_Repository> repo, const std::wstring& path)
-	: _libgit(libgit), _repository(repo), _path(path)
+GitRepository::GitRepository(std::shared_ptr<LibGit_Repository> repo, const std::wstring& path)
+	: _repository(repo), _path(path)
 {
 }
 

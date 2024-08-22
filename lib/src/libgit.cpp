@@ -289,7 +289,9 @@ std::string LibGit_Remote::remoteNameOnServer() const
 	if (index < 0 || index == full_url.length() - 1)
 		return full_url;
 
-	return full_url.substr(index + 1);
+	const auto trimmed = full_url.substr(index + 1);
+
+	return trimmed.ends_with(".git") ? trimmed.substr(0, trimmed.size() - 4) : trimmed;
 }
 
 LibGit_Repository::~LibGit_Repository() noexcept
@@ -387,17 +389,7 @@ Author LibGit_Repository::getAuthorFromConfig() const
 	return author;
 }
 
-LibGit::LibGit()
-{
-	git_libgit2_init();
-}
-
-LibGit::~LibGit() noexcept
-{
-	git_libgit2_shutdown();
-}
-
-bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
+/* bool LibGit::checkRepositoryIsValid(const std::filesystem::path& path) const
 {
 	const auto str = path.generic_string();
 	const auto result = git_repository_open_ext(nullptr, str.c_str(), 0, nullptr);
@@ -444,5 +436,5 @@ std::optional<std::filesystem::path> LibGit::detectRepositoryRootPath(const std:
 	git_buf_dispose(&buf);
 
 	return str;
-}
+}*/
 } // namespace RaportPKUP

@@ -9,14 +9,13 @@
 
 namespace RaportPKUP
 {
-class LibGit;
 class LibGit_Repository;
 class GitRepositoryAccessor;
 
 class GitRepository : public IRepository
 {
   public:
-	GitRepository(const LibGit&, std::shared_ptr<LibGit_Repository>, const std::wstring& path);
+	GitRepository(std::shared_ptr<LibGit_Repository>, const std::wstring& path);
 
 	std::wstring path() const override
 	{
@@ -38,6 +37,5 @@ class GitRepository : public IRepository
 
 	std::wstring _path;
 	std::shared_ptr<LibGit_Repository> _repository;
-	const LibGit& _libgit;
 };
 } // namespace RaportPKUP

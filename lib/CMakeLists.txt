@@ -48,6 +48,8 @@ if(${ENABLE_TESTS})
 
   target_compile_definitions(${executable_name}
                              PRIVATE RAPORTPKUP_CORE_STATIC_DEFINE)
+  target_compile_definitions(
+    ${executable_name} PRIVATE GIT_REPOSITORY_ROOT="${GIT_REPOSITORY_ROOT}")
 
   target_include_directories(${executable_name}
                              PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
