@@ -1,4 +1,5 @@
 #include <cassert>
+#include <codecvt>
 #include <filesystem>
 
 #include <LibGit.hpp>
@@ -15,15 +16,12 @@ namespace
 {
 std::wstring getWStringFromMBPtr(const char* ptr)
 {
-	const size_t target_size = std::strlen(ptr) + 1;
-	auto name_wstr = std::unique_ptr<wchar_t[]>(new wchar_t[target_size]);
+	const std::string mb_str(ptr);
 
-	const size_t converted_chars = std::mbstowcs(name_wstr.get(), ptr, target_size);
+	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+	std::wstring str = converter.from_bytes(mb_str);
 
-	if (converted_chars < 1)
-		return {};
-
-	return std::wstring(name_wstr.get(), converted_chars);
+	return str;
 }
 } // namespace
 
