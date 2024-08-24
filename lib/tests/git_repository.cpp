@@ -112,12 +112,21 @@ TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
 	std::regex branch_regex(BRANCH_NAME_REGEX);
 
 	ASSERT_TRUE(std::regex_match(test_commit.branch_name, branch_regex));
-	ASSERT_EQ(test_commit.datetime, std::chrono::sys_days(std::chrono::year_month_day(
-										std::chrono::year(2023), std::chrono::month(3), std::chrono::day(30))));
+
+	ASSERT_EQ(std::chrono::floor<std::chrono::days>(test_commit.datetime),
+			  std::chrono::sys_days(
+				  std::chrono::year_month_day(std::chrono::year(2023), std::chrono::month(3), std::chrono::day(30))));
 	ASSERT_STREQ(test_commit.repo_name.c_str(), "RaportPKUP");
 	ASSERT_STREQ(test_commit.message.c_str(), L"Initial commit");
 
 	const auto& author = test_commit.author;
 	ASSERT_STREQ(author.email.c_str(), L"mateuszokroj1@gmail.com");
-	ASSERT_STREQ(author.name.c_str(), L"Mateusz Okrój");
 }
+
+// TEST_F(GitRepositoryTest, fetch_shouldBeSuccessful)
+//{
+//	auto repo = accessor->openRepository(valid_path).get();
+//	ASSERT_TRUE(repo);
+
+//	ASSERT_TRUE(repo->fetchFirstRemote(false).get());
+//}

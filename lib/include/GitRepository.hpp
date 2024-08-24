@@ -26,6 +26,8 @@ class GitRepository : public IRepository
 
 	std::string getNameOfRemoteRepository() const override;
 
+	std::future<bool> fetchFirstRemote(bool with_prune) override;
+
 	std::future<std::list<Commit>> getCommitsFromTimeRange(
 		const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to,
 		const Author& author, std::optional<std::stop_token> stop_token = {}) const override;

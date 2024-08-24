@@ -315,7 +315,9 @@ bool LibGit_Repository::tryOpen(const std::filesystem::path& dir) noexcept
 
 bool LibGit_Repository::fetch(const LibGit_Remote& remote)
 {
-	return git_remote_fetch(remote._handle, nullptr, nullptr, "Fetch in Raport PKUP - before generating raport.") == 0;
+	auto err = git_remote_fetch(remote._handle, nullptr, nullptr, "Fetch in Raport PKUP - before generating raport.");
+
+	return err == 0;
 }
 
 bool LibGit_Repository::prune(const LibGit_Remote& remote)

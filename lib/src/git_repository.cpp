@@ -135,4 +135,21 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 
 	return list;
 }
+
+std::future<bool> GitRepository::fetchFirstRemote(bool with_prune)
+{
+	return std::async(
+		[this, with_prune]()
+		{
+			const auto remotes = _repository->enumerateRemotes();
+
+			if (remotes.empty())
+				return false;
+
+			if (with_prune && !_repository->prune(*remotes.front()))
+				return false;
+
+			return _repository->fetch(*remotes.front());
+		});
+}
 } // namespace RaportPKUP
