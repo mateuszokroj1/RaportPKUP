@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-  "builtin-baseline": "c3801cf53c614ffc54c94051d124eba097b057b1",
+  "builtin-baseline": "73964f854d0d6424f335e9515b61b3a2dad5e15b",
   "dependencies": [
     {
       "name": "gtest",
-      "version>=": "1.14.0"
+      "version>=": "1.15.0"
     },
     {
       "name": "libgit2",
@@ -12,7 +12,7 @@
     },
     {
       "name": "tbb",
-      "version>=": "2021.11.0"
+      "version>=": "2021.13.0"
     }
   ],
   "description": "Raport PKUP",

@@ -27,13 +27,10 @@ struct FactoryInfo
 	Factory factory;
 };
 
-template <class Type, class Base>
-concept Controller = std::is_final_v<Type> && std::is_base_of_v<Base, Type>;
-
 class ApplicationDefinition
 {
   public:
-	template <Abstract InterfaceType, Controller<InterfaceType> ControllerType>
+	template <Abstract InterfaceType, std::derived_from<InterfaceType> ControllerType>
 	ApplicationDefinition& registerController()
 	{
 		if (std::any_of(_factories.cbegin(), _factories.cend(),

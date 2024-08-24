@@ -19,6 +19,8 @@ if(NOT DEFINED DISABLE_PRECOMMIT)
   precommitinstall()
 endif()
 
+set(GIT_REPOSITORY_ROOT ${CMAKE_CURRENT_LIST_DIR})
+
 set(ENABLE_TESTS
     True
     CACHE BOOL "Enable unit tests")

@@ -11,8 +11,6 @@ class GitRepositoryAccessor;
 class RAPORTPKUP_CORE_EXPORT GitRepositoryDetector : public IRepositoryDetector
 {
   public:
-	virtual ~GitRepositoryDetector() = default;
-
 	const IRepositoryAccessor& getAccessor() const override;
 
 	std::future<std::optional<std::filesystem::path>> detect(

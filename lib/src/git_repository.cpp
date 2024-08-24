@@ -9,8 +9,8 @@
 
 namespace RaportPKUP
 {
-GitRepository::GitRepository(const LibGit& libgit, std::shared_ptr<LibGit_Repository> repo, const std::wstring& path)
-	: _libgit(libgit), _repository(repo), _path(path)
+GitRepository::GitRepository(std::shared_ptr<LibGit_Repository> repo, const std::wstring& path)
+	: _repository(repo), _path(path)
 {
 }
 
@@ -40,24 +40,20 @@ std::string GitRepository::getNameOfRemoteRepository() const
 	return list_of_remotes.front()->remoteNameOnServer();
 }
 
-namespace
+short compareDate(const std::chrono::system_clock::time_point& value, const std::chrono::system_clock::time_point& from,
+				  const std::chrono::system_clock::time_point& to)
 {
-template <typename ValueType> bool _isInRange(const ValueType& value, const ValueType& from, const ValueType& to)
-{
-	return value >= from && value <= to;
-}
-} // namespace
+	const auto value_time = value.time_since_epoch();
+	const auto from_time = from.time_since_epoch();
+	const auto to_time = to.time_since_epoch();
 
-bool isInDateRange(const std::chrono::system_clock::time_point& value,
-				   const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to)
-{
-	const std::chrono::year_month_day value_ymd(std::chrono::floor<std::chrono::days>(value));
-	const std::chrono::year_month_day from_ymd(std::chrono::floor<std::chrono::days>(from));
-	const std::chrono::year_month_day to_ymd(std::chrono::floor<std::chrono::days>(to));
+	if (value < from)
+		return -1;
 
-	return _isInRange(value_ymd.year(), from_ymd.year(), to_ymd.year()) &&
-		   _isInRange(value_ymd.month(), from_ymd.month(), to_ymd.month()) &&
-		   _isInRange(value_ymd.day(), from_ymd.day(), to_ymd.day());
+	if (value > to)
+		return 1;
+
+	return 0;
 }
 
 std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::system_clock::time_point& from,
@@ -84,39 +80,49 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 
 		walker->setReference(*branch);
 
-		//   if (stop_token && stop_token->stop_requested())
-		//   {
-		//	   tbb::task::current_context()->cancel_group_execution();
-		//	   return;
-		//   }
+		if (stop_token && stop_token->stop_requested())
+		{
+			//	   tbb::task::current_context()->cancel_group_execution();
+			break;
+		}
 
 		while (const auto opt = walker->next())
 		{
 			if (const auto commit = *opt)
 			{
-				//	   if (stop_token && stop_token->stop_requested())
-				//		   {
-				//			   tbb::task::current_context()->cancel_group_execution();
-				//			   return;
-				//		   }
+				if (stop_token && stop_token->stop_requested())
+				{
+					//			   tbb::task::current_context()->cancel_group_execution();
+					break;
+				}
 
 				Commit result;
-				result.branch_name = branch->name();
-				result.datetime = commit->getTime();
-				result.repo_name = repo_name;
-
-				// if (!isInDateRange(result.datetime, from, to))
-				//    return;
-
-				// result.author = commit->getAuthor();
-
-				// if (author.email != result.author.email)
-				//    continue;
-
-				result.message = commit->getShortMessage();
 
 				const auto id = commit->id();
 				git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
+
+				if (std::ranges::any_of(list, [&result](decltype(list)::const_reference previous_commit)
+										{ return strcmp(result.id, previous_commit.id) == 0; }))
+					continue;
+
+				result.author = commit->getAuthor();
+
+				if (author.email != result.author.email)
+					continue;
+
+				result.datetime = commit->getTime();
+
+				const auto compare_result = compareDate(result.datetime, from, to);
+
+				if (compare_result < 0)
+					continue;
+				else if (compare_result > 0)
+					break;
+
+				result.branch_name = branch->name();
+
+				result.repo_name = repo_name;
+				result.message = commit->getShortMessage();
 
 				// std::unique_lock locker(*mutex);
 				list.push_back(std::move(result));
@@ -128,5 +134,22 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 		throw CanceledOperationException();
 
 	return list;
+}
+
+std::future<bool> GitRepository::fetchFirstRemote(bool with_prune)
+{
+	return std::async(
+		[this, with_prune]()
+		{
+			const auto remotes = _repository->enumerateRemotes();
+
+			if (remotes.empty())
+				return false;
+
+			if (with_prune && !_repository->prune(*remotes.front()))
+				return false;
+
+			return _repository->fetch(*remotes.front());
+		});
 }
 } // namespace RaportPKUP

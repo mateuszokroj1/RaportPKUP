@@ -9,14 +9,13 @@
 
 namespace RaportPKUP
 {
-class LibGit;
 class LibGit_Repository;
 class GitRepositoryAccessor;
 
 class GitRepository : public IRepository
 {
   public:
-	GitRepository(const LibGit&, std::shared_ptr<LibGit_Repository>, const std::wstring& path);
+	GitRepository(std::shared_ptr<LibGit_Repository>, const std::wstring& path);
 
 	std::wstring path() const override
 	{
@@ -26,6 +25,8 @@ class GitRepository : public IRepository
 	std::optional<Author> getDefaultAuthor() const override;
 
 	std::string getNameOfRemoteRepository() const override;
+
+	std::future<bool> fetchFirstRemote(bool with_prune) override;
 
 	std::future<std::list<Commit>> getCommitsFromTimeRange(
 		const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to,
@@ -38,6 +39,5 @@ class GitRepository : public IRepository
 
 	std::wstring _path;
 	std::shared_ptr<LibGit_Repository> _repository;
-	const LibGit& _libgit;
 };
 } // namespace RaportPKUP
