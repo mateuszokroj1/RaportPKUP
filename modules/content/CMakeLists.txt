@@ -28,6 +28,7 @@ qt6_add_qml_module(
   MainViewItem.qml
   DataInputStepView.qml
   DataFilteringStepView.qml
+  DatePicker.qml
   ReportingStepView.qml)
 
 target_link_libraries(content PUBLIC RaportPKUP.Core)

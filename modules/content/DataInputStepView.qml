@@ -175,11 +175,39 @@ ColumnLayout {
             Layout.fillWidth: true
 
             RowLayout {
-                InputField {
-                    value: controller.fromDay
+                DatePicker {
+                    id: fromDate
+
+                    Component.onCompleted: {
+                        fromDate.set(controller.fromDay);
+                    }
+                    onClicked: {
+                        controller.fromDay = fromDate.selectedDate;
+                    }
                 }
-                InputField {
-                    value: controller.toDay
+                DatePicker {
+                    id: toDate
+
+                    Component.onCompleted: {
+                        toDate.set(controller.toDay);
+                    }
+                    onClicked: {
+                        controller.toDay = toDate.selectedDate;
+                    }
+                }
+                Connections {
+                    function onFromDayChanged() {
+                        fromDate.set(controller.fromDay);
+                    }
+
+                    target: controller
+                }
+                Connections {
+                    function onToDayChanged() {
+                        toDate.set(controller.toDay);
+                    }
+
+                    target: controller
                 }
             }
             RowLayout {
