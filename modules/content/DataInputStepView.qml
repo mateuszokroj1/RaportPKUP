@@ -104,6 +104,7 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.margins: Theme.defaultPadding
+            Layout.minimumHeight: 100
             model: controller.repositories
 
             delegate: Item {
@@ -153,7 +154,6 @@ ColumnLayout {
         }
         RowLayout {
             Layout.alignment: Qt.AlignTop
-            Layout.fillHeight: false
             Layout.fillWidth: true
 
             FormField {
@@ -172,13 +172,20 @@ ColumnLayout {
             }
         }
         ColumnLayout {
-            Layout.alignment: Qt.AlignTop
             Layout.fillHeight: true
             Layout.fillWidth: true
 
+            UIText {
+                Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
+                text: "Zakres dat przeszukiwania"
+            }
             RowLayout {
+                Layout.fillWidth: true
+
                 DatePicker {
                     id: fromDate
+
+                    Layout.alignment: Qt.AlignLeft
 
                     Component.onCompleted: {
                         fromDate.set(controller.fromDay);
@@ -189,6 +196,8 @@ ColumnLayout {
                 }
                 DatePicker {
                     id: toDate
+
+                    Layout.alignment: Qt.AlignRight
 
                     Component.onCompleted: {
                         toDate.set(controller.toDay);
@@ -210,16 +219,6 @@ ColumnLayout {
                     }
 
                     target: controller
-                }
-            }
-            RowLayout {
-                InputField {
-                    placeholderText: "Miejscowość"
-                    value: controller.city
-                }
-                CheckBox {
-                    //checked: controller.canFetchBefore
-                    text: "Pobierz informacje o zmianach przed przeszukaniem"
                 }
             }
         }

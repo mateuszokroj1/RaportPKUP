@@ -72,7 +72,7 @@ ListView {
                         // index is 0 to 48
                         property int day: index - 7 // 0 = top left below Sunday (-7 to 41)
 
-                        border.color: new Date(year, month, date).toDateString() == selectedDate.toDateString() && text.text && day >= 0 ? 'black' : 'transparent' // selected
+                        border.color: new Date(year, month, date).toDateString() == selectedDate.toDateString() && text.text && day >= 0 ? Theme.activatedElementBackground : 'transparent' // selected
                         border.width: 0.3 * radius
                         height: grid.cellHeight
                         opacity: !mouseArea.pressed ? 1 : 0.3  //  pressed state
