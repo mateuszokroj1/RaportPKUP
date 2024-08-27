@@ -102,7 +102,7 @@ std::list<Commit> GitRepository::getCommitsFromTimeRangeImpl(const std::chrono::
 				git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
 
 				if (std::ranges::any_of(list, [&result](decltype(list)::const_reference previous_commit)
-										{ return strcmp(result.id, previous_commit.id) == 0; }))
+										{ return result.id == previous_commit.id; }))
 					continue;
 
 				result.author = commit->getAuthor();

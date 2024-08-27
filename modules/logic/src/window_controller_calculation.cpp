@@ -7,6 +7,7 @@
 
 // #include <tbb/tbb.h>
 
+#include <include/Filters.hpp>
 #include <include/IProcess.hpp>
 #include <include/IRepositoryAccessor.hpp>
 
@@ -38,46 +39,6 @@ class RepositoryVisitorImpl : public IRepositoryVisitor
 	std::list<Commit> commits;
 };
 
-void uniqueIdAndSortDescendingByDate(std::vector<std::unique_ptr<Commit>>& commits)
-{
-	bool can_break = true;
-
-	do
-	{
-		can_break = true;
-
-		for (int position = 0; position < commits.size() - 1; ++position)
-		{
-			if (!commits[position])
-			{
-				commits.erase(commits.begin() + position);
-				can_break = false;
-				break;
-			}
-
-			for (int offset = 1; position + offset < commits.size(); ++offset)
-			{
-				if (std::strcmp(commits[position]->id, commits[position + offset]->id) == 0)
-				{
-					commits.erase(commits.begin() + position + offset);
-					can_break = false;
-					break;
-				}
-
-				if (commits[position]->datetime < commits[position + offset]->datetime)
-				{
-					commits[position].swap(commits[position + offset]);
-					can_break = false;
-					break;
-				}
-			}
-
-			if (!can_break)
-				break;
-		}
-	} while (!can_break);
-}
-
 void WindowController::searchForCommits()
 {
 	std::vector<std::unique_ptr<Commit>> result;
@@ -102,7 +63,11 @@ void WindowController::searchForCommits()
 		//					   });
 	}
 
-	uniqueIdAndSortDescendingByDate(result);
+	Filters::removeEmptyPointers(result);
+	Filters::unique<std::unique_ptr<Commit>, Commit::Id>(result,
+														 [](const std::unique_ptr<Commit>& item) { return item->id; });
+	Filters::sortDescending<std::unique_ptr<Commit>, DateTime>(result, [](const std::unique_ptr<Commit>& item)
+															   { return item->datetime; });
 
 	const auto temp_list = _commits;
 	_commits.clear();
