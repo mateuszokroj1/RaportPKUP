@@ -14,11 +14,12 @@ set(PUBLIC_HEADERS
     IRepositoryAccessor.hpp
     GitRepositoryAccessor.hpp
     GitRepositoryDetector.hpp
+    Filters.hpp
     ICommand.hpp)
 
 set(SOURCES git_repository.cpp libgit.cpp repository_detector_git.cpp)
 
-set(TESTS git_repository.cpp)
+set(TESTS git_repository.cpp filters.cpp)
 
 list(TRANSFORM SOURCES PREPEND "src/")
 

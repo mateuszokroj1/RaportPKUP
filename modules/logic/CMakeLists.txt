@@ -17,7 +17,9 @@ qt_add_library(
   src/Preset.hpp
   src/preset.cpp
   src/WindowController.hpp
-  src/window_controller.cpp)
+  src/window_controller_fields.cpp
+  src/window_controller_calculation.cpp
+  src/window_controller_reporting.cpp)
 
 qt6_add_qml_module(
   logic
@@ -40,7 +42,9 @@ qt6_add_qml_module(
   src/Preset.hpp
   src/preset.cpp
   src/WindowController.hpp
-  src/window_controller.cpp)
+  src/window_controller_fields.cpp
+  src/window_controller_calculation.cpp
+  src/window_controller_reporting.cpp)
 
 target_link_libraries(
   logic
