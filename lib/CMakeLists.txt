@@ -19,7 +19,7 @@ set(PUBLIC_HEADERS
 
 set(SOURCES git_repository.cpp libgit.cpp repository_detector_git.cpp)
 
-set(TESTS git_repository.cpp)
+set(TESTS git_repository.cpp filters.cpp)
 
 list(TRANSFORM SOURCES PREPEND "src/")
 
