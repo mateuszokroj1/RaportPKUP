@@ -2,6 +2,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QObject>
+#include <QtQml/qqmlregistration.h>
 
 #include <include/Commit.hpp>
 
@@ -10,6 +11,8 @@ namespace RaportPKUP::UI
 class CommitItem : public QObject
 {
 	Q_OBJECT
+	QML_ELEMENT
+	QML_UNCREATABLE("Read only")
 
   public:
 	CommitItem(std::unique_ptr<Commit>&&, QObject*);
