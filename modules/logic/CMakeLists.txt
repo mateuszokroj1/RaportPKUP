@@ -16,6 +16,8 @@ qt_add_library(
   src/repository_list_item.cpp
   src/Preset.hpp
   src/preset.cpp
+  src/PresetsManager.h
+  src/presets_manager.cpp
   src/WindowController.hpp
   src/window_controller_fields.cpp
   src/window_controller_calculation.cpp
@@ -41,6 +43,8 @@ qt6_add_qml_module(
   src/repository_list_item.cpp
   src/Preset.hpp
   src/preset.cpp
+  src/PresetsManager.h
+  src/presets_manager.cpp
   src/WindowController.hpp
   src/window_controller_fields.cpp
   src/window_controller_calculation.cpp

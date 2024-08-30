@@ -18,7 +18,8 @@ using namespace Qt::Literals::StringLiterals;
 namespace RaportPKUP::UI
 {
 WindowController::WindowController(std::weak_ptr<Application> app)
-	: _application(app), _addRepositoryCmd(new Command(this)), _searchForCommitsCmd(new Command(this))
+	: _application(app), _addRepositoryCmd(new Command(this)), _searchForCommitsCmd(new Command(this)),
+	  _presets_manager(this)
 {
 	if (auto app_ptr = _application.lock())
 	{
@@ -39,6 +40,12 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 	connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
 
 	connect(this, &WindowController::commitsChanged, this, &WindowController::isFilteringEnabledChanged);
+
+	connect(&_presets_manager, &PresetsManager::loaded, this, &WindowController::loadPresets, Qt::QueuedConnection);
+	connect(this, &WindowController::presetsChanged, &_presets_manager, &PresetsManager::saveToFile,
+			Qt::QueuedConnection);
+
+	_presets_manager.loadFromFile();
 }
 
 WindowController::~WindowController() noexcept
@@ -235,6 +242,11 @@ void WindowController::recallPreset(int index)
 	const auto preset = _presets.at(index);
 
 	// setAuthorName(); TODO
+}
+
+void WindowController::loadPresets()
+{
+	// TODO
 }
 
 void WindowController::addRepository()

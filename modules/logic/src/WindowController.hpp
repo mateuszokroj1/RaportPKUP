@@ -10,6 +10,7 @@
 #include "Command.hpp"
 #include "CommitItem.hpp"
 #include "Preset.hpp"
+#include "PresetsManager.h"
 #include "RepositoryListItem.hpp"
 
 namespace RaportPKUP::UI
@@ -126,12 +127,15 @@ class WindowController : public QObject
 	Q_INVOKABLE void saveRaportToFile(QString filename);
 
   private:
+	void loadPresets();
+
 	std::weak_ptr<Application> _application;
 	QList<Preset*> _presets;
 	QList<RepositoryListItem*> _repositories;
 	QList<CommitItem*> _commits;
 	std::shared_ptr<IProcessFactory> _process_factory;
 	std::shared_ptr<IRepositoryDetector> _repository_detector;
+	PresetsManager _presets_manager;
 
 	Command* _addRepositoryCmd = nullptr;
 	Command* _searchForCommitsCmd = nullptr;
