@@ -49,7 +49,7 @@ endif()
 
 add_subdirectory(lib)
 
-find_package(Qt6 6.7 REQUIRED COMPONENTS Core Quick)
+find_package(Qt6 6.7 REQUIRED COMPONENTS Core Quick Gui Widgets)
 set(CMAKE_AUTOMOC true)
 add_subdirectory(modules/logic)
 add_subdirectory(modules/content)

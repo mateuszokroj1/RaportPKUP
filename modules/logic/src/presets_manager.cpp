@@ -1,4 +1,4 @@
-#include "PresetsManager.h"
+#include "PresetsManager.hpp"
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
@@ -33,125 +33,132 @@ QString getJsonFilePath()
 }
 } // namespace
 
-void PresetsManager::loadFromFile()
+std::future<bool> PresetsManager::loadFromFile()
 {
-	const auto path = getJsonFilePath();
-
-	if (path.isEmpty())
-		return;
-
-	QFile file(path);
-	if (!file.open(QFile::OpenModeFlag::Text | QFile::OpenModeFlag::ReadOnly | QFile::OpenModeFlag::ExistingOnly))
-		return;
-
-	QByteArray bytes(file.size(), 0);
-
-	{
-		QDataStream stream(&file);
-		stream.readRawData(bytes.data(), bytes.size());
-	}
-
-	file.close();
-
-	QJsonDocument doc;
-	QJsonParseError err;
-	doc.fromJson(bytes, &err);
-
-	if (err.error != err.NoError)
-		return;
-
-	if (!doc.isArray())
-		return;
-
-	const auto main_array = doc.array();
-
-	presets.clear();
-	for (const auto item : main_array)
-	{
-		if (!item.isObject())
-			continue;
-
-		const auto object = item.toObject();
-
-		if (!object.isEmpty())
-			continue;
-
-		auto preset = new Preset(parent());
-
-		auto value = object.value("name");
-		preset->name = value.toString();
-
-		value = object.value("authorName");
-		preset->authorName = value.toString();
-
-		value = object.value("authorEmail");
-		preset->authorEmail = value.toString();
-
-		value = object.value("city");
-		preset->city = value.toString();
-
-		value = object.value("repositories");
-		const auto array = value.toArray();
-		for (const auto item : array)
+	return std::async(
+		[this]()
 		{
-			if (!item.isString())
-				continue;
+			std::lock_guard lock(_mutex);
 
-			QDir dir(item.toString());
-			if (!dir.exists())
-				continue;
+			const auto path = getJsonFilePath();
 
-			preset->repositories.append(dir.absolutePath());
-		}
+			if (path.isEmpty())
+				return false;
 
-		presets.append(preset);
-	}
+			QFile file(path);
+			if (!file.open(QFile::OpenModeFlag::Text | QFile::OpenModeFlag::ReadOnly |
+						   QFile::OpenModeFlag::ExistingOnly))
+				return false;
 
-	emit loaded();
+			const auto bytes = file.readAll();
+
+			file.close();
+
+			QJsonParseError err;
+			auto doc = QJsonDocument::fromJson(bytes, &err);
+
+			if (err.error != err.NoError)
+			{
+				qDebug() << err.errorString();
+				return false;
+			}
+
+			if (!doc.isArray())
+				return false;
+
+			const auto main_array = doc.array();
+
+			presets.clear();
+			for (const auto item : main_array)
+			{
+				if (!item.isObject())
+					continue;
+
+				const auto object = item.toObject();
+
+				if (object.isEmpty())
+					continue;
+
+				auto preset = new Preset(parent());
+
+				auto value = object.value("name");
+				preset->name = value.toString();
+
+				value = object.value("authorName");
+				preset->authorName = value.toString();
+
+				value = object.value("authorEmail");
+				preset->authorEmail = value.toString();
+
+				value = object.value("city");
+				preset->city = value.toString();
+
+				value = object.value("repositories");
+				const auto array = value.toArray();
+				for (const auto item : array)
+				{
+					if (!item.isString())
+						continue;
+
+					QDir dir(item.toString());
+					if (!dir.exists())
+						continue;
+
+					preset->repositories.append(dir.absolutePath());
+				}
+
+				presets.append(preset);
+			}
+
+			emit loaded();
+
+			return true;
+		});
 }
 
-void PresetsManager::saveToFile()
+std::future<bool> PresetsManager::saveToFile()
 {
-	const auto path = getJsonFilePath();
+	return std::async(
+		[this]()
+		{
+			std::lock_guard lock(_mutex);
 
-	QFile file(path);
-	if (!file.open(QFile::OpenModeFlag::Text | QFile::OpenModeFlag::ReadWrite))
-		return;
+			const auto path = getJsonFilePath();
 
-	QJsonArray root_array;
+			QFile file(path);
+			if (!file.open(QFile::OpenModeFlag::Text | QFile::OpenModeFlag::ReadWrite))
+				return false;
 
-	for (const auto preset : presets)
-	{
-		if (!preset)
-			continue;
+			QJsonArray root_array;
 
-		QJsonObject object;
+			for (const auto& preset : presets)
+			{
+				if (!preset)
+					continue;
 
-		object.insert("name", preset->name);
-		object.insert("authorName", preset->authorName);
-		object.insert("authorEmail", preset->authorEmail);
-		object.insert("", preset->city);
+				QJsonObject object;
 
-		QJsonArray array;
-		std::copy(preset->repositories.cbegin(), preset->repositories.cend(), std::back_inserter(array));
+				object.insert("name", preset->name);
+				object.insert("authorName", preset->authorName);
+				object.insert("authorEmail", preset->authorEmail);
+				object.insert("city", preset->city);
 
-		object.insert("repositories", array);
+				QJsonArray array;
+				std::copy(preset->repositories.cbegin(), preset->repositories.cend(), std::back_inserter(array));
+				object.insert("repositories", array);
 
-		root_array.append(object);
-	}
+				root_array.append(object);
+			}
 
-	QJsonDocument doc;
-	doc.setArray(root_array);
-	const auto bytes = doc.toJson();
+			QJsonDocument doc;
+			doc.setArray(root_array);
+			const auto bytes = doc.toJson();
 
-	file.resize(0);
-
-	{
-		QDataStream stream(&file);
-		stream.writeRawData(bytes.constData(), bytes.size());
-	}
-
-	file.flush();
-	file.close();
+			file.resize(0);
+			file.write(bytes);
+			file.flush();
+			file.close();
+			return true;
+		});
 }
 } // namespace RaportPKUP::UI

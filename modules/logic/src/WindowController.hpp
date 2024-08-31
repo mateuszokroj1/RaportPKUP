@@ -10,7 +10,7 @@
 #include "Command.hpp"
 #include "CommitItem.hpp"
 #include "Preset.hpp"
-#include "PresetsManager.h"
+#include "PresetsManager.hpp"
 #include "RepositoryListItem.hpp"
 
 namespace RaportPKUP::UI
@@ -28,6 +28,8 @@ class WindowController : public QObject
 	/* Data input */
 	Q_PROPERTY(QQmlListProperty<Preset> presets READ presets NOTIFY presetsChanged)
 
+	Q_PROPERTY(QString presetSelectorText READ presetSelectorText WRITE setPresetSelectorText NOTIFY
+				   presetSelectorTextChanged BINDABLE bindablePresetSelectorText)
 	Q_PROPERTY(
 		QString authorName READ authorName WRITE setAuthorName NOTIFY authorNameChanged BINDABLE bindableAuthorName)
 	Q_PROPERTY(QString authorEmail READ authorEmail WRITE setAuthorEmail NOTIFY authorEmailChanged BINDABLE
@@ -41,8 +43,10 @@ class WindowController : public QObject
 				   bindableRepositoryPath)
 	Q_PROPERTY(QQmlListProperty<RepositoryListItem> repositories READ repositories NOTIFY repositoriesChanged)
 
-	Q_PROPERTY(bool canFetchBefore READ canFetchBefore WRITE setCanFetchBefore NOTIFY canFetchBeforeChanged BINDABLE
-				   bindableCanFetchBefore)
+	// Q_PROPERTY(bool canFetchBefore READ canFetchBefore WRITE setCanFetchBefore NOTIFY canFetchBeforeChanged BINDABLE
+	//			   bindableCanFetchBefore)
+
+	Q_PROPERTY(bool canSavePreset READ canSavePreset NOTIFY canSavePresetChanged)
 
 	/* Filtering */
 	Q_PROPERTY(QQmlListProperty<CommitItem> commits READ commits NOTIFY commitsChanged)
@@ -56,6 +60,7 @@ class WindowController : public QObject
 	QQmlListProperty<RepositoryListItem> repositories();
 	QQmlListProperty<CommitItem> commits();
 
+	QString presetSelectorText() const;
 	QString authorName() const;
 	QString authorEmail() const;
 	QString city() const;
@@ -63,6 +68,7 @@ class WindowController : public QObject
 	QDate toDay() const;
 	QString repositoryPath() const;
 	bool canFetchBefore() const;
+	bool canSavePreset() const;
 
 	QString raportFileName() const;
 
@@ -81,6 +87,7 @@ class WindowController : public QObject
 		return _searchForCommitsCmd;
 	}
 
+	void setPresetSelectorText(QString);
 	void setAuthorName(QString);
 	void setAuthorEmail(QString);
 	void setCity(QString);
@@ -89,6 +96,7 @@ class WindowController : public QObject
 	Q_INVOKABLE void setRepositoryPath(QString);
 	void setCanFetchBefore(bool);
 
+	QBindable<QString> bindablePresetSelectorText() const;
 	QBindable<QString> bindableAuthorName() const;
 	QBindable<QString> bindableAuthorEmail() const;
 	QBindable<QString> bindableCity() const;
@@ -100,6 +108,7 @@ class WindowController : public QObject
   signals:
 	void itemsChanged();
 	void presetsChanged();
+	void presetSelectorTextChanged();
 	void authorNameChanged();
 	void authorEmailChanged();
 	void cityChanged();
@@ -108,6 +117,7 @@ class WindowController : public QObject
 	void repositoriesChanged();
 	void repositoryPathChanged();
 	void canFetchBeforeChanged();
+	void canSavePresetChanged();
 	void isFilteringEnabledChanged();
 	void commitsChanged();
 	void previewDocumentChanged();
@@ -126,8 +136,11 @@ class WindowController : public QObject
 
 	Q_INVOKABLE void saveRaportToFile(QString filename);
 
+	Q_INVOKABLE bool YesCancelDialog(const QString& title, const QString& message, const QString& detailed_info = {});
+
   private:
 	void loadPresets();
+	void syncPresetsFile();
 
 	std::weak_ptr<Application> _application;
 	QList<Preset*> _presets;
@@ -140,6 +153,8 @@ class WindowController : public QObject
 	Command* _addRepositoryCmd = nullptr;
 	Command* _searchForCommitsCmd = nullptr;
 
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _presetSelectorText,
+							   &WindowController::presetSelectorTextChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _authorName, &WindowController::authorNameChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _authorEmail, &WindowController::authorEmailChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _city, &WindowController::cityChanged)
