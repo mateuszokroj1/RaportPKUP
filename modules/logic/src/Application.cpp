@@ -38,6 +38,9 @@ int Application::run(int argc, char* argv[])
 
 	{
 		auto app = new QGuiApplication(argc, argv);
+
+		app->setApplicationName("RaportPKUP");
+
 		_main_app.reset(app);
 
 		_qml = std::make_unique<QQmlApplicationEngine>();

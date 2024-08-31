@@ -16,6 +16,8 @@ qt_add_library(
   src/repository_list_item.cpp
   src/Preset.hpp
   src/preset.cpp
+  src/PresetsManager.hpp
+  src/presets_manager.cpp
   src/WindowController.hpp
   src/window_controller_fields.cpp
   src/window_controller_calculation.cpp
@@ -41,6 +43,8 @@ qt6_add_qml_module(
   src/repository_list_item.cpp
   src/Preset.hpp
   src/preset.cpp
+  src/PresetsManager.hpp
+  src/presets_manager.cpp
   src/WindowController.hpp
   src/window_controller_fields.cpp
   src/window_controller_calculation.cpp
@@ -49,6 +53,6 @@ qt6_add_qml_module(
 target_link_libraries(
   logic
   PUBLIC RaportPKUP.Core
-  PRIVATE Qt6::Core Qt6::Gui)
+  PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
 
 target_include_directories(logic PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)

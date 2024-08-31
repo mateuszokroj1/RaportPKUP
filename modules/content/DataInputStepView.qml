@@ -44,10 +44,12 @@ ColumnLayout {
                 textRole: "name"
 
                 onCurrentIndexChanged: controller.recallPreset(presetSelector.currentIndex)
+                onEditTextChanged: controller.presetSelectorText = presetSelector.editText
             }
             UIButton {
                 id: savePresetCmd
 
+                enabled: controller.canSavePreset
                 text: "Zapisz"
 
                 onClicked: controller.savePreset(presetSelector.editText)
@@ -216,7 +218,7 @@ ColumnLayout {
                     value: controller.city
                 }
                 CheckBox {
-                    checked: controller.canFetchBefore
+                    //checked: controller.canFetchBefore
                     text: "Pobierz informacje o zmianach przed przeszukaniem"
                 }
             }
