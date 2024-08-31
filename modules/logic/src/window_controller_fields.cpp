@@ -383,8 +383,8 @@ void WindowController::removeCommit(CommitItem* ptr)
 bool WindowController::YesCancelDialog(const QString& title, const QString& message, const QString& detailed_info)
 {
 	return QMessageBox::warning(nullptr, title, message,
-		QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel,
-		QMessageBox::StandardButton::Yes) == QMessageBox::StandardButton::Yes;
+								QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel,
+								QMessageBox::StandardButton::Yes) == QMessageBox::StandardButton::Yes;
 }
 
 } // namespace RaportPKUP::UI
