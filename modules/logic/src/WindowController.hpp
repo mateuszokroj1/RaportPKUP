@@ -112,12 +112,15 @@ class WindowController : public QObject
 	void repositoryPathChanged();
 	void canStartSearchChanged();
 	void canSavePresetChanged();
+	void searchingDone();
+
 	void commitsChanged();
-	void previewDocumentChanged();
 
 	void lockScreen();
 	void unlockScreen();
 	void showFilteringView();
+
+	void previewDocumentChanged();
 
   public:
 	Q_INVOKABLE void savePreset(const QString&);
@@ -139,10 +142,13 @@ class WindowController : public QObject
 	void loadPresets();
 	void syncPresetsFile();
 
+	void whenCommitsLoaded();
+
 	QString _repository_path;
 	std::weak_ptr<Application> _application;
 	QList<Preset*> _presets;
 	QList<RepositoryListItem*> _repositories;
+	std::vector<std::unique_ptr<Commit>> _commits_temp;
 	QList<CommitItem*> _commits;
 	std::shared_ptr<IProcessFactory> _process_factory;
 	std::shared_ptr<IRepositoryDetector> _repository_detector;

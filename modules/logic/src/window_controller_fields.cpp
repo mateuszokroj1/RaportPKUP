@@ -51,6 +51,8 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 	connect(this, &WindowController::fromDayChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::toDayChanged, this, &WindowController::canStartSearchChanged);
 
+	connect(this, &WindowController::searchingDone, this, &WindowController::whenCommitsLoaded, Qt::QueuedConnection);
+
 	_presets_manager.loadFromFile();
 }
 
@@ -194,6 +196,7 @@ void WindowController::setRepositoryPath(QString value)
 		return;
 
 	_repository_path = QString::fromStdWString(result->generic_wstring());
+	emit repositoryPathChanged();
 }
 
 QBindable<QString> WindowController::bindablePresetSelectorText() const
@@ -243,6 +246,7 @@ void WindowController::addRepository()
 		_repositories.push_back(new RepositoryListItem(std::move(repo), this));
 		emit repositoriesChanged();
 		_repository_path = {};
+		emit repositoryPathChanged();
 	}
 
 	if (_repositories.count() == 1 && author)
