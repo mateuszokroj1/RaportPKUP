@@ -36,7 +36,7 @@ Button {
     states: [
         State {
             name: "flat"
-            when: root.flat
+            when: root.flat && !root.enabled
 
             PropertyChanges {
                 color: "transparent"
@@ -49,7 +49,7 @@ Button {
         },
         State {
             name: "highlight"
-            when: root.highlighted && !root.flat
+            when: root.enabled && root.highlighted && !root.flat
 
             PropertyChanges {
                 color: Theme.activatedElementBackground
@@ -62,7 +62,7 @@ Button {
         },
         State {
             name: "disabledNonFlat"
-            when: root.highlighted && !root.flat
+            when: !root.enabled && root.highlighted && !root.flat
 
             PropertyChanges {
                 border.color: Theme.disabledText
@@ -72,13 +72,18 @@ Button {
         }
     ]
 
+    onClicked: {
+        if (root.command != null && root.command.canExecute)
+            root.command.execute();
+    }
+
     StateGroup {
         id: stateGroup
 
         states: [
             State {
                 name: "disabled"
-                when: !root.enabled
+                when: !root.enabled && !root.highlighted
 
                 PropertyChanges {
                     color: Theme.disabledText
@@ -86,13 +91,5 @@ Button {
                 }
             }
         ]
-    }
-    Connections {
-        function onClicked() {
-            if (root.command != null && root.command.canExecute)
-                root.command.execute();
-        }
-
-        target: root
     }
 }

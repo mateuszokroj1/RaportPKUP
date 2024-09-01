@@ -3,6 +3,12 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 ColumnLayout {
+    RowLayout {
+        InputField {
+            placeholderText: "Miejscowość"
+            value: controller.city
+        }
+    }
     Button {
         text: "Zapisz"
 

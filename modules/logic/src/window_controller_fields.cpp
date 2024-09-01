@@ -40,12 +40,16 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 
 	connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
 
-	connect(this, &WindowController::commitsChanged, this, &WindowController::isFilteringEnabledChanged);
-
 	connect(&_presets_manager, &PresetsManager::loaded, this, &WindowController::loadPresets, Qt::QueuedConnection);
 	connect(this, &WindowController::presetsChanged, this, &WindowController::syncPresetsFile, Qt::QueuedConnection);
 
 	connect(this, &WindowController::presetSelectorTextChanged, this, &WindowController::canSavePresetChanged);
+
+	connect(this, &WindowController::authorNameChanged, this, &WindowController::canStartSearchChanged);
+	connect(this, &WindowController::authorEmailChanged, this, &WindowController::canStartSearchChanged);
+	connect(this, &WindowController::repositoriesChanged, this, &WindowController::canStartSearchChanged);
+	connect(this, &WindowController::fromDayChanged, this, &WindowController::canStartSearchChanged);
+	connect(this, &WindowController::toDayChanged, this, &WindowController::canStartSearchChanged);
 
 	_presets_manager.loadFromFile();
 }
@@ -104,12 +108,7 @@ QDate WindowController::toDay() const
 
 QString WindowController::repositoryPath() const
 {
-	return _repositoryPath.value();
-}
-
-bool WindowController::canFetchBefore() const
-{
-	return _canFetchBefore.value();
+	return _repository_path;
 }
 
 bool WindowController::canSavePreset() const
@@ -118,6 +117,23 @@ bool WindowController::canSavePreset() const
 
 	return !text.isEmpty() &&
 		   std::ranges::none_of(_presets, [&text](const Preset* item) { return item && item->name == text; });
+}
+
+bool WindowController::canStartSearch() const
+{
+	if (authorName().isEmpty())
+		return false;
+
+	if (authorEmail().isEmpty())
+		return false;
+
+	if (fromDay() > toDay())
+		return false;
+
+	if (_repositories.empty())
+		return false;
+
+	return true;
 }
 
 void WindowController::setPresetSelectorText(QString value)
@@ -165,7 +181,7 @@ void WindowController::setRepositoryPath(QString value)
 	QDir dir(url.toLocalFile());
 	if (!dir.exists())
 	{
-		_repositoryPath.setValue("");
+		_repository_path = {};
 		return;
 	}
 
@@ -177,12 +193,7 @@ void WindowController::setRepositoryPath(QString value)
 	if (!result)
 		return;
 
-	_repositoryPath.setValue(QString::fromStdWString(result->generic_wstring()));
-}
-
-void WindowController::setCanFetchBefore(bool value)
-{
-	_canFetchBefore.setValue(value);
+	_repository_path = QString::fromStdWString(result->generic_wstring());
 }
 
 QBindable<QString> WindowController::bindablePresetSelectorText() const
@@ -215,122 +226,13 @@ QBindable<QDate> WindowController::bindableToDay() const
 	return &_toDay;
 }
 
-QBindable<QString> WindowController::bindableRepositoryPath() const
-{
-	return &_repositoryPath;
-}
-
-QBindable<bool> WindowController::bindableCanFetchBefore() const
-{
-	return &_canFetchBefore;
-}
-
-void WindowController::savePreset(const QString& name)
-{
-	Preset* preset = nullptr;
-
-	for (auto item : _presets)
-	{
-		if (item->name == name)
-			return;
-	}
-
-	if (!preset)
-		preset = new Preset(this);
-
-	preset->name = name;
-	preset->authorName = _authorName.value();
-	preset->authorEmail = _authorEmail.value();
-	preset->city = _city.value();
-	preset->repositories.clear();
-
-	std::transform(_repositories.begin(), _repositories.end(), std::back_inserter(preset->repositories),
-				   [](RepositoryListItem* item) { return item->path(); });
-
-	_presets.push_back(preset);
-
-	emit presetsChanged();
-}
-
-void WindowController::deletePreset(int index)
-{
-	if (index < 0)
-		return;
-
-	_presets.removeAt(index);
-
-	emit presetsChanged();
-}
-
-void WindowController::recallPreset(int index)
-{
-	if (index < 0)
-		return;
-
-	const auto preset = _presets.at(index);
-
-	setAuthorName(preset->authorName);
-	setAuthorEmail(preset->authorEmail);
-	setCity(preset->city);
-
-	auto list = _repositories;
-	qDeleteAll(list);
-	_repositories.clear();
-
-	const auto& accessor = _repository_detector->getAccessor();
-
-	for (const auto& repoPath : preset->repositories)
-	{
-		const auto wstr = repoPath.toStdWString();
-
-		if (auto repo = accessor.openRepository(std::filesystem::path(std::move(wstr))).get())
-			_repositories.push_back(new RepositoryListItem(std::move(repo), this));
-	}
-
-	emit repositoriesChanged();
-}
-
-void WindowController::loadPresets()
-{
-	auto list = _presets;
-	_presets.clear();
-	qDeleteAll(list);
-
-	std::copy(_presets_manager.presets.cbegin(), _presets_manager.presets.cend(), std::back_inserter(_presets));
-	emit presetsChanged();
-}
-
-void WindowController::syncPresetsFile()
-{
-	if (_presets.size() == _presets_manager.presets.size())
-	{
-		bool broken = false;
-
-		for (size_t i = 0; i < _presets.size(); ++i)
-		{
-			if (_presets[i] != _presets_manager.presets[i])
-			{
-				broken = true;
-				break;
-			}
-		}
-
-		if (!broken)
-			return;
-	}
-
-	_presets_manager.presets.clear();
-	std::copy(_presets.cbegin(), _presets.cend(), std::back_inserter(_presets_manager.presets));
-	_presets_manager.saveToFile();
-}
-
 void WindowController::addRepository()
 {
 	const auto& accessor = _repository_detector->getAccessor();
 	const auto wstr = repositoryPath().toStdWString();
 
-	if (std::any_of(_repositories.cbegin(), _repositories.cend(),
-					[this](const RepositoryListItem* item) { return item && item->path() == _repositoryPath; }))
+	if (std::ranges::any_of(_repositories, [this](const RepositoryListItem* item)
+							{ return item && item->path() == _repository_path; }))
 		return;
 
 	std::optional<Author> author;
@@ -340,7 +242,7 @@ void WindowController::addRepository()
 
 		_repositories.push_back(new RepositoryListItem(std::move(repo), this));
 		emit repositoriesChanged();
-		_repositoryPath.setValue("");
+		_repository_path = {};
 	}
 
 	if (_repositories.count() == 1 && author)
@@ -382,9 +284,7 @@ void WindowController::removeCommit(CommitItem* ptr)
 
 bool WindowController::YesCancelDialog(const QString& title, const QString& message, const QString& detailed_info)
 {
-	return QMessageBox::warning(nullptr, title, message,
-								QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel,
-								QMessageBox::StandardButton::Yes) == QMessageBox::StandardButton::Yes;
+	return false;
 }
 
 } // namespace RaportPKUP::UI
