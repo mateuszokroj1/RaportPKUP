@@ -1,6 +1,7 @@
 #include <signal.h>
 
 #include <QQmlApplicationEngine>
+#include <QtGui/QSurfaceFormat>
 #include <qqmlcontext.h>
 
 #include "EmptyDeleter.hpp"
@@ -42,6 +43,10 @@ int Application::run(int argc, char* argv[])
 		app->setApplicationName("RaportPKUP");
 
 		_main_app.reset(app);
+
+		QSurfaceFormat format;
+		format.setSamples(8);
+		QSurfaceFormat::setDefaultFormat(format);
 
 		_qml = std::make_unique<QQmlApplicationEngine>();
 		const QUrl url(u"qrc:/qt/qml/Main/main.qml"_qs);
