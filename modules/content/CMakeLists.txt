@@ -20,10 +20,10 @@ qt6_add_qml_module(
   FormItemBase.qml
   Theme.qml
   UIText.ui.qml
-  UIButton.ui.qml
+  UIButton.qml
   InputField.ui.qml
   StepSelectorButton.ui.qml
-  StepSelector.ui.qml
+  StepSelector.qml
   App.qml
   MainViewItem.qml
   DataInputStepView.qml

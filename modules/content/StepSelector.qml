@@ -10,6 +10,12 @@ RowLayout {
     property double arrowsWidth: 35
     default required property list<MainViewItem> items
 
+    function selectView(index) {
+        if (index < 0 || index >= items.length())
+            return;
+        contentStack.currentIndex = index;
+    }
+
     implicitHeight: menu.implicitHeight + 100
     implicitWidth: menu.width + contentStack.implicitWidth
     spacing: Theme.defaultPadding
