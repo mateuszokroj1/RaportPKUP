@@ -66,9 +66,12 @@ ColumnLayout {
         }
     }
     ColumnLayout {
+        Layout.bottomMargin: 15
         Layout.fillHeight: true
         Layout.fillWidth: true
-        Layout.margins: Theme.defaultPadding
+        Layout.leftMargin: 15
+        Layout.rightMargin: 50
+        Layout.topMargin: 15
 
         RowLayout {
             Layout.alignment: Qt.AlignTop
@@ -76,6 +79,8 @@ ColumnLayout {
             spacing: Theme.defaultPadding
 
             InputField {
+                id: repositoryPath
+
                 Layout.fillWidth: true
                 value: controller.repositoryPath
             }
@@ -85,6 +90,7 @@ ColumnLayout {
                 onClicked: directoryDialog.open()
             }
             UIButton {
+                enabled: repositoryPath.value.length > 0
                 text: "Dodaj"
 
                 onClicked: controller.addRepository()
@@ -100,63 +106,73 @@ ColumnLayout {
 
             onAccepted: controller.setRepositoryPath(directoryDialog.selectedFolder)
         }
-        ListView {
+        ScrollView {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.margins: Theme.defaultPadding
-            Layout.minimumHeight: 100
-            model: controller.repositories
+            Layout.minimumHeight: 1
 
-            delegate: Item {
-                id: repoList_item
+            ListView {
+                model: controller.repositories
+                spacing: 15
 
-                required property int index
-                required property string path
+                delegate: Item {
+                    id: repoList_item
 
-                anchors.left: parent.left
-                anchors.margins: 15
-                anchors.right: parent.right
-                implicitHeight: repoList_itemLayout.implicitHeight
-                implicitWidth: repoList_itemLayout.implicitWidth
+                    required property int index
+                    required property string path
 
-                Rectangle {
-                    anchors.fill: parent
-                    color: "#eeeeee"
-                    radius: 4
-                }
-                RowLayout {
-                    id: repoList_itemLayout
+                    anchors.left: parent.left
+                    anchors.margins: 15
+                    anchors.right: parent.right
+                    implicitHeight: repoList_itemLayout.implicitHeight
+                    implicitWidth: repoList_itemLayout.implicitWidth
 
-                    anchors.fill: parent
-
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Layout.margins: Theme.defaultPadding
-
-                        UIText {
-                            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-                            elide: Text.ElideMiddle
-                            text: path
-                            wrapMode: Text.NoWrap
-                        }
+                    Rectangle {
+                        anchors.fill: parent
+                        color: "#eeeeee"
+                        radius: 4
                     }
-                    UIButton {
-                        Layout.alignment: Qt.AlignRight
-                        Layout.bottomMargin: Theme.defaultPadding
-                        Layout.rightMargin: Theme.defaultPadding
-                        Layout.topMargin: Theme.defaultPadding
-                        text: "Usuń"
+                    RowLayout {
+                        id: repoList_itemLayout
 
-                        onClicked: controller.removeRepository(index)
+                        anchors.fill: parent
+
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.margins: Theme.defaultPadding
+
+                            UIText {
+                                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                                elide: Text.ElideMiddle
+                                text: path
+                                wrapMode: Text.NoWrap
+                            }
+                        }
+                        UIButton {
+                            Layout.alignment: Qt.AlignRight
+                            Layout.bottomMargin: Theme.defaultPadding
+                            Layout.rightMargin: Theme.defaultPadding
+                            Layout.topMargin: Theme.defaultPadding
+                            text: "Usuń"
+
+                            onClicked: controller.removeRepository(index)
+                        }
                     }
                 }
             }
         }
-        RowLayout {
+        GridLayout {
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
+            columns: 2
+            rows: 1
 
             FormField {
+                Layout.column: 0
+                Layout.fillHeight: false
+                Layout.fillWidth: true
+                Layout.row: 0
                 label: "Imię i nazwisko"
 
                 InputField {
@@ -164,6 +180,10 @@ ColumnLayout {
                 }
             }
             FormField {
+                Layout.column: 1
+                Layout.fillHeight: false
+                Layout.fillWidth: true
+                Layout.row: 0
                 label: "Adres e-mail"
 
                 InputField {
@@ -174,18 +194,30 @@ ColumnLayout {
         ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
+            Layout.margins: Theme.defaultPadding
 
-            UIText {
-                Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
-                text: "Zakres dat przeszukiwania"
+            RowLayout {
+                Item {
+                    Layout.fillWidth: true
+                }
+                UIText {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.bottomMargin: Theme.defaultPadding
+                    color: Theme.activatedElementBackground
+                    text: "Zakres dat przeszukiwania"
+                }
+                Item {
+                    Layout.fillWidth: true
+                }
             }
             RowLayout {
                 Layout.fillWidth: true
 
+                Item {
+                    Layout.fillWidth: true
+                }
                 DatePicker {
                     id: fromDate
-
-                    Layout.alignment: Qt.AlignLeft
 
                     Component.onCompleted: {
                         fromDate.set(controller.fromDay);
@@ -194,10 +226,11 @@ ColumnLayout {
                         controller.fromDay = fromDate.selectedDate;
                     }
                 }
+                Item {
+                    Layout.fillWidth: true
+                }
                 DatePicker {
                     id: toDate
-
-                    Layout.alignment: Qt.AlignRight
 
                     Component.onCompleted: {
                         toDate.set(controller.toDay);
@@ -206,19 +239,8 @@ ColumnLayout {
                         controller.toDay = toDate.selectedDate;
                     }
                 }
-                Connections {
-                    function onFromDayChanged() {
-                        fromDate.set(controller.fromDay);
-                    }
-
-                    target: controller
-                }
-                Connections {
-                    function onToDayChanged() {
-                        toDate.set(controller.toDay);
-                    }
-
-                    target: controller
+                Item {
+                    Layout.fillWidth: true
                 }
             }
         }
@@ -226,13 +248,31 @@ ColumnLayout {
             Layout.alignment: Qt.AlignBottom
             Layout.fillWidth: true
 
+            Item {
+                Layout.fillWidth: true
+            }
             UIButton {
                 Layout.alignment: Qt.AlignCenter
+                Layout.margins: Theme.defaultPadding
+                enabled: controller.canStartSearch
                 highlighted: true
                 text: "Przeszukaj repozytoria"
 
                 onClicked: controller.searchForCommits()
             }
+            Item {
+                Layout.fillWidth: true
+            }
         }
+    }
+    Connections {
+        function onFromDayChanged() {
+            fromDate.set(controller.fromDay);
+        }
+        function onToDayChanged() {
+            toDate.set(controller.toDay);
+        }
+
+        target: controller
     }
 }

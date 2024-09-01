@@ -39,14 +39,11 @@ class WindowController : public QObject
 	Q_PROPERTY(QDate fromDay READ fromDay WRITE setFromDay NOTIFY fromDayChanged BINDABLE bindableFromDay)
 	Q_PROPERTY(QDate toDay READ toDay WRITE setToDay NOTIFY toDayChanged BINDABLE bindableToDay)
 
-	Q_PROPERTY(QString repositoryPath READ repositoryPath WRITE setRepositoryPath NOTIFY repositoryPathChanged BINDABLE
-				   bindableRepositoryPath)
+	Q_PROPERTY(QString repositoryPath READ repositoryPath WRITE setRepositoryPath NOTIFY repositoryPathChanged)
 	Q_PROPERTY(QQmlListProperty<RepositoryListItem> repositories READ repositories NOTIFY repositoriesChanged)
 
-	// Q_PROPERTY(bool canFetchBefore READ canFetchBefore WRITE setCanFetchBefore NOTIFY canFetchBeforeChanged BINDABLE
-	//			   bindableCanFetchBefore)
-
 	Q_PROPERTY(bool canSavePreset READ canSavePreset NOTIFY canSavePresetChanged)
+	Q_PROPERTY(bool canStartSearch READ canStartSearch NOTIFY canStartSearchChanged)
 
 	/* Filtering */
 	Q_PROPERTY(QQmlListProperty<CommitItem> commits READ commits NOTIFY commitsChanged)
@@ -67,8 +64,8 @@ class WindowController : public QObject
 	QDate fromDay() const;
 	QDate toDay() const;
 	QString repositoryPath() const;
-	bool canFetchBefore() const;
 	bool canSavePreset() const;
+	bool canStartSearch() const;
 
 	QString raportFileName() const;
 
@@ -94,7 +91,6 @@ class WindowController : public QObject
 	void setFromDay(QDate);
 	void setToDay(QDate);
 	Q_INVOKABLE void setRepositoryPath(QString);
-	void setCanFetchBefore(bool);
 
 	QBindable<QString> bindablePresetSelectorText() const;
 	QBindable<QString> bindableAuthorName() const;
@@ -102,8 +98,6 @@ class WindowController : public QObject
 	QBindable<QString> bindableCity() const;
 	QBindable<QDate> bindableFromDay() const;
 	QBindable<QDate> bindableToDay() const;
-	QBindable<QString> bindableRepositoryPath() const;
-	QBindable<bool> bindableCanFetchBefore() const;
 
   signals:
 	void itemsChanged();
@@ -116,11 +110,14 @@ class WindowController : public QObject
 	void toDayChanged();
 	void repositoriesChanged();
 	void repositoryPathChanged();
-	void canFetchBeforeChanged();
+	void canStartSearchChanged();
 	void canSavePresetChanged();
-	void isFilteringEnabledChanged();
 	void commitsChanged();
 	void previewDocumentChanged();
+
+	void lockScreen();
+	void unlockScreen();
+	void showFilteringView();
 
   public:
 	Q_INVOKABLE void savePreset(const QString&);
@@ -142,6 +139,7 @@ class WindowController : public QObject
 	void loadPresets();
 	void syncPresetsFile();
 
+	QString _repository_path;
 	std::weak_ptr<Application> _application;
 	QList<Preset*> _presets;
 	QList<RepositoryListItem*> _repositories;
@@ -160,8 +158,5 @@ class WindowController : public QObject
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _city, &WindowController::cityChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _fromDay, &WindowController::fromDayChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _toDay, &WindowController::toDayChanged)
-	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _repositoryPath, &WindowController::repositoryPathChanged)
-	Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(WindowController, bool, _canFetchBefore, true,
-										 &WindowController::canFetchBeforeChanged)
 };
 } // namespace RaportPKUP::UI
