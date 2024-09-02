@@ -29,13 +29,15 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 			return;
 
 		_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
+
+		connect(app_ptr->getQApplication(), &QGuiApplication::aboutToQuit, this,
+				[this]() { _is_about_to_quit = true; });
 	}
 
 	const auto today = QDate::currentDate();
 	_fromDay.setValue(QDate(today.year(), today.month(), 1));
 	_toDay.setValue(QDate(today.year(), today.month(), today.daysInMonth()));
 
-	//_addRepositoryCmd->bindableCanExecute().setBinding([this](){ return !_repositoryPath.value().isEmpty(); });
 	connect(_addRepositoryCmd, &Command::onExecute, this, &WindowController::addRepository);
 
 	connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
@@ -50,8 +52,6 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 	connect(this, &WindowController::repositoriesChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::fromDayChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::toDayChanged, this, &WindowController::canStartSearchChanged);
-
-	connect(this, &WindowController::searchingDone, this, &WindowController::whenCommitsLoaded, Qt::QueuedConnection);
 
 	_presets_manager.loadFromFile();
 }

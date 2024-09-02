@@ -39,11 +39,18 @@ class RepositoryVisitorImpl : public IRepositoryVisitor
 
 void WindowController::searchForCommits()
 {
-	auto _ = std::async(
+	if (_last_thread.joinable())
+	{
+		qDebug() << "Another thread is working...";
+		return;
+	}
+
+	emit lockScreen();
+	_thread_finished = false;
+
+	_last_thread = std::thread(
 		[this]()
 		{
-			emit lockScreen();
-
 			_commits_temp.clear();
 			const std::chrono::system_clock::time_point from = fromDay().toStdSysDays();
 			const std::chrono::system_clock::time_point to = toDay().toStdSysDays();
@@ -56,8 +63,15 @@ void WindowController::searchForCommits()
 				RepositoryVisitorImpl visitor(from, to, author);
 				repo->accept(visitor);
 
-				std::transform(visitor.commits.cbegin(), visitor.commits.cend(), std::back_inserter(_commits_temp),
-							   [](Commit commit) { return std::make_unique<Commit>(commit); });
+				for (const auto& commit : visitor.commits)
+				{
+					if (_is_about_to_quit)
+						return;
+
+					_commits_temp.push_back(std::make_unique<Commit>(commit));
+
+					QCoreApplication::processEvents();
+				}
 			}
 
 			Filters::removeEmptyPointers(_commits_temp);
@@ -66,19 +80,37 @@ void WindowController::searchForCommits()
 			Filters::sortDescending<std::unique_ptr<Commit>, DateTime>(
 				_commits_temp, [](const std::unique_ptr<Commit>& item) { return item->datetime; });
 
-			emit searchingDone();
+			_thread_finished = true;
 		});
+
+	whenCommitsLoaded();
 }
 
 void WindowController::whenCommitsLoaded()
 {
+	while (!_thread_finished && !_is_about_to_quit)
+		QCoreApplication::processEvents();
+
+	if (_last_thread.joinable())
+		_last_thread.join();
+
+	if (_is_about_to_quit)
+		return;
+
 	const auto temp_list = _commits;
 	_commits.clear();
 	emit commitsChanged();
 	qDeleteAll(temp_list);
 
-	std::ranges::transform(_commits_temp, std::back_inserter(_commits),
-						   [this](std::unique_ptr<Commit>& commit) { return new CommitItem(std::move(commit), this); });
+	for (auto& commit : _commits_temp)
+	{
+		_commits.push_back(new CommitItem(std::move(commit), this));
+
+		if (_is_about_to_quit)
+			return;
+
+		QCoreApplication::processEvents();
+	}
 
 	_commits_temp.clear();
 
