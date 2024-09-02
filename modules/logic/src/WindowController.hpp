@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QDir>
+#include <QtCore/QThread>
 #include <QtQml/QQmlListProperty>
 
 #include <include/IProcess.hpp>
@@ -112,12 +113,14 @@ class WindowController : public QObject
 	void repositoryPathChanged();
 	void canStartSearchChanged();
 	void canSavePresetChanged();
+
 	void commitsChanged();
-	void previewDocumentChanged();
 
 	void lockScreen();
 	void unlockScreen();
 	void showFilteringView();
+
+	void previewDocumentChanged();
 
   public:
 	Q_INVOKABLE void savePreset(const QString&);
@@ -139,14 +142,23 @@ class WindowController : public QObject
 	void loadPresets();
 	void syncPresetsFile();
 
-	QString _repository_path;
+	void whenCommitsLoaded();
+
 	std::weak_ptr<Application> _application;
-	QList<Preset*> _presets;
-	QList<RepositoryListItem*> _repositories;
-	QList<CommitItem*> _commits;
 	std::shared_ptr<IProcessFactory> _process_factory;
 	std::shared_ptr<IRepositoryDetector> _repository_detector;
 	PresetsManager _presets_manager;
+
+	QList<Preset*> _presets;
+	QList<RepositoryListItem*> _repositories;
+	std::vector<std::unique_ptr<Commit>> _commits_temp;
+	QList<CommitItem*> _commits;
+
+	QString _repository_path;
+
+	std::thread _last_thread;
+	std::atomic_bool _thread_finished = false;
+	std::atomic_bool _is_about_to_quit = false;
 
 	Command* _addRepositoryCmd = nullptr;
 	Command* _searchForCommitsCmd = nullptr;

@@ -11,7 +11,7 @@ RowLayout {
     default required property list<MainViewItem> items
 
     function selectView(index) {
-        if (index < 0 || index >= items.length())
+        if (index < 0 || index >= items.length)
             return;
         contentStack.currentIndex = index;
     }

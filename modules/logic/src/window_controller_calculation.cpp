@@ -5,8 +5,6 @@
 #include <QtQml/QQmlContext>
 #include <QtQml/qqmllist.h>
 
-// #include <tbb/tbb.h>
-
 #include <include/Filters.hpp>
 #include <include/IProcess.hpp>
 #include <include/IRepositoryAccessor.hpp>
@@ -41,42 +39,83 @@ class RepositoryVisitorImpl : public IRepositoryVisitor
 
 void WindowController::searchForCommits()
 {
-	std::vector<std::unique_ptr<Commit>> result;
-	const std::chrono::system_clock::time_point from = fromDay().toStdSysDays();
-	const std::chrono::system_clock::time_point to = toDay().toStdSysDays();
-	Author author;
-	author.email = authorEmail().toStdWString();
-	author.name = authorName().toStdWString();
-
-	std::unique_ptr<std::mutex> mutex = std::make_unique<std::mutex>();
-
-	for (auto repo : _repositories)
-	// tbb::parallel_for_each(_repositories.begin(), _repositories.end(),
-	//					   [&](RepositoryListItem* item)
+	if (_last_thread.joinable())
 	{
-		RepositoryVisitorImpl visitor(from, to, author);
-		repo->accept(visitor);
-
-		// std::unique_lock locker(*mutex);
-		std::transform(visitor.commits.cbegin(), visitor.commits.cend(), std::back_inserter(result),
-					   [](Commit commit) { return std::make_unique<Commit>(commit); });
-		//					   });
+		qDebug() << "Another thread is working...";
+		return;
 	}
 
-	Filters::removeEmptyPointers(result);
-	Filters::unique<std::unique_ptr<Commit>, Commit::Id>(result,
-														 [](const std::unique_ptr<Commit>& item) { return item->id; });
-	Filters::sortDescending<std::unique_ptr<Commit>, DateTime>(result, [](const std::unique_ptr<Commit>& item)
-															   { return item->datetime; });
+	emit lockScreen();
+	_thread_finished = false;
+
+	_last_thread = std::thread(
+		[this]()
+		{
+			_commits_temp.clear();
+			const std::chrono::system_clock::time_point from = fromDay().toStdSysDays();
+			const std::chrono::system_clock::time_point to = toDay().toStdSysDays();
+			Author author;
+			author.email = authorEmail().toStdWString();
+			author.name = authorName().toStdWString();
+
+			for (auto repo : _repositories)
+			{
+				RepositoryVisitorImpl visitor(from, to, author);
+				repo->accept(visitor);
+
+				for (const auto& commit : visitor.commits)
+				{
+					if (_is_about_to_quit)
+						return;
+
+					_commits_temp.push_back(std::make_unique<Commit>(commit));
+
+					QCoreApplication::processEvents();
+				}
+			}
+
+			Filters::removeEmptyPointers(_commits_temp);
+			Filters::unique<std::unique_ptr<Commit>, Commit::Id>(_commits_temp, [](const std::unique_ptr<Commit>& item)
+																 { return item->id; });
+			Filters::sortDescending<std::unique_ptr<Commit>, DateTime>(
+				_commits_temp, [](const std::unique_ptr<Commit>& item) { return item->datetime; });
+
+			_thread_finished = true;
+		});
+
+	whenCommitsLoaded();
+}
+
+void WindowController::whenCommitsLoaded()
+{
+	while (!_thread_finished && !_is_about_to_quit)
+		QCoreApplication::processEvents();
+
+	if (_last_thread.joinable())
+		_last_thread.join();
+
+	if (_is_about_to_quit)
+		return;
 
 	const auto temp_list = _commits;
 	_commits.clear();
 	emit commitsChanged();
 	qDeleteAll(temp_list);
 
-	std::transform(result.begin(), result.end(), std::back_inserter(_commits),
-				   [this](std::unique_ptr<Commit>& commit) { return new CommitItem(std::move(commit), this); });
+	for (auto& commit : _commits_temp)
+	{
+		_commits.push_back(new CommitItem(std::move(commit), this));
+
+		if (_is_about_to_quit)
+			return;
+
+		QCoreApplication::processEvents();
+	}
+
+	_commits_temp.clear();
 
 	emit commitsChanged();
+	emit unlockScreen();
+	emit showFilteringView();
 }
 } // namespace RaportPKUP::UI

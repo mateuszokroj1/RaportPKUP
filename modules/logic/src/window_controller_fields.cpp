@@ -29,13 +29,15 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 			return;
 
 		_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
+
+		connect(app_ptr->getQApplication(), &QGuiApplication::aboutToQuit, this,
+				[this]() { _is_about_to_quit = true; });
 	}
 
 	const auto today = QDate::currentDate();
 	_fromDay.setValue(QDate(today.year(), today.month(), 1));
 	_toDay.setValue(QDate(today.year(), today.month(), today.daysInMonth()));
 
-	//_addRepositoryCmd->bindableCanExecute().setBinding([this](){ return !_repositoryPath.value().isEmpty(); });
 	connect(_addRepositoryCmd, &Command::onExecute, this, &WindowController::addRepository);
 
 	connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
@@ -194,6 +196,7 @@ void WindowController::setRepositoryPath(QString value)
 		return;
 
 	_repository_path = QString::fromStdWString(result->generic_wstring());
+	emit repositoryPathChanged();
 }
 
 QBindable<QString> WindowController::bindablePresetSelectorText() const
@@ -243,6 +246,7 @@ void WindowController::addRepository()
 		_repositories.push_back(new RepositoryListItem(std::move(repo), this));
 		emit repositoriesChanged();
 		_repository_path = {};
+		emit repositoryPathChanged();
 	}
 
 	if (_repositories.count() == 1 && author)
