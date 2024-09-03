@@ -102,8 +102,7 @@ TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
 	const std::chrono::year_month_day to(std::chrono::year(2024), std::chrono::month(6), std::chrono::day(1));
 
 	const auto vec = repo->getCommitsFromTimeRange(std::chrono::sys_days(from), std::chrono::sys_days(to),
-												   {L"Mateusz Okrój", L"mateuszokroj1@gmail.com"})
-						 .get();
+												   {L"Mateusz Okrój", L"mateuszokroj1@gmail.com"});
 
 	ASSERT_EQ(vec.size(), 20);
 

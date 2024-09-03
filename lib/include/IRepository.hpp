@@ -25,8 +25,9 @@ class IRepository
 
 	virtual std::future<bool> fetchFirstRemote(bool with_prune) = 0;
 
-	virtual std::future<std::list<Commit>> getCommitsFromTimeRange(
-		const std::chrono::system_clock::time_point& from, const std::chrono::system_clock::time_point& to_exclude,
-		const Author& author, std::optional<std::stop_token> stop_token = {}) const = 0;
+	virtual std::list<Commit> getCommitsFromTimeRange(const std::chrono::system_clock::time_point& from,
+													  const std::chrono::system_clock::time_point& to_exclude,
+													  const Author& author,
+													  const std::stop_token& stop_token = {}) const = 0;
 };
 } // namespace RaportPKUP

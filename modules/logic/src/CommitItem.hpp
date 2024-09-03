@@ -14,9 +14,9 @@ class CommitItem : public QObject
   public:
 	CommitItem(std::unique_ptr<Commit>&&, QObject*);
 
-	Q_PROPERTY(QString id READ id STORED false)
-	Q_PROPERTY(QString message READ message STORED false)
-	Q_PROPERTY(QDateTime time READ time STORED false)
+	Q_PROPERTY(QString id READ id STORED false CONSTANT)
+	Q_PROPERTY(QString message READ message STORED false CONSTANT)
+	Q_PROPERTY(QDateTime time READ time STORED false CONSTANT)
 	Q_PROPERTY(ushort duration MEMBER duration NOTIFY durationChanged)
 
 	QString id() const;

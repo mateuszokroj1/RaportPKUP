@@ -9,9 +9,9 @@
 #include "GitAccessImpl.hpp"
 #include <include/GitRepositoryAccessor.hpp>
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
-GitRepositoryDetectorDI::GitRepositoryDetectorDI(std::weak_ptr<UI::Application> app)
+GitRepositoryDetectorDI::GitRepositoryDetectorDI(std::weak_ptr<Application> app)
 {
 	auto application = app.lock();
 	if (!application)
@@ -24,7 +24,7 @@ GitRepositoryDetectorDI::GitRepositoryDetectorDI(std::weak_ptr<UI::Application> 
 	else
 		throw std::exception("Cannot get git accessor.");
 }
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI
 
 using namespace RaportPKUP;
 using namespace RaportPKUP::UI;

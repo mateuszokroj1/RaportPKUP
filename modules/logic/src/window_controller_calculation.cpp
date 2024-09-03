@@ -27,7 +27,7 @@ class RepositoryVisitorImpl : public IRepositoryVisitor
 
 	void visit(const IRepository& repository) override
 	{
-		commits = repository.getCommitsFromTimeRange(from, to, author).get();
+		commits = repository.getCommitsFromTimeRange(from, to, author);
 	}
 
 	const std::chrono::system_clock::time_point from;
@@ -52,8 +52,10 @@ void WindowController::searchForCommits()
 		[this]()
 		{
 			_commits_temp.clear();
+
 			const std::chrono::system_clock::time_point from = fromDay().toStdSysDays();
-			const std::chrono::system_clock::time_point to = toDay().toStdSysDays();
+			const std::chrono::system_clock::time_point to = toDay().toStdSysDays() + 23h + 59min + 59s;
+
 			Author author;
 			author.email = authorEmail().toStdWString();
 			author.name = authorName().toStdWString();
