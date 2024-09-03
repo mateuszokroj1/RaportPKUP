@@ -2,12 +2,14 @@
 
 #include <include/GitRepositoryDetector.hpp>
 
-namespace RaportPKUP
+namespace RaportPKUP::UI
 {
+class Application;
+
 class GitRepositoryDetectorDI final : public GitRepositoryDetector
 {
   public:
-	GitRepositoryDetectorDI(std::weak_ptr<UI::Application> app);
+	GitRepositoryDetectorDI(std::weak_ptr<Application> app);
 
   private:
 	const GitRepositoryAccessor& getAccessorImpl() const override
@@ -17,4 +19,4 @@ class GitRepositoryDetectorDI final : public GitRepositoryDetector
 
 	std::shared_ptr<GitRepositoryAccessor> _accessor;
 };
-} // namespace RaportPKUP
+} // namespace RaportPKUP::UI
