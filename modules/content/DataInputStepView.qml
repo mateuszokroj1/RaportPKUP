@@ -83,6 +83,10 @@ ColumnLayout {
 
                 Layout.fillWidth: true
                 value: controller.repositoryPath
+
+                onValueChanged: {
+                    controller.repositoryPath = repositoryPath.value;
+                }
             }
             UIButton {
                 text: "Wybierz folder"
