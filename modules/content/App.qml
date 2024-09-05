@@ -22,13 +22,13 @@ Window {
 
         items: [
             MainViewItem {
-                name: "Wprowadzanie danych"
+                name: "Przeszukiwanie repozytoriów"
 
                 DataInputStepView {
                 }
             },
             MainViewItem {
-                name: "Uzupełnianie godzin"
+                name: "Edycja listy"
 
                 DataFilteringStepView {
                 }
