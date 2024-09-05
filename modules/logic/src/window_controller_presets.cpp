@@ -31,7 +31,7 @@ void WindowController::savePreset(const QString& name)
 	if (!preset)
 		preset = new Preset(this);
 
-	preset->name = name;
+	preset->name = name.trimmed();
 	preset->authorName = _authorName.value();
 	preset->authorEmail = _authorEmail.value();
 	preset->city = _city.value();
@@ -64,7 +64,9 @@ void WindowController::recallPreset(int index)
 
 	setAuthorName(preset->authorName);
 	setAuthorEmail(preset->authorEmail);
-	setCity(preset->city);
+
+	if (!preset->city.isEmpty())
+		setCity(preset->city);
 
 	auto list = _repositories;
 	qDeleteAll(list);

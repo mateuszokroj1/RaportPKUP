@@ -43,6 +43,10 @@ ColumnLayout {
                 model: controller.presets
                 textRole: "name"
 
+                validator: RegularExpressionValidator {
+                    regularExpression: /^[A-z]/
+                }
+
                 onCurrentIndexChanged: controller.recallPreset(presetSelector.currentIndex)
                 onEditTextChanged: controller.presetSelectorText = presetSelector.editText
             }
@@ -84,8 +88,13 @@ ColumnLayout {
                 Layout.fillWidth: true
                 value: controller.repositoryPath
 
-                onValueChanged: {
-                    controller.repositoryPath = repositoryPath.value;
+                validator: RegularExpressionValidator {
+                    regularExpression: /[\:\;\~A-z0-9_\\\/\+\&\-\,\.\s]+/
+                }
+
+                onFocusInsideChanged: {
+                    if (!repositoryPath.focusInside)
+                        controller.repositoryPath = repositoryPath.value;
                 }
             }
             UIButton {
@@ -114,7 +123,6 @@ ColumnLayout {
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.margins: Theme.defaultPadding
-            Layout.minimumHeight: 1
 
             ListView {
                 model: controller.repositories
@@ -180,7 +188,17 @@ ColumnLayout {
                 label: "Imię i nazwisko"
 
                 InputField {
+                    id: authorName
+
                     value: controller.authorName
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[A-z]/
+                    }
+
+                    onValueChanged: {
+                        controller.authorName = authorName.value;
+                    }
                 }
             }
             FormField {
@@ -191,7 +209,17 @@ ColumnLayout {
                 label: "Adres e-mail"
 
                 InputField {
+                    id: authorEmail
+
                     value: controller.authorEmail
+
+                    validator: RegularExpressionValidator {
+                        regularExpression: /^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$/
+                    }
+
+                    onValueChanged: {
+                        controller.authorEmail = authorEmail.value;
+                    }
                 }
             }
         }
