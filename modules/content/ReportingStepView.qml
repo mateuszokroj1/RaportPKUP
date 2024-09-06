@@ -4,14 +4,24 @@ import QtQuick.Controls
 
 ColumnLayout {
     RowLayout {
-        InputField {
-            placeholderText: "Miejscowość"
-            value: controller.city
+        RowLayout {
+            InputField {
+                placeholderText: "Miejscowość"
+                value: controller.city
+
+                onValueChanged: {
+                    controller.city = this.value;
+                }
+            }
+        }
+        UIButton {
+            text: "Zapisz..."
+
+            onClicked: controller.saveRaportToFile("s")
         }
     }
-    Button {
-        text: "Zapisz"
-
-        onClicked: controller.saveRaportToFile("s")
+    TextEdit {
+        Layout.fillHeight: true
+        Layout.fillWidth: true
     }
 }

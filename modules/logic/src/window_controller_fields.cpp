@@ -179,18 +179,21 @@ void WindowController::setRepositoryPath(QString value)
 	if (value.isEmpty())
 		return;
 
-	QUrl url(value);
-	QDir dir(url.toLocalFile());
+	if (value.startsWith("file:///"))
+		value = value.mid(8);
+
+	QDir dir(value);
 	if (!dir.exists())
 	{
 		_repository_path = {};
+		emit repositoryPathChanged();
 		return;
 	}
 
 	if (!_repository_detector)
 		return;
 
-	const auto result = _repository_detector->detect(url.toLocalFile().toStdWString()).get();
+	const auto result = _repository_detector->detect(dir.filesystemAbsolutePath()).get();
 
 	if (!result)
 		return;
