@@ -4,11 +4,13 @@ import QtQuick.Controls 2.15
 
 import logic
 
-RowLayout {
+Item {
     id: root
 
     property double arrowsWidth: 35
     default required property list<MainViewItem> items
+    readonly property int minimumHeight: items[contentStack.currentIndex].content.minimumHeight
+    readonly property int minimumWidth: items[contentStack.currentIndex].content.minimumWidth
 
     function selectView(index) {
         if (index < 0 || index >= items.length)
@@ -18,25 +20,26 @@ RowLayout {
 
     implicitHeight: menu.implicitHeight + 100
     implicitWidth: menu.width + contentStack.implicitWidth
-    spacing: Theme.defaultPadding
 
     Item {
-        Layout.fillHeight: true
-        implicitHeight: menu.implicitHeight
-        implicitWidth: menu.implicitWidth
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.top: parent.top
+        width: menu.implicitWidth
+        z: 1
 
         Rectangle {
             anchors.fill: parent
             anchors.rightMargin: arrowsWidth
             color: Theme.menuBackground
-            z: -1
         }
         ColumnLayout {
             id: menu
 
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.topMargin: Theme.defaultPadding
+            anchors.topMargin: 100
+            z: 0
 
             Repeater {
                 model: root.items
@@ -46,7 +49,7 @@ RowLayout {
                     required property bool isEnabled
                     required property string name
 
-                    Layout.preferredWidth: 300
+                    Layout.preferredWidth: 320
                     arrowWidth: arrowsWidth
                     checked: contentStack.currentIndex === index
                     enabled: isEnabled
@@ -61,13 +64,16 @@ RowLayout {
     StackLayout {
         id: contentStack
 
-        Layout.fillHeight: true
-        Layout.fillWidth: true
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.leftMargin: 320 - arrowsWidth
+        anchors.right: parent.right
+        anchors.top: parent.top
 
         Repeater {
             model: root.items
 
-            Item {
+            delegate: Item {
                 required property Item content
 
                 Layout.fillHeight: true

@@ -14,7 +14,7 @@ QtObject {
     readonly property double fontSize: 13
     readonly property color highlightedElementBackground: "white"
     readonly property color invalidAccentBorderColor: "#f00000"
-    readonly property color menuBackground: "#e5e5e5"
+    readonly property color menuBackground: "#eeeeee"
     readonly property double radius: 4
     readonly property color validAccentBorderColor: "#00e900"
     readonly property color windowBackground: "#fafafa"
