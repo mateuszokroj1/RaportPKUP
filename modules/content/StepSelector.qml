@@ -36,9 +36,7 @@ Item {
         ColumnLayout {
             id: menu
 
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.topMargin: 120
+            anchors.centerIn: parent
             z: 0
 
             Repeater {
