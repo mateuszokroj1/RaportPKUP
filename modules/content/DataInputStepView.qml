@@ -70,12 +70,9 @@ ColumnLayout {
         }
     }
     ColumnLayout {
-        Layout.bottomMargin: 15
         Layout.fillHeight: true
         Layout.fillWidth: true
-        Layout.leftMargin: 15
-        Layout.rightMargin: 50
-        Layout.topMargin: 15
+        Layout.margins: Theme.defaultPageMargin
 
         RowLayout {
             Layout.alignment: Qt.AlignTop

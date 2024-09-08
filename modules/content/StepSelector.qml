@@ -38,7 +38,7 @@ Item {
 
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.topMargin: 100
+            anchors.topMargin: 120
             z: 0
 
             Repeater {

@@ -9,6 +9,7 @@ QtObject {
     readonly property color defaultBorderColor: "#2cafff"
     readonly property font defaultFont: Fonts.font_FiraSans
     readonly property double defaultPadding: 15
+    readonly property double defaultPageMargin: 60
     readonly property color disabledBackground: "#c6c6c6"
     readonly property color disabledText: "#8a8a8a"
     readonly property double fontSize: 13
