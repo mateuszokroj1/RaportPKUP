@@ -39,7 +39,8 @@ FormItemBase {
     TextField {
         id: textField
 
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
         font: Theme.defaultFont
         horizontalAlignment: Qt.AlignLeft
         padding: Theme.defaultPadding

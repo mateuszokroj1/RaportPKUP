@@ -232,7 +232,7 @@ ColumnLayout {
                 UIText {
                     Layout.alignment: Qt.AlignVCenter
                     Layout.bottomMargin: Theme.defaultPadding
-                    color: Theme.activatedElementBackground
+                    color: Theme.accentTitle
                     text: "Zakres dat przeszukiwania"
                 }
                 Item {

@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick 6.2
 
 QtObject {
+    readonly property color accentTitle: "#1589ff"
     readonly property color activatedElementBackground: "#1589ff"
     readonly property color activatedElementText: "white"
     readonly property color controlBackground: "#ededed"

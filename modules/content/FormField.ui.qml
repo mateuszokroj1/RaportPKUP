@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import logic
 
 ColumnLayout {
+    property alias color: header.color
     default property alias item: loader.sourceComponent
     property string label: "Field"
     property string messageOnInvalidate: "Invalid value"
@@ -12,6 +13,8 @@ ColumnLayout {
     spacing: Theme.defaultPadding
 
     UIText {
+        id: header
+
         Layout.alignment: Qt.AlignTop | Qt.AlignLeft
         Layout.leftMargin: Theme.defaultPadding
         color: Theme.activatedElementBackground
