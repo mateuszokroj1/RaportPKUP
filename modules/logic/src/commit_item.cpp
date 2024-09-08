@@ -27,7 +27,7 @@ QString CommitItem::message() const
 
 QDateTime CommitItem::time() const
 {
-	return QDateTime::fromStdTimePoint(_commit->datetime);
+	return QDateTime::fromStdTimePoint(std::chrono::time_point_cast<std::chrono::milliseconds>(_commit->datetime));
 }
 
 QString CommitItem::repositoryName() const

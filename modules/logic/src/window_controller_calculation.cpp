@@ -5,6 +5,8 @@
 #include <QtQml/QQmlContext>
 #include <QtQml/qqmllist.h>
 
+#include <execution>
+
 #include <include/Filters.hpp>
 #include <include/IProcess.hpp>
 #include <include/IRepositoryAccessor.hpp>
@@ -16,27 +18,6 @@ using namespace Qt::Literals::StringLiterals;
 
 namespace RaportPKUP::UI
 {
-class RepositoryVisitorImpl : public IRepositoryVisitor
-{
-  public:
-	RepositoryVisitorImpl(const std::chrono::system_clock::time_point& from,
-						  const std::chrono::system_clock::time_point& to, const Author& author)
-		: from(from), to(to), author(author)
-	{
-	}
-
-	void visit(const IRepository& repository) override
-	{
-		commits = repository.getCommitsFromTimeRange(from, to, author);
-	}
-
-	const std::chrono::system_clock::time_point from;
-	const std::chrono::system_clock::time_point to;
-	const Author author;
-
-	std::list<Commit> commits;
-};
-
 void WindowController::searchForCommits()
 {
 	if (_last_thread.joinable())
@@ -53,28 +34,29 @@ void WindowController::searchForCommits()
 		{
 			_commits_temp.clear();
 
-			const std::chrono::system_clock::time_point from = fromDay().toStdSysDays();
-			const std::chrono::system_clock::time_point to = toDay().toStdSysDays() + 23h + 59min + 59s;
+			const DateTime from = fromDay().toStdSysDays();
+			const DateTime to = toDay().toStdSysDays() + 23h + 59min + 59s;
 
 			Author author;
 			author.email = authorEmail().toStdWString();
 			author.name = authorName().toStdWString();
 
-			for (auto repo : _repositories)
-			{
-				RepositoryVisitorImpl visitor(from, to, author);
-				repo->accept(visitor);
+			auto mutex = std::make_unique<std::mutex>();
 
-				for (const auto& commit : visitor.commits)
-				{
-					if (_is_about_to_quit)
-						return;
+			std::for_each(std::execution::par, _repositories.cbegin(), _repositories.cend(),
+						  [this, &from, &to, &author, &mutex](const RepositoryListItem* repo)
+						  {
+							  auto list = repo->getRepository()->getCommitsFromTimeRange(from, to, author);
 
-					_commits_temp.push_back(std::make_unique<Commit>(commit));
+							  for (const auto& commit : list)
+							  {
+								  if (_is_about_to_quit)
+									  return;
 
-					QCoreApplication::processEvents();
-				}
-			}
+								  std::lock_guard lock(*mutex);
+								  _commits_temp.push_back(std::make_unique<Commit>(commit));
+							  }
+						  });
 
 			Filters::removeEmptyPointers(_commits_temp);
 			Filters::unique<std::unique_ptr<Commit>, Commit::Id>(_commits_temp, [](const std::unique_ptr<Commit>& item)

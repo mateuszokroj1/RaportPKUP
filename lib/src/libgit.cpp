@@ -101,9 +101,8 @@ Author LibGit_Commit::getAuthor()
 DateTime LibGit_Commit::getTime() const
 {
 	const auto git_time = git_commit_time(_handle);
-	auto point = std::chrono::system_clock::from_time_t(git_time);
 
-	return std::chrono::time_point_cast<std::chrono::milliseconds>(point);
+	return std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>(std::chrono::seconds(git_time));
 }
 
 LibGit_Ref::LibGit_Ref(git_reference* handle) : _handle(handle)
@@ -170,7 +169,7 @@ void LibGit_RevisionWalker::setReference(const LibGit_Ref& reference)
 {
 	reset();
 
-	if (git_revwalk_push_ref(_handle, reference.name().c_str()) != 0)
+	if (git_revwalk_sorting(_handle, git_sort_t::GIT_SORT_TIME) != 0)
 	{
 		auto err = git_error_last();
 		if (!err)
@@ -181,7 +180,7 @@ void LibGit_RevisionWalker::setReference(const LibGit_Ref& reference)
 		throw LibGit_Exception(msg, err->klass);
 	}
 
-	if (git_revwalk_sorting(_handle, git_sort_t::GIT_SORT_TIME | git_sort_t::GIT_SORT_REVERSE) != 0)
+	if (git_revwalk_push_ref(_handle, reference.name().c_str()) != 0)
 	{
 		auto err = git_error_last();
 		if (!err)
@@ -193,7 +192,7 @@ void LibGit_RevisionWalker::setReference(const LibGit_Ref& reference)
 	}
 }
 
-std::optional<Ptr<LibGit_Commit>> LibGit_RevisionWalker::next()
+Ptr<LibGit_Commit> LibGit_RevisionWalker::next()
 {
 	git_oid id;
 	const auto result = git_revwalk_next(&id, _handle);
@@ -237,7 +236,7 @@ LibGit_BranchIterator::~LibGit_BranchIterator() noexcept
 	_handle = nullptr;
 }
 
-std::optional<Ptr<LibGit_Ref>> LibGit_BranchIterator::next()
+Ptr<LibGit_Ref> LibGit_BranchIterator::next()
 {
 	git_reference* ref;
 	git_branch_t type;
@@ -333,8 +332,7 @@ std::vector<Ptr<LibGit_Ref>> enumerateBranches(const LibGit_Repository& reposito
 	LibGit_BranchIterator iterator(repository, filter_by_type);
 
 	while (auto ptr = iterator.next())
-		if (ptr->operator bool())
-			result.push_back(*ptr);
+		result.push_back(ptr);
 
 	return result;
 }

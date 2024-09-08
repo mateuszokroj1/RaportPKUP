@@ -20,6 +20,7 @@ class CommitItem : public QObject
 	Q_PROPERTY(QString id READ id STORED false CONSTANT)
 	Q_PROPERTY(QString message READ message STORED false CONSTANT)
 	Q_PROPERTY(QDateTime time READ time STORED false CONSTANT)
+	Q_PROPERTY(QString repositoryName READ repositoryName STORED false CONSTANT)
 	Q_PROPERTY(ushort duration MEMBER duration NOTIFY durationChanged)
 
 	QString id() const;

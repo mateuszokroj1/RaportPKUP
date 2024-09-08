@@ -9,10 +9,7 @@
 
 namespace RaportPKUP::UI
 {
-using IRepositoryVisitor = IVisitor<const IRepository&>;
-using IRepositoryVisitorAccept = IAcceptVisitor<const IRepository&>;
-
-class RepositoryListItem : public QObject, public IRepositoryVisitorAccept
+class RepositoryListItem : public QObject
 {
 	Q_OBJECT
 	QML_ELEMENT
@@ -32,7 +29,10 @@ class RepositoryListItem : public QObject, public IRepositoryVisitorAccept
 		return _repository->getDefaultAuthor();
 	}
 
-	void accept(IRepositoryVisitor&) override;
+	const std::shared_ptr<const IRepository> getRepository() const
+	{
+		return _repository;
+	}
 
   private:
 	const std::shared_ptr<IRepository> _repository;
