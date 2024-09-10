@@ -76,7 +76,7 @@ class LibGit_Ref final
 	git_reference* _handle = nullptr;
 };
 
-class LibGit_RevisionWalker final : public IEnumerator<Ptr<LibGit_Commit>>
+class LibGit_RevisionWalker final : public IEnumerator<LibGit_Commit>
 {
   public:
 	friend class LibGit_Repository;
@@ -89,14 +89,14 @@ class LibGit_RevisionWalker final : public IEnumerator<Ptr<LibGit_Commit>>
 	void reset();
 	void setReference(const LibGit_Ref&);
 
-	std::optional<Ptr<LibGit_Commit>> next() override;
+	Ptr<LibGit_Commit> next() override;
 
   private:
 	const LibGit_Repository& _repository;
 	git_revwalk* _handle = nullptr;
 };
 
-class LibGit_BranchIterator final : public IEnumerator<Ptr<LibGit_Ref>>
+class LibGit_BranchIterator final : public IEnumerator<LibGit_Ref>
 {
   public:
 	~LibGit_BranchIterator() noexcept override;
@@ -105,7 +105,7 @@ class LibGit_BranchIterator final : public IEnumerator<Ptr<LibGit_Ref>>
 	explicit LibGit_BranchIterator(const LibGit_Repository&,
 								   git_branch_t filter_by_type = git_branch_t::GIT_BRANCH_ALL);
 
-	std::optional<Ptr<LibGit_Ref>> next() override;
+	Ptr<LibGit_Ref> next() override;
 
   private:
 	git_branch_iterator* _handle = nullptr;

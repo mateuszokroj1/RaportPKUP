@@ -10,8 +10,8 @@ Window {
     id: mainWindow
 
     color: Theme.windowBackground
-    minimumHeight: content.implicitHeight
-    minimumWidth: content.implicitWidth
+    minimumHeight: content.minimumHeight
+    minimumWidth: content.minimumWidth
     title: "Generator raportów PKUP"
     visible: true
 
@@ -25,18 +25,24 @@ Window {
                 name: "Przeszukiwanie repozytoriów"
 
                 DataInputStepView {
+                    readonly property int minimumHeight: 1000
+                    readonly property int minimumWidth: 1090
                 }
             },
             MainViewItem {
                 name: "Edycja listy"
 
                 DataFilteringStepView {
+                    readonly property int minimumHeight: 1000
+                    readonly property int minimumWidth: 1400
                 }
             },
             MainViewItem {
                 name: "Generowanie raportu"
 
                 ReportingStepView {
+                    readonly property int minimumHeight: 1000
+                    readonly property int minimumWidth: 1090
                 }
             }
         ]

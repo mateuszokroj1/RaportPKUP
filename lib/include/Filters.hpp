@@ -20,7 +20,11 @@ void unique(std::vector<DataType>& items, const std::function<KeyType(const Data
 		for (int offset = 1; position + offset < items.size(); ++offset)
 		{
 			if (key_selector(items[position]) == key_selector(items[position + offset]))
+			{
 				items.erase(items.begin() + position + offset);
+
+				--offset;
+			}
 		}
 	}
 }

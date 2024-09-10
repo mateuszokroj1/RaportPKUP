@@ -44,7 +44,7 @@ ColumnLayout {
                 textRole: "name"
 
                 validator: RegularExpressionValidator {
-                    regularExpression: /^[A-z]/
+                    regularExpression: /^[A-z].*/
                 }
 
                 onCurrentIndexChanged: controller.recallPreset(presetSelector.currentIndex)
@@ -70,12 +70,9 @@ ColumnLayout {
         }
     }
     ColumnLayout {
-        Layout.bottomMargin: 15
         Layout.fillHeight: true
         Layout.fillWidth: true
-        Layout.leftMargin: 15
-        Layout.rightMargin: 50
-        Layout.topMargin: 15
+        Layout.margins: Theme.defaultPageMargin
 
         RowLayout {
             Layout.alignment: Qt.AlignTop
@@ -119,57 +116,62 @@ ColumnLayout {
 
             onAccepted: controller.setRepositoryPath(directoryDialog.selectedFolder)
         }
-        ScrollView {
+        ListView {
+            id: repositories
+
             Layout.fillHeight: true
             Layout.fillWidth: true
             Layout.margins: Theme.defaultPadding
+            clip: true
+            model: controller.repositories
+            snapMode: ListView.SnapOneItem
+            spacing: 15
 
-            ListView {
-                model: controller.repositories
-                spacing: 15
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+                snapMode: ScrollBar.SnapAlways
+            }
+            delegate: Item {
+                id: repoList_item
 
-                delegate: Item {
-                    id: repoList_item
+                required property int index
+                required property string path
 
-                    required property int index
-                    required property string path
+                anchors.left: parent.left
+                anchors.margins: 15
+                anchors.right: parent.right
+                implicitHeight: repoList_itemLayout.implicitHeight
+                implicitWidth: repoList_itemLayout.implicitWidth
 
-                    anchors.left: parent.left
-                    anchors.margins: 15
-                    anchors.right: parent.right
-                    implicitHeight: repoList_itemLayout.implicitHeight
-                    implicitWidth: repoList_itemLayout.implicitWidth
+                Rectangle {
+                    anchors.fill: parent
+                    color: "#eeeeee"
+                    radius: 4
+                }
+                RowLayout {
+                    id: repoList_itemLayout
 
-                    Rectangle {
-                        anchors.fill: parent
-                        color: "#eeeeee"
-                        radius: 4
-                    }
+                    anchors.fill: parent
+
                     RowLayout {
-                        id: repoList_itemLayout
+                        Layout.fillWidth: true
+                        Layout.margins: Theme.defaultPadding
 
-                        anchors.fill: parent
-
-                        RowLayout {
-                            Layout.fillWidth: true
-                            Layout.margins: Theme.defaultPadding
-
-                            UIText {
-                                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-                                elide: Text.ElideMiddle
-                                text: path
-                                wrapMode: Text.NoWrap
-                            }
+                        UIText {
+                            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                            elide: Text.ElideMiddle
+                            text: path
+                            wrapMode: Text.NoWrap
                         }
-                        UIButton {
-                            Layout.alignment: Qt.AlignRight
-                            Layout.bottomMargin: Theme.defaultPadding
-                            Layout.rightMargin: Theme.defaultPadding
-                            Layout.topMargin: Theme.defaultPadding
-                            text: "Usuń"
+                    }
+                    UIButton {
+                        Layout.alignment: Qt.AlignRight
+                        Layout.bottomMargin: Theme.defaultPadding
+                        Layout.rightMargin: Theme.defaultPadding
+                        Layout.topMargin: Theme.defaultPadding
+                        text: "Usuń"
 
-                            onClicked: controller.removeRepository(index)
-                        }
+                        onClicked: controller.removeRepository(index)
                     }
                 }
             }
@@ -214,7 +216,7 @@ ColumnLayout {
                     value: controller.authorEmail
 
                     validator: RegularExpressionValidator {
-                        regularExpression: /^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$/
+                        regularExpression: /^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$/
                     }
 
                     onValueChanged: {
@@ -235,7 +237,7 @@ ColumnLayout {
                 UIText {
                     Layout.alignment: Qt.AlignVCenter
                     Layout.bottomMargin: Theme.defaultPadding
-                    color: Theme.activatedElementBackground
+                    color: Theme.accentTitle
                     text: "Zakres dat przeszukiwania"
                 }
                 Item {

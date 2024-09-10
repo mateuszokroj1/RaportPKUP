@@ -54,3 +54,8 @@ set(CMAKE_AUTOMOC true)
 add_subdirectory(modules/logic)
 add_subdirectory(modules/content)
 add_subdirectory(app)
+
+set(QML_IMPORT_PATH
+    CACHE
+      STRING
+      "${CMAKE_BINARY_DIR}/modules/logic;${CMAKE_BINARY_DIR}/modules/content")

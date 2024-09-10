@@ -5,8 +5,6 @@ import QtQuick.Layouts
 import logic
 
 FormItemBase {
-    id: formItemBase
-
     property alias focusInside: textField.focus
     property alias placeholderText: textField.placeholderText
     property alias validator: textField.validator
@@ -39,7 +37,8 @@ FormItemBase {
     TextField {
         id: textField
 
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
         font: Theme.defaultFont
         horizontalAlignment: Qt.AlignLeft
         padding: Theme.defaultPadding

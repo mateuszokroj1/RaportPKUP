@@ -11,7 +11,7 @@ concept Abstract = std::is_abstract_v<AbstractType>;
 template <class Type>
 concept Final = std::is_final_v<Type>;
 
-using DateTime = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
+using DateTime = std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds>;
 
 template <typename Type> using Ptr = std::shared_ptr<Type>;
 
@@ -37,12 +37,16 @@ template <typename... ArgsTypes> class IAcceptVisitor
 	virtual void accept(IVisitor<ArgsTypes...>&) = 0;
 };
 
-template <typename ReturnedItemType> class IEnumerator
+template <typename ContainerType, typename T>
+concept SharedPointer =
+	std::is_same_v<ContainerType, std::optional<T>> || std::is_same_v<ContainerType, std::shared_ptr<T>>;
+
+template <typename ValueType, SharedPointer<ValueType> ReturnType = std::shared_ptr<ValueType>> class IEnumerator
 {
   public:
 	virtual ~IEnumerator() = default;
 
-	virtual std::optional<ReturnedItemType> next() = 0;
+	virtual ReturnType next() = 0;
 };
 
 #define COPY_CONSTRUCTOR(Type) Type(const Type&)

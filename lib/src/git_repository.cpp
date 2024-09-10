@@ -33,8 +33,7 @@ std::string GitRepository::getNameOfRemoteRepository() const
 	return list_of_remotes.front()->remoteNameOnServer();
 }
 
-short compareDate(const std::chrono::system_clock::time_point& value, const std::chrono::system_clock::time_point& from,
-				  const std::chrono::system_clock::time_point& to)
+short compareDate(const DateTime& value, const DateTime& from, const DateTime& to)
 {
 	if (value < from)
 		return -1;
@@ -45,9 +44,8 @@ short compareDate(const std::chrono::system_clock::time_point& value, const std:
 	return 0;
 }
 
-std::list<Commit> GitRepository::getCommitsFromTimeRange(const std::chrono::system_clock::time_point& from,
-														 const std::chrono::system_clock::time_point& to,
-														 const Author& author, const std::stop_token& stop_token) const
+std::list<Commit> GitRepository::getCommitsFromTimeRange(const DateTime& from, const DateTime& to, const Author& author,
+														 const std::stop_token& stop_token) const
 {
 	const auto branches = _repository->enumerateAllRemoteBranches();
 	const auto repo_name = getNameOfRemoteRepository();
@@ -71,44 +69,37 @@ std::list<Commit> GitRepository::getCommitsFromTimeRange(const std::chrono::syst
 					  if (stop_token.stop_requested())
 						  return;
 
-					  while (const auto opt = walker->next())
+					  while (const auto commit = walker->next())
 					  {
-						  if (const auto commit = *opt)
-						  {
-							  if (stop_token.stop_requested())
-								  return;
+						  if (stop_token.stop_requested())
+							  return;
 
-							  Commit result;
+						  Commit result;
 
-							  const auto id = commit->id();
-							  git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
+						  const auto id = commit->id();
+						  git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
 
-							  if (std::ranges::any_of(list, [&result](decltype(list)::const_reference previous_commit)
-													  { return result.id == previous_commit.id; }))
-								  continue;
+						  result.datetime = commit->getTime();
 
-							  result.datetime = commit->getTime();
+						  const auto compare_result = compareDate(result.datetime, from, to);
 
-							  const auto compare_result = compareDate(result.datetime, from, to);
+						  if (compare_result < 0)
+							  break;
+						  if (compare_result > 0)
+							  continue;
 
-							  if (compare_result < 0)
-								  break;
-							  else if (compare_result > 0)
-								  continue;
+						  result.author = commit->getAuthor();
 
-							  result.author = commit->getAuthor();
+						  if (author.email != result.author.email)
+							  continue;
 
-							  if (author.email != result.author.email)
-								  continue;
+						  result.branch_name = branch->name();
 
-							  result.branch_name = branch->name();
+						  result.repo_name = repo_name;
+						  result.message = commit->getShortMessage();
 
-							  result.repo_name = repo_name;
-							  result.message = commit->getShortMessage();
-
-							  std::lock_guard lock(*mutex);
-							  list.push_back(std::move(result));
-						  }
+						  std::lock_guard lock(*mutex);
+						  list.push_back(std::move(result));
 					  }
 				  });
 
