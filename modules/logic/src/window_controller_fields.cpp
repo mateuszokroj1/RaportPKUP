@@ -38,9 +38,9 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 	_fromDay.setValue(QDate(today.year(), today.month(), 1));
 	_toDay.setValue(QDate(today.year(), today.month(), today.daysInMonth()));
 
-	connect(_addRepositoryCmd, &Command::onExecute, this, &WindowController::addRepository);
+	// connect(_addRepositoryCmd, &Command::onExecute, this, &WindowController::addRepository);
 
-	connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
+	// connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
 
 	connect(&_presets_manager, &PresetsManager::loaded, this, &WindowController::loadPresets, Qt::QueuedConnection);
 	connect(this, &WindowController::presetsChanged, this, &WindowController::syncPresetsFile, Qt::QueuedConnection);
@@ -52,6 +52,16 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 	connect(this, &WindowController::repositoriesChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::fromDayChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::toDayChanged, this, &WindowController::canStartSearchChanged);
+
+	connect(this, &WindowController::commitsChanged, this,
+			[this]()
+			{
+				for (CommitItem* commit : _commits)
+					connect(commit, &CommitItem::durationChanged, this, &WindowController::sumOfHoursChanged,
+							Qt::UniqueConnection);
+
+				emit sumOfHoursChanged();
+			});
 
 	_presets_manager.loadFromFile();
 }
@@ -277,16 +287,26 @@ void WindowController::clearRepositories()
 	emit repositoriesChanged();
 }
 
-void WindowController::removeCommit(CommitItem* ptr)
+void WindowController::removeCommit(int index)
 {
-	const auto index = _commits.indexOf(ptr);
 	if (index < 0 || index >= _commits.count())
 		return;
 
+	auto ptr = _commits[index];
 	_commits.removeAt(index);
 	ptr->deleteLater();
 
-	emit repositoriesChanged();
+	emit commitsChanged();
+}
+
+uint WindowController::sumOfHours() const
+{
+	uint sum = 0;
+
+	for (const auto& commit : _commits)
+		sum += commit->duration;
+
+	return sum;
 }
 
 bool WindowController::YesCancelDialog(const QString& title, const QString& message, const QString& detailed_info)

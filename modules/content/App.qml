@@ -25,7 +25,7 @@ Window {
                 name: "Przeszukiwanie repozytoriów"
 
                 DataInputStepView {
-                    readonly property int minimumHeight: 890
+                    readonly property int minimumHeight: 1000
                     readonly property int minimumWidth: 1090
                 }
             },
@@ -33,15 +33,15 @@ Window {
                 name: "Edycja listy"
 
                 DataFilteringStepView {
-                    readonly property int minimumHeight: 890
-                    readonly property int minimumWidth: 1090
+                    readonly property int minimumHeight: 1000
+                    readonly property int minimumWidth: 1400
                 }
             },
             MainViewItem {
                 name: "Generowanie raportu"
 
                 ReportingStepView {
-                    readonly property int minimumHeight: 890
+                    readonly property int minimumHeight: 1000
                     readonly property int minimumWidth: 1090
                 }
             }

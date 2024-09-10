@@ -43,19 +43,37 @@ Item {
                         Layout.fillWidth: true
                     }
                     FormField {
+                        id: form1
+
+                        property int val: 0
+
                         Layout.fillWidth: false
                         color: Theme.windowText
                         label: "Liczba dni roboczych"
 
                         InputField {
-                            id: workingDays
+                            property int defaultValue: Math.round(Math.abs((controller.toDay - controller.fromDay) / (24 * 60 * 60 * 1000)))
 
                             Layout.fillHeight: false
-                            value: "1"
+                            value: defaultValue
 
                             validator: IntValidator {
                                 bottom: 1
-                                top: Math.round(Math.abs((controller.toDay - controller.fromDay) / (24 * 60 * 60 * 1000)))
+                                top: 1000000
+                            }
+
+                            Component.onCompleted: {
+                                form1.val = defaultValue;
+                            }
+                            Keys.onDownPressed: {
+                                if (value > 0)
+                                    this.value--;
+                            }
+                            Keys.onUpPressed: {
+                                this.value++;
+                            }
+                            onValueChanged: {
+                                form1.val = this.value;
                             }
                         }
                     }
@@ -64,14 +82,14 @@ Item {
                     }
                     UIText {
                         Layout.alignment: Qt.AlignVCenter
-                        text: "Suma godzin pracy twórczej: "
+                        text: "Suma godzin pracy twórczej: " + controller.sumOfHours
                     }
                     Item {
                         Layout.fillWidth: true
                     }
                     UIText {
                         Layout.alignment: Qt.AlignVCenter
-                        text: "Procentowy udział: 0%"
+                        text: "Procentowy udział: " + Math.trunc(controller.sumOfHours / (form1.val * 24)) + "%"
                     }
                     Item {
                         Layout.fillWidth: true
@@ -147,7 +165,7 @@ Item {
                 Rectangle {
                     id: header5
 
-                    SplitView.minimumWidth: 120
+                    SplitView.minimumWidth: 100
                     color: "#eeeeee"
 
                     UIText {
@@ -160,7 +178,7 @@ Item {
                 Rectangle {
                     id: header6
 
-                    SplitView.minimumWidth: 50
+                    SplitView.minimumWidth: 120
                     color: "#eeeeee"
 
                     UIText {
@@ -171,309 +189,162 @@ Item {
                     }
                 }
             }
-            ScrollView {
+            ListView {
+                id: commits
+
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.topMargin: Theme.defaultPadding
+                clip: true
+                model: controller.commits
+                snapMode: ListView.SnapOneItem
+                spacing: 6
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    spacing: 10
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AsNeeded
+                    snapMode: ScrollBar.SnapAlways
+                }
+                delegate: Item {
+                    id: row
 
-                    Repeater {
-                        model: controller.commits
+                    property color background: "#efefef"
+                    required property int index
+                    required property CommitItem modelData
+                    property color textColor: Theme.windowText
 
-                        RowLayout {
-                            property color background: "#f0f0f0"
-                            required property int index
-                            required property QtObject modelData
-                            property color textColor: Theme.windowText
+                    implicitHeight: row_layout.implicitHeight
+                    implicitWidth: row_layout.implicitWidth
 
-                            spacing: 10
+                    RowLayout {
+                        id: row_layout
 
-                            Rectangle {
-                                Layout.preferredWidth: header1.width
-                                color: background
+                        spacing: 6
 
-                                UIText {
-                                    anchors.centerIn: parent
-                                    anchors.margins: Theme.defaultPadding
-                                    color: textColor
-                                    text: index + 1
-                                }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: header1.width
+                            color: background
+                            implicitHeight: text1.implicitHeight + Theme.defaultPadding * 2
+
+                            UIText {
+                                id: text1
+
+                                anchors.centerIn: parent
+                                color: textColor
+                                text: index + 1
                             }
-                            Rectangle {
-                                Layout.preferredWidth: header2.width
-                                color: background
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: header2.width
+                            color: background
+                            implicitHeight: text2.implicitHeight + Theme.defaultPadding * 2
 
-                                UIText {
-                                    anchors.centerIn: parent
-                                    anchors.margins: Theme.defaultPadding
-                                    color: textColor
-                                    elide: Text.ElideRight
-                                    text: modelData.repositoryName
-                                }
+                            UIText {
+                                id: text2
+
+                                anchors.centerIn: parent
+                                anchors.margins: Theme.defaultPadding
+                                color: textColor
+                                elide: Text.ElideRight
+                                text: modelData.repositoryName
                             }
-                            Rectangle {
-                                Layout.preferredWidth: header3.width
-                                color: background
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: header3.width
+                            color: background
+                            implicitHeight: text3.implicitHeight + Theme.defaultPadding * 2
 
-                                UIText {
-                                    anchors.centerIn: parent
-                                    anchors.margins: Theme.defaultPadding
-                                    color: textColor
-                                    text: modelData.time.getDate() + "-" + modelData.time.getMonth() + "-" + modelData.time.getFullYear()
-                                }
+                            UIText {
+                                id: text3
+
+                                anchors.centerIn: parent
+                                anchors.margins: Theme.defaultPadding
+                                color: textColor
+                                text: modelData.time.getDate() + "-" + modelData.time.getMonth() + "-" + modelData.time.getFullYear()
                             }
-                            Rectangle {
-                                Layout.preferredWidth: header4.width
-                                color: background
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: header4.width
+                            color: background
+                            implicitHeight: text4_wrapper.implicitHeight + Theme.defaultPadding * 2
+
+                            Item {
+                                id: text4_wrapper
+
+                                anchors.centerIn: parent
+                                implicitHeight: text4.implicitHeight
+                                implicitWidth: text4.implicitWidth
 
                                 UIText {
-                                    anchors.left: parent.left
-                                    anchors.margins: Theme.defaultPadding
-                                    anchors.verticalCenter: parent
+                                    id: text4
+
+                                    anchors.fill: parent
                                     color: textColor
                                     elide: Text.ElideRight
                                     text: modelData.message
+                                    wrapMode: Text.WordWrap
                                 }
                             }
-                            Rectangle {
-                                Layout.preferredWidth: header5.width
-                                color: background
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: header5.width
+                            color: background
+                            implicitHeight: textField1.implicitHeight + Theme.defaultPadding * 2
 
-                                InputField {
-                                    anchors.centerIn: parent
-                                    anchors.margins: Theme.defaultPadding
-                                    value: modelData.duration
+                            InputField {
+                                id: textField1
 
-                                    validator: IntValidator {
-                                        bottom: 0
-                                        top: 1000000
-                                    }
+                                anchors.centerIn: parent
+                                value: modelData.duration
+                                width: 80
 
-                                    onValueChanged: {
-                                        modelData.duration = this.value;
-                                    }
+                                validator: IntValidator {
+                                    bottom: 0
+                                    top: 1000000
+                                }
+
+                                Keys.onDownPressed: {
+                                    if (modelData.duration > 0)
+                                        modelData.duration--;
+                                }
+                                Keys.onUpPressed: {
+                                    if (modelData.duration < 1000000)
+                                        modelData.duration++;
+                                }
+                                onValueChanged: {
+                                    modelData.duration = this.value;
                                 }
                             }
-                            Rectangle {
-                                Layout.preferredWidth: header6.width
-                                color: background
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: header6.width
+                            color: background
+                            implicitHeight: button1.implicitHeight + Theme.defaultPadding * 2
 
-                                UIButton {
-                                    anchors.centerIn: parent
-                                    anchors.margins: Theme.defaultPadding
-                                    text: "Usuń"
+                            UIButton {
+                                id: button1
 
-                                    onClicked: {
-                                        controller.removeCommit(modelData);
-                                    }
+                                anchors.centerIn: parent
+                                padding: 5
+                                text: "Usuń"
+
+                                onClicked: {
+                                    controller.removeCommit(index);
                                 }
                             }
                         }
                     }
                 }
-                UIText {
-                    anchors.centerIn: parent
-                    text: "Lista jest pusta"
-                    visible: controller.commits.length === 0
-                }
             }
         }
+    }
+    UIText {
+        anchors.centerIn: parent
+        text: "Lista jest pusta"
+        visible: controller.commits.length === 0
     }
 }
-
-/*ColumnLayout {
-    ColumnLayout {
-        UIText {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.margins: Theme.defaultPadding
-            color: Theme.activatedElementBackground
-            text: "Przelicznik pracy twórczej"
-        }
-        RowLayout {
-            Layout.fillWidth: true
-
-            Item {
-                Layout.fillWidth: true
-            }
-            FormField {
-                label: "Liczba dni roboczych"
-
-                InputField {
-                    id: workingDays
-
-                    value: "0"
-                }
-            }
-            Item {
-                Layout.fillWidth: true
-            }
-            UIText {
-                Layout.alignment: Qt.AlignVCenter
-                text: "Suma godzin pracy twórczej: "
-            }
-            Item {
-                Layout.fillWidth: true
-            }
-            UIText {
-                Layout.alignment: Qt.AlignVCenter
-                text: "Procentowy udział: 0%"
-            }
-            Item {
-                Layout.fillWidth: true
-            }
-        }
-    }
-    ColumnLayout {
-        Layout.margins: 15
-
-        SplitView {
-            id: headers
-
-            //Layout.fillWidth: true
-            Layout.margins: 15
-            Layout.preferredHeight: 50
-            //implicitWidth: header1.implicitWidth + header2.implicitWidth + header3.implicitWidth + header4.implicitWidth
-            orientation: Qt.Horizontal
-
-            onWidthChanged: width => {
-                console.log(width);
-            }
-
-            Rectangle {
-                id: header1
-
-                SplitView.fillHeight: true
-                SplitView.minimumWidth: 160
-                //SplitView.preferredWidth: 160
-                color: "#eeeeee"
-
-                //implicitWidth: headerText1.implicitWidth
-
-                UIText {
-                    id: headerText1
-
-                    anchors.centerIn: parent
-                    text: "Nazwa repozytorium"
-                }
-            }
-            Rectangle {
-                id: header2
-
-                SplitView.fillHeight: true
-                SplitView.minimumWidth: 160
-                //SplitView.preferredWidth: 310
-                color: "#eeeeee"
-
-                //implicitWidth: headerText2.implicitWidth
-
-                UIText {
-                    id: headerText2
-
-                    anchors.centerIn: parent
-                    text: "Tytuł"
-                }
-            }
-            Rectangle {
-                id: header3
-
-                SplitView.fillHeight: true
-                SplitView.minimumWidth: 160
-                //SplitView.preferredWidth: 160
-                color: "#eeeeee"
-
-                //implicitWidth: headerText3.implicitWidth
-
-                UIText {
-                    id: headerText3
-
-                    anchors.centerIn: parent
-                    text: "Data wykonania"
-                }
-            }
-            Rectangle {
-                id: header4
-
-                SplitView.fillHeight: true
-                SplitView.minimumWidth: 142
-                //SplitView.preferredWidth: 142
-                color: "#eeeeee"
-
-                //implicitWidth: headerText4.implicitWidth
-
-                UIText {
-                    id: headerText4
-
-                    anchors.centerIn: parent
-                    text: "Liczba godzin"
-                }
-            }
-            Rectangle {
-                id: header5
-
-                SplitView.fillHeight: true
-                SplitView.minimumWidth: 50
-                //SplitView.preferredWidth: 50
-                color: "#eeeeee"
-
-                //implicitWidth: headerText5.implicitWidth
-
-                UIText {
-                    id: headerText5
-
-                    anchors.centerIn: parent
-                    text: "Usuń"
-                }
-            }
-        }
-        ListView {
-            //Layout.fillHeight: true
-            //Layout.fillWidth: true
-            Layout.margins: 15
-            model: controller.commits
-
-            delegate: Item {
-                required property CommitItem commit
-
-                anchors.left: parent.left
-                anchors.margins: 15
-                anchors.right: parent.right
-
-                ColumnLayout {
-                    spacing: 15
-
-                    Rectangle {
-                    }
-                    Rectangle {
-                    }
-                    Rectangle {
-                    }
-                    Rectangle {
-                        Layout.margins: 15
-                        Layout.preferredWidth: header4.width
-
-                        SpinBox {
-                            anchors.centerIn: parent
-                            anchors.margins: 15
-                            from: 0
-                            stepSize: 1
-                            to: 100000
-                            value: commit.duration
-                        }
-                    }
-                    Rectangle {
-                        Layout.margins: 15
-                        Layout.preferredWidth: header5.width
-
-                        UIButton {
-                            anchors.centerIn: parent
-                            text: "Usuń"
-                        }
-                    }
-                }
-            }
-        }
-    }
-}*/

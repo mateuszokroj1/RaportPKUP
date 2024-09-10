@@ -48,6 +48,7 @@ class WindowController : public QObject
 
 	/* Filtering */
 	Q_PROPERTY(QQmlListProperty<CommitItem> commits READ commits NOTIFY commitsChanged)
+	Q_PROPERTY(uint sumOfHours READ sumOfHours NOTIFY sumOfHoursChanged)
 
 	Q_PROPERTY(QString previewDocument READ previewDocument NOTIFY previewDocumentChanged)
 
@@ -115,6 +116,7 @@ class WindowController : public QObject
 	void canSavePresetChanged();
 
 	void commitsChanged();
+	void sumOfHoursChanged();
 
 	void lockScreen();
 	void unlockScreen();
@@ -132,7 +134,9 @@ class WindowController : public QObject
 	Q_INVOKABLE void clearRepositories();
 
 	Q_INVOKABLE void searchForCommits();
-	Q_INVOKABLE void removeCommit(CommitItem*);
+	Q_INVOKABLE void removeCommit(int index);
+
+	Q_INVOKABLE uint sumOfHours() const;
 
 	Q_INVOKABLE void saveRaportToFile(QString filename);
 

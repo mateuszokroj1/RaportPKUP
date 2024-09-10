@@ -5,8 +5,6 @@ import QtQuick.Layouts
 import logic
 
 FormItemBase {
-    id: formItemBase
-
     property alias focusInside: textField.focus
     property alias placeholderText: textField.placeholderText
     property alias validator: textField.validator
