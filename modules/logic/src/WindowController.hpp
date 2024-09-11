@@ -50,6 +50,8 @@ class WindowController : public QObject
 	Q_PROPERTY(QQmlListProperty<CommitItem> commits READ commits NOTIFY commitsChanged)
 	Q_PROPERTY(uint sumOfHours READ sumOfHours NOTIFY sumOfHoursChanged)
 
+	Q_PROPERTY(
+		QDate raportDate READ raportDate WRITE setRaportDate NOTIFY raportDateChanged BINDABLE bindableRaportDate)
 	Q_PROPERTY(QString previewDocument READ previewDocument NOTIFY previewDocumentChanged)
 
 	QQmlListProperty<Preset> presets();
@@ -66,10 +68,11 @@ class WindowController : public QObject
 	bool canSavePreset() const;
 	bool canStartSearch() const;
 
-	QString previewDocument() const
-	{
-		return {}; // TODO
-	}
+	QString raportFileName() const;
+
+	QString previewDocument() const;
+
+	QDate raportDate() const;
 
 	void setPresetSelectorText(QString);
 	void setAuthorName(QString);
@@ -78,6 +81,7 @@ class WindowController : public QObject
 	void setFromDay(QDate);
 	void setToDay(QDate);
 	Q_INVOKABLE void setRepositoryPath(QString);
+	void setRaportDate(QDate);
 
 	QBindable<QString> bindablePresetSelectorText() const;
 	QBindable<QString> bindableAuthorName() const;
@@ -85,6 +89,7 @@ class WindowController : public QObject
 	QBindable<QString> bindableCity() const;
 	QBindable<QDate> bindableFromDay() const;
 	QBindable<QDate> bindableToDay() const;
+	QBindable<QDate> bindableRaportDate() const;
 
   signals:
 	void itemsChanged();
@@ -107,6 +112,7 @@ class WindowController : public QObject
 	void unlockScreen();
 	void showFilteringView();
 
+	void raportDateChanged();
 	void previewDocumentChanged();
 
   public:
@@ -153,5 +159,6 @@ class WindowController : public QObject
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _city, &WindowController::cityChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _fromDay, &WindowController::fromDayChanged)
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _toDay, &WindowController::toDayChanged)
+	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QDate, _raportDate, &WindowController::raportDateChanged)
 };
 } // namespace RaportPKUP::UI

@@ -46,22 +46,13 @@ uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
 	return total_duration;
 }
 
-void WindowController::saveRaportToFile(QString /* filename*/)
+void WindowController::saveRaportToFile(QString filename_url)
 {
-	//	QFileDialog dialog;
-	//	dialog.setAcceptMode(QFileDialog::AcceptSave);
-	//	dialog.setFileMode(QFileDialog::FileMode::AnyFile);
+	QString filename;
+	if (filename_url.startsWith("file:///"))
+		filename = filename_url.mid(8);
 
-	//	dialog.setNameFilter("Adobe PDF (*.pdf)");
-
-	//	dialog.setModal(true);
-
-	//	if (dialog.exec() != QDialog::DialogCode::Accepted)
-	//		return;
-
-	const auto root_temp_dir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	const auto id = QUuid::createUuid().toString(QUuid::StringFormat::Id128);
-	const auto filename = root_temp_dir + "/" + id + ".tmp.tex";
+	const auto tex_file = filename + ".tex";
 
 	{
 		QFile file(filename);
@@ -151,5 +142,10 @@ void WindowController::saveRaportToFile(QString /* filename*/)
 	}
 
 	QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
+}
+
+QString WindowController::previewDocument() const
+{
+	return "<!DOCTYPE html><html><body><h1>Demo</h1></body></html>";
 }
 } // namespace RaportPKUP::UI

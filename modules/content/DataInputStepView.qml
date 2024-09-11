@@ -213,6 +213,7 @@ ColumnLayout {
                 InputField {
                     id: authorEmail
 
+                    inputMethodHints: Qt.ImhEmailCharactersOnly
                     value: controller.authorEmail
 
                     validator: RegularExpressionValidator {

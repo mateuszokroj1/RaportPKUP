@@ -34,7 +34,7 @@ Window {
 
                 DataFilteringStepView {
                     readonly property int minimumHeight: 1000
-                    readonly property int minimumWidth: 1400
+                    readonly property int minimumWidth: 1600
                 }
             },
             MainViewItem {

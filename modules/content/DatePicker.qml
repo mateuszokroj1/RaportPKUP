@@ -114,4 +114,11 @@ ListView {
             }
         }
     }
+
+    Keys.onLeftPressed: {
+        set(selectedDate.setMonth(selectedDate.getMonth() - 1));
+    }
+    Keys.onRightPressed: {
+        set(selectedDate.setMonth(selectedDate.getMonth() + 1));
+    }
 }

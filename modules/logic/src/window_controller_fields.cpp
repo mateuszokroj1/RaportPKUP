@@ -66,6 +66,8 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 				emit sumOfHoursChanged();
 			});
 
+	_raportDate.setBinding([this]() { return _toDay.value(); });
+
 	_presets_manager.loadFromFile();
 }
 
@@ -151,6 +153,11 @@ bool WindowController::canStartSearch() const
 	return true;
 }
 
+QDate WindowController::raportDate() const
+{
+	return _raportDate.value();
+}
+
 void WindowController::setPresetSelectorText(QString value)
 {
 	_presetSelectorText.setValue(std::move(value));
@@ -215,6 +222,11 @@ void WindowController::setRepositoryPath(QString value)
 	emit repositoryPathChanged();
 }
 
+void WindowController::setRaportDate(QDate value)
+{
+	_raportDate.setValue(value);
+}
+
 QBindable<QString> WindowController::bindablePresetSelectorText() const
 {
 	return &_presetSelectorText;
@@ -243,6 +255,11 @@ QBindable<QDate> WindowController::bindableFromDay() const
 QBindable<QDate> WindowController::bindableToDay() const
 {
 	return &_toDay;
+}
+
+QBindable<QDate> WindowController::bindableRaportDate() const
+{
+	return &_raportDate;
 }
 
 void WindowController::addRepository()
