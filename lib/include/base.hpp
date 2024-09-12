@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <mutex>
 #include <type_traits>
 
 namespace RaportPKUP
@@ -37,6 +38,9 @@ template <typename... ArgsTypes> class IAcceptVisitor
 	virtual void accept(IVisitor<ArgsTypes...>&) = 0;
 };
 
+template <typename ContainerType, typename DataType>
+concept PushBackAvailable = requires(DataType data, ContainerType container) { container.push_back(std::move(data)); };
+
 template <typename ContainerType, typename T>
 concept SharedPointer =
 	std::is_same_v<ContainerType, std::optional<T>> || std::is_same_v<ContainerType, std::shared_ptr<T>>;
@@ -57,5 +61,50 @@ class CanceledOperationException : public std::exception
 	CanceledOperationException() : std::exception("Cancellation requested.")
 	{
 	}
+};
+
+template <std::movable DataType> class ISynchronizationContainerWrapper
+{
+  public:
+	virtual ~ISynchronizationContainerWrapper() = default;
+
+	virtual void push_back(DataType&& data, const std::stop_token& stop_token = {}) = 0;
+};
+
+template <std::movable DataType, PushBackAvailable<DataType> ContainerType>
+class SynchronizationContainerWrapper final : public ISynchronizationContainerWrapper<DataType>
+{
+  public:
+	SynchronizationContainerWrapper(ContainerType& container) : _container(container)
+	{
+	}
+
+	void push_back(DataType&& data, const std::stop_token& stop_token = {}) override
+	{
+		try
+		{
+			while (!_mutex.try_lock() && !stop_token.stop_requested())
+				std::this_thread::yield();
+
+			if (stop_token.stop_requested())
+			{
+				_mutex.unlock();
+				return;
+			}
+
+			_container.push_back(data);
+
+			_mutex.unlock();
+		}
+		catch (...)
+		{
+			_mutex.unlock();
+			throw;
+		}
+	}
+
+  private:
+	std::mutex _mutex;
+	ContainerType& _container;
 };
 } // namespace RaportPKUP

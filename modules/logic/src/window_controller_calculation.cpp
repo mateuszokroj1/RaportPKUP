@@ -46,16 +46,9 @@ void WindowController::searchForCommits()
 			std::for_each(std::execution::par, _repositories.cbegin(), _repositories.cend(),
 						  [this, &from, &to, &author, &mutex](const RepositoryListItem* repo)
 						  {
-							  auto list = repo->getRepository()->getCommitsFromTimeRange(from, to, author);
+							  repo->getRepository()->getCommitsFromTimeRange(from, to, author);
 
-							  for (const auto& commit : list)
-							  {
-								  if (_is_about_to_quit)
-									  return;
-
-								  std::lock_guard lock(*mutex);
-								  _commits_temp.push_back(std::make_unique<Commit>(commit));
-							  }
+							  for (size_t i = 0; i < list.)
 						  });
 
 			Filters::removeEmptyPointers(_commits_temp);

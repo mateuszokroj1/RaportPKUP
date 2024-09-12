@@ -155,7 +155,7 @@ class WindowController : public QObject
 
 	QList<Preset*> _presets;
 	QList<RepositoryListItem*> _repositories;
-	std::vector<std::unique_ptr<Commit>> _commits_temp;
+	std::list<Commit> _commits_temp;
 	QList<CommitItem*> _commits;
 
 	QString _repository_path;
