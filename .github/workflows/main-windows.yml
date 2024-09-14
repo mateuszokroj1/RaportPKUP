@@ -18,6 +18,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     - name: Configure Visual Studio path
       uses: TheMrMilchmann/setup-msvc-dev@v3
@@ -35,7 +37,7 @@ jobs:
       uses: actions/cache@v4.0.0
       with:
         # A list of files, directories, and wildcard patterns to cache and restore
-        path: out/build
+        path: ~/out/build
         # An explicit key for restoring and saving the cache
         key: build-cache
 
