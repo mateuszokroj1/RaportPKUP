@@ -63,14 +63,14 @@ Project {
     qt6Project: true
 
     /* List of plugin directories passed to QML runtime */
-    importPaths: [ "modules", "out/build/modules" ]
+    importPaths: [ "out/build/modules" ]
 
     /* Required for deployment */
     targetDirectory: "/opt/app"
 
     qdsVersion: "4.3"
 
-    quickVersion: "6.2"
+    quickVersion: "6.7"
 
     /* If any modules the project imports require widgets (e.g. QtCharts), widgetApp must be true */
     widgetApp: true

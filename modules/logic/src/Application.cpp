@@ -1,13 +1,12 @@
-#include <signal.h>
-
-#include <QQmlApplicationEngine>
 #include <QtGui/QSurfaceFormat>
-#include <qqmlcontext.h>
-
-#include "EmptyDeleter.hpp"
+#include <QtQml/QQmlApplicationEngine>
+#include <QtQml/qqmlcontext.h>
 
 #include "Application.hpp"
+#include "EmptyDeleter.hpp"
 #include "WindowController.hpp"
+
+#include <signal.h>
 
 namespace
 {
