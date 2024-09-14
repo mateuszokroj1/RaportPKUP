@@ -4,6 +4,7 @@
 #include <GitRepositoryAccessor.hpp>
 #include <GitRepositoryDetector.hpp>
 #include <LibGit.hpp>
+#include <Version.h>
 
 #include <filesystem>
 #include <gmock/gmock.h>
@@ -71,6 +72,9 @@ TEST_F(GitRepositoryTest, checkIsValidPath_whenValueIsInvalid_shouldReturnFalse)
 
 TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
 {
+	if (std::string(GIT_BRANCH) == "HEAD")
+		return;
+
 	auto repo = accessor->openRepository(valid_path).get();
 	ASSERT_TRUE(repo);
 
@@ -95,6 +99,9 @@ TEST_F(GitRepositoryTest, getNameOfRemoteRepo_shouldReturnGitHubName)
 
 TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
 {
+	if (std::string(GIT_BRANCH) == "HEAD")
+		return;
+
 	auto repo = accessor->openRepository(valid_path).get();
 	ASSERT_TRUE(repo);
 

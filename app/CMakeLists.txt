@@ -44,7 +44,7 @@ target_include_directories(${executable_name}
                            PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
 target_include_directories(${executable_name}
-                           PRIVATE "${CMAKE_SOURCE_DIR}/config/Version.h")
+                           PRIVATE "${CMAKE_SOURCE_DIR}/config")
 
 qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES
                  qtquickcontrols2.conf)
@@ -105,7 +105,3 @@ if(WIN32)
     )
   ]])
 endif()
-
-# make IDEs aware of the QML import path set(QML_IMPORT_PATH
-# ${PROJECT_BINARY_DIR}/qml CACHE PATH "Path to the custom QML components
-# defined by the project")

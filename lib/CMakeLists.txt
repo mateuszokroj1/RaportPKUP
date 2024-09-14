@@ -55,6 +55,8 @@ if(${ENABLE_TESTS})
                              PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
   target_include_directories(${executable_name}
                              PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_include_directories(${executable_name}
+                             PRIVATE ${CMAKE_SOURCE_DIR}/config)
 
   gtest_discover_tests(${executable_name})
 endif()

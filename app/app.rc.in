@@ -1,26 +1,23 @@
 IDI_ICON1 ICON DISCARDABLE "icon.ico"
 
-1 VERSIONINFO
-    FILEVERSION @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_PATCH@,0
-    PRODUCTVERSION @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_PATCH@,0
-    FILEFLAGS 0x0L
-    FILEOS 0x4L
-    FILETYPE 0x1L
-    FILESUBTYPE 0x0L
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_PATCH@,@VERSION_REVISION@
+    PRODUCTVERSION @VERSION_MAJOR@,@VERSION_MINOR@,@VERSION_PATCH@,@VERSION_REVISION@
+
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "080904b0"
+        BLOCK "040904E4"
         BEGIN
             VALUE "Comments", L"Generator raportów do Podwyższonych Kosztów Uzyskania Przychodów"
             VALUE "CompanyName", L"Mateusz Okrój"
             VALUE "FileDescription", L"Generator raportów do Podwyższonych Kosztów Uzyskania Przychodów"
-            VALUE "FileVersion", "@VERSION_MAJOR@, @VERSION_MINOR@, @VERSION_PATCH@, 0"
+            VALUE "FileVersion", "@VERSION_MAJOR@, @VERSION_MINOR@, @VERSION_PATCH@, @VERSION_REVISION@"
             VALUE "InternalName", "Generator PKUP"
             VALUE "LegalCopyright", L"2024 Mateusz Okrój"
             VALUE "OriginalFilename", "@executable_name@.exe"
             VALUE "ProductName", L"Generator raportów PKUP" 
-            VALUE "ProductVersion", "@VERSION_MAJOR@, @VERSION_MINOR@, @VERSION_PATCH@, 0"
+            VALUE "ProductVersion", "@VERSION_MAJOR@, @VERSION_MINOR@, @VERSION_PATCH@, @VERSION_REVISION@"
         END
     END
 

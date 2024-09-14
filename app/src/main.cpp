@@ -4,7 +4,8 @@
 
 #include "Application.hpp"
 #include "Process.hpp"
-#include "include/IProcess.hpp"
+#include <Version.h>
+#include <include/IProcess.hpp>
 
 #include "GitAccessImpl.hpp"
 #include <include/GitRepositoryAccessor.hpp>
@@ -54,5 +55,12 @@ int main(int argc, char* argv[])
 
 	set_qt_environment();
 	std::setlocale(LC_ALL, "pl_PL.UTF-8");
+	auto qapp = app.getQApplication();
+	qapp->setOrganizationName(u"Mateusz Okrój"_qs);
+	qapp->setApplicationName("RaportPKUP");
+	qapp->setApplicationDisplayName(u"Generator raportów PKUP"_qs);
+	qapp->setApplicationVersion(
+		QString("%1.%2.%3.%4").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH).arg(VERSION_REVISION));
+
 	app.run(argc, argv);
 }
