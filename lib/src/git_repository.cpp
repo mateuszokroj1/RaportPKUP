@@ -1,12 +1,11 @@
-#include <execution>
-#include <filesystem>
+#include "GitRepository.hpp"
 
 #include "Commit.hpp"
 #include "LibGit.hpp"
 #include "base.hpp"
-#include <tbb/tbb.h>
 
-#include "GitRepository.hpp"
+#include <execution>
+#include <filesystem>
 
 namespace RaportPKUP
 {
@@ -44,20 +43,18 @@ short compareDate(const DateTime& value, const DateTime& from, const DateTime& t
 	return 0;
 }
 
-std::list<Commit> GitRepository::getCommitsFromTimeRange(const DateTime& from, const DateTime& to, const Author& author,
-														 const std::stop_token& stop_token) const
+void GitRepository::getCommitsFromTimeRange(const DateTime& from, const DateTime& to, const Author& author,
+											ISynchronizationContainerWrapper<Commit, Commit::Key>& container,
+											const std::stop_token& stop_token) const
 {
 	const auto branches = _repository->enumerateAllRemoteBranches();
 	const auto repo_name = getNameOfRemoteRepository();
 
 	if (stop_token.stop_requested())
-		return {};
-
-	auto mutex = std::make_unique<std::mutex>();
-	std::list<Commit> list;
+		return;
 
 	std::for_each(std::execution::par, branches.cbegin(), branches.cend(),
-				  [this, &stop_token, &author, &repo_name, &from, &to, &list, &mutex](const auto& branch)
+				  [this, &stop_token, &author, &repo_name, &from, &to, &container](const LibGit_Ref::Ptr& branch)
 				  {
 					  auto walker = _repository->createWalker();
 					  if (!walker)
@@ -77,7 +74,7 @@ std::list<Commit> GitRepository::getCommitsFromTimeRange(const DateTime& from, c
 						  Commit result;
 
 						  const auto id = commit->id();
-						  git_oid_tostr(reinterpret_cast<char*>(&result.id), 8, &id);
+						  git_oid_tostr(result.id.value.data(), 8, &id);
 
 						  result.datetime = commit->getTime();
 
@@ -86,6 +83,11 @@ std::list<Commit> GitRepository::getCommitsFromTimeRange(const DateTime& from, c
 						  if (compare_result < 0)
 							  break;
 						  if (compare_result > 0)
+							  continue;
+
+						  Commit::Key key{result.id, result.datetime};
+
+						  if (container.contains(key))
 							  continue;
 
 						  result.author = commit->getAuthor();
@@ -98,15 +100,9 @@ std::list<Commit> GitRepository::getCommitsFromTimeRange(const DateTime& from, c
 						  result.repo_name = repo_name;
 						  result.message = commit->getShortMessage();
 
-						  std::lock_guard lock(*mutex);
-						  list.push_back(std::move(result));
+						  container.emplace(std::move(key), std::move(result), stop_token);
 					  }
 				  });
-
-	if (stop_token.stop_requested())
-		return {};
-
-	return list;
 }
 
 std::future<bool> GitRepository::fetchFirstRemote(bool with_prune)

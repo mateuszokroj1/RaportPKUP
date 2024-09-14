@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <mutex>
 #include <type_traits>
 
@@ -38,9 +39,6 @@ template <typename... ArgsTypes> class IAcceptVisitor
 	virtual void accept(IVisitor<ArgsTypes...>&) = 0;
 };
 
-template <typename ContainerType, typename DataType>
-concept PushBackAvailable = requires(DataType data, ContainerType container) { container.push_back(std::move(data)); };
-
 template <typename ContainerType, typename T>
 concept SharedPointer =
 	std::is_same_v<ContainerType, std::optional<T>> || std::is_same_v<ContainerType, std::shared_ptr<T>>;
@@ -63,23 +61,65 @@ class CanceledOperationException : public std::exception
 	}
 };
 
-template <std::movable DataType> class ISynchronizationContainerWrapper
+template <typename T>
+concept Comparable = requires(T a, T b) {
+	a > b;
+	a < b;
+};
+
+template <typename T>
+concept Equatable = requires(T a, T b) {
+	a == b;
+	a != b;
+};
+
+template <typename T>
+concept MovableMapKey = std::movable<T> && Equatable<T> && Comparable<T>;
+
+template <std::movable DataType, MovableMapKey KeyType> class ISynchronizationContainerWrapper
 {
   public:
 	virtual ~ISynchronizationContainerWrapper() = default;
 
-	virtual void push_back(DataType&& data, const std::stop_token& stop_token = {}) = 0;
+	virtual bool contains(const KeyType&, const std::stop_token& stop_token = {}) const = 0;
+	virtual void emplace(KeyType&&, DataType&&, const std::stop_token& stop_token = {}) = 0;
 };
 
-template <std::movable DataType, PushBackAvailable<DataType> ContainerType>
-class SynchronizationContainerWrapper final : public ISynchronizationContainerWrapper<DataType>
+template <std::movable DataType, MovableMapKey KeyType>
+class SynchronizationContainerWrapper final : public ISynchronizationContainerWrapper<DataType, KeyType>
 {
   public:
-	SynchronizationContainerWrapper(ContainerType& container) : _container(container)
+	SynchronizationContainerWrapper(std::map<KeyType, DataType>& container) : _container(container)
 	{
 	}
 
-	void push_back(DataType&& data, const std::stop_token& stop_token = {}) override
+	bool contains(const KeyType& key, const std::stop_token& stop_token = {}) const
+	{
+		try
+		{
+			while (!_mutex.try_lock() && !stop_token.stop_requested())
+				std::this_thread::yield();
+
+			if (stop_token.stop_requested())
+			{
+				_mutex.unlock();
+				return false;
+			}
+
+			const bool result = _container.contains(key);
+
+			_mutex.unlock();
+
+			return result;
+		}
+		catch (...)
+		{
+			_mutex.unlock();
+			throw;
+		}
+	}
+
+	void emplace(KeyType&& key, DataType&& data, const std::stop_token& stop_token = {}) override
 	{
 		try
 		{
@@ -92,7 +132,8 @@ class SynchronizationContainerWrapper final : public ISynchronizationContainerWr
 				return;
 			}
 
-			_container.push_back(data);
+			if (!_container.contains(key))
+				_container.emplace(std::move(key), std::move(data));
 
 			_mutex.unlock();
 		}
@@ -104,7 +145,7 @@ class SynchronizationContainerWrapper final : public ISynchronizationContainerWr
 	}
 
   private:
-	std::mutex _mutex;
-	ContainerType& _container;
+	mutable std::mutex _mutex;
+	std::map<KeyType, DataType>& _container;
 };
 } // namespace RaportPKUP
