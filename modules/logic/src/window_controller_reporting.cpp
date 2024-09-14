@@ -26,16 +26,18 @@ uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
 
 		stream << counter;
 		stream << " & ";
-		stream << commit->id();
+		stream << commit->repositoryName();
 		stream << " & ";
-		stream << commit->time().toString();
+		stream << commit->time().toString("dd-MM-yyyy");
+		stream << " & ";
+		stream << commit->id();
 		stream << " & ";
 		stream << commit->message();
 		stream << " & ";
 		stream << commit->duration;
 
 		if (commits.last() != commit)
-			stream << "\\\\\n \\hline \\\\";
+			stream << "\\\\\n \\hline\n";
 
 		stream << '\n';
 
@@ -74,63 +76,67 @@ void WindowController::saveRaportToFile(QString filename_url)
 			stream << "\\usepackage{longtable}" << '\n';
 			stream << "\\usepackage{array}" << '\n';
 
-			stream << "\\title{Raport}";
+			stream << "\\title{Raport}" << '\n';
 
-			stream << "\\begin{document}";
-			stream << "\\begin{flushright} Słupsk, " << QDate::currentDate().toString("dd-MM-yyyy")
-				   << "\\end{flushright}";
+			stream << "\\begin{document}" << '\n';
+			stream << "\\begin{flushright} " << city() << ", " << raportDate().toString("dd-MM-yyyy")
+				   << "\\end{flushright}" << '\n';
 
-			stream << "\\paragraph{";
+			stream << "\\paragraph{" << '\n';
 
-			stream << "\\begin{center} Raport od " << fromDay().toString() << " do " << toDay().toString()
-				   << "\\end{center}";
-			stream << "}";
+			stream << "\\begin{center} Raport od " << fromDay().toString("dd MMMM yyyy") << " do "
+				   << toDay().toString("dd MMMM yyyy") << "\\end{center}" << '\n';
+			stream << "}" << '\n';
 
 			stream
 				<< "\\begin{flushleft} Lista przekazanych utworów objętych majątkowym prawem autorskim, wytworzonych i "
 				   "przekazanych pracodawcy przez pracownika: "
-				<< authorName() << ".\\end{flushleft}";
+				<< authorName() << ".\\end{flushleft}" << '\n';
 
-			stream << "\\begin{center}";
-			stream << "\\begin{longtable}{| l | l | l | l | l |}";
+			stream << "\\begin{center}" << '\n';
+			stream << "\\begin{longtable}{|l|l|l|l|l|l|l|}" << '\n';
 
-			stream << "\\hline \\multicolumn{1}{| c |}{\\textbf{Lp.}} & \\multicolumn{1}{c |}{\\textbf{ID}} & "
-					  "\\multicolumn{1}{c |}{\\textbf{Data publikacji}} & \\multicolumn{1}{c |}{\\textbf{Tytuł}} & "
-					  "\\multicolumn{1}{c "
-					  "|}{\\textbf{Liczba godzin}}\\\\ \\hline";
-			stream << "\\endfirsthead";
+			stream
+				<< "\\hline \\multicolumn{1}{|c|}{\\textbf{Lp.}} & \\multicolumn{1}{c|}{\\textbf{Nazwa repozytorium}} "
+				   "& "
+				   "\\multicolumn{1}{c|}{\\textbf{Data wykonania}} & \\multicolumn{1}{|c|}{\\textbf{ID}} & "
+				   "\\multicolumn{1}{c|}{\\textbf{Tytuł}} & \\multicolumn{1}{c|}{\\textbf{Liczba godzin}} \\\\ \\hline"
+				<< '\n';
+			stream << "\\endfirsthead" << '\n';
 
-			stream << "\\multicolumn{5}{c}%";
-			stream << "{} \\\\";
-			stream << "\\hline \\multicolumn{1}{| c |}{\\textbf{Lp.}} & \\multicolumn{1}{c |}{\\textbf{ID}} & "
-					  "\\multicolumn{1}{c |}{\\textbf{Data publikacji}} & \\multicolumn{1}{c |}{\\textbf{Tytuł}} & "
-					  "\\multicolumn{1}{c "
-					  "|}{\\textbf{Liczba godzin}}\\\\ \\hline";
-			stream << "\\endhead";
+			stream << "\\multicolumn{6}{c}{} \\\\" << '\n';
+			stream
+				<< "\\hline \\multicolumn{1}{|c|}{\\textbf{Lp.}} & \\multicolumn{1}{c|}{\\textbf{Nazwa repozytorium}} "
+				   "& "
+				   "\\multicolumn{1}{c|}{\\textbf{Data wykonania}} & \\multicolumn{1}{|c|}{\\textbf{ID}} & "
+				   "\\multicolumn{1}{c|}{\\textbf{Tytuł}} & \\multicolumn{1}{c|}{\\textbf{Liczba godzin}} \\\\ \\hline"
+				<< '\n';
+			stream << "\\endhead" << '\n';
 
-			stream << "\\hline";
-			stream << "\\endfoot";
+			stream << "\\hline" << '\n';
+			stream << "\\endfoot" << '\n';
 
 			const auto duration = saveCommitsToStream(stream, _commits);
 
-			stream << "\\end{longtable}";
-			stream << "\\end{center}";
+			stream << "\\end{longtable}" << '\n';
+			stream << "\\end{center}" << '\n';
 
 			stream << "\\begin{flushleft}";
 			stream << "Łączny czas pracy poświęcony na wytworzenie utworów objętych prawem autorskim w podanym wyżej "
 					  "okresie: "
 				   << duration << " godzin.";
-			stream << "\\end{flushleft}";
+			stream << "\\end{flushleft}" << '\n';
 
-			stream << "\\paragraph{}";
-			stream << "\\begin{center}";
-			stream << "\\begin{tabular}{p{55mm} p{55mm}}";
+			stream << "\\paragraph{}" << '\n';
+			stream << "\\begin{center}" << '\n';
+			stream << "\\begin{tabular}{p{55mm} p{55mm}}" << '\n';
 
 			stream << "\\begin{flushleft}Podpis pracodawcy\\end{flushleft} & \\begin{flushright} Podpis "
-					  "pracownika\\end{flushright}";
+					  "pracownika\\end{flushright}"
+				   << '\n';
 
-			stream << "\\end{tabular}";
-			stream << "\\end{center}";
+			stream << "\\end{tabular}" << '\n';
+			stream << "\\end{center}" << '\n';
 
 			stream << "\\end{document}";
 
