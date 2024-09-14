@@ -51,7 +51,8 @@ jobs:
 
     - name: Test
       shell: sh
-      run: ctest out/build
+      working-directory: out/build
+      run: ctest .
       timeout-minutes: 1
 
     - name: Install artifacts
