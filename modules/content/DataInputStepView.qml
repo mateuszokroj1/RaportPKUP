@@ -195,7 +195,7 @@ ColumnLayout {
                     value: controller.authorName
 
                     validator: RegularExpressionValidator {
-                        regularExpression: /^[A-z]/
+                        regularExpression: /^[A-z].*/
                     }
 
                     onValueChanged: {
