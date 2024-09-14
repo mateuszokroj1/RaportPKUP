@@ -49,6 +49,11 @@ jobs:
       shell: sh
       run: cmake --build out/build
 
+    - name: Test
+      shell: sh
+      run: ctest out/build
+      timeout-minutes: 1
+
     - name: Install artifacts
       shell: sh
       run: cmake --install out/build
