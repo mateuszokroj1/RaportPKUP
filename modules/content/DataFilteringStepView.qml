@@ -89,7 +89,7 @@ Item {
                     }
                     UIText {
                         Layout.alignment: Qt.AlignVCenter
-                        text: "Procentowy udział: " + Math.trunc(controller.sumOfHours / (form1.val * 24)) + "%"
+                        text: "Procentowy udział: " + Math.round((controller.sumOfHours / (form1.val * 8)) * 10000) / 100 + "%"
                     }
                     Item {
                         Layout.fillWidth: true
@@ -214,6 +214,33 @@ Item {
                     implicitHeight: row_layout.implicitHeight
                     implicitWidth: row_layout.implicitWidth
 
+                    states: [
+                        State {
+                            name: "hovered"
+                            when: hover.hovered
+
+                            changes: [
+                                PropertyChanges {
+                                    background: Theme.activatedElementBackground
+                                    target: row
+                                    textColor: "white"
+                                }
+                            ]
+                        }
+                    ]
+                    transitions: [
+                        Transition {
+                            ColorAnimation {
+                                duration: 150
+                                target: row
+                            }
+                        }
+                    ]
+
+                    HoverHandler {
+                        id: hover
+
+                    }
                     RowLayout {
                         id: row_layout
 
