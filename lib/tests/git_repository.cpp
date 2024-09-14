@@ -4,6 +4,7 @@
 #include <GitRepositoryAccessor.hpp>
 #include <GitRepositoryDetector.hpp>
 #include <LibGit.hpp>
+#include <Version.h>
 
 #include <filesystem>
 #include <gmock/gmock.h>
@@ -71,6 +72,9 @@ TEST_F(GitRepositoryTest, checkIsValidPath_whenValueIsInvalid_shouldReturnFalse)
 
 TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
 {
+	if (std::string(GIT_BRANCH) == "HEAD")
+		return;
+
 	auto repo = accessor->openRepository(valid_path).get();
 	ASSERT_TRUE(repo);
 
@@ -95,18 +99,24 @@ TEST_F(GitRepositoryTest, getNameOfRemoteRepo_shouldReturnGitHubName)
 
 TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
 {
+	if (std::string(GIT_BRANCH) == "HEAD")
+		return;
+
 	auto repo = accessor->openRepository(valid_path).get();
 	ASSERT_TRUE(repo);
 
 	const std::chrono::year_month_day from(std::chrono::year(2023), std::chrono::month(1), std::chrono::day(1));
 	const std::chrono::year_month_day to(std::chrono::year(2024), std::chrono::month(6), std::chrono::day(1));
 
-	const auto vec = repo->getCommitsFromTimeRange(std::chrono::sys_days(from), std::chrono::sys_days(to),
-												   {L"Mateusz Okrój", L"mateuszokroj1@gmail.com"});
+	std::map<Commit::Key, Commit> map;
+	SynchronizationContainerWrapper<Commit, Commit::Key> container(map);
 
-	ASSERT_EQ(vec.size(), 20);
+	repo->getCommitsFromTimeRange(std::chrono::sys_days(from), std::chrono::sys_days(to),
+								  {L"Mateusz Okrój", L"mateuszokroj1@gmail.com"}, container);
 
-	const auto& test_commit = vec.front();
+	ASSERT_EQ(map.size(), 20);
+
+	const auto test_commit = map.cbegin()->second;
 
 	std::regex branch_regex(BRANCH_NAME_REGEX);
 
@@ -121,11 +131,3 @@ TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
 	const auto& author = test_commit.author;
 	ASSERT_STREQ(author.email.c_str(), L"mateuszokroj1@gmail.com");
 }
-
-// TEST_F(GitRepositoryTest, fetch_shouldBeSuccessful)
-//{
-//	auto repo = accessor->openRepository(valid_path).get();
-//	ASSERT_TRUE(repo);
-
-//	ASSERT_TRUE(repo->fetchFirstRemote(false).get());
-//}

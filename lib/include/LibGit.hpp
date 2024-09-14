@@ -63,6 +63,8 @@ class LibGit_Ref final
 	friend class LibGit_BranchIterator;
 
   public:
+	using Ptr = Ptr<LibGit_Ref>;
+
 	~LibGit_Ref() noexcept;
 	COPY_CONSTRUCTOR(LibGit_Ref) = delete;
 

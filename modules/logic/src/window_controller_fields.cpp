@@ -1,3 +1,8 @@
+#include "WindowController.hpp"
+
+#include <include/IProcess.hpp>
+#include <include/IRepositoryAccessor.hpp>
+
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
@@ -6,41 +11,40 @@
 #include <QtQml/qqmllist.h>
 #include <QtWidgets/QMessageBox>
 
-// #include <tbb/tbb.h>
-
-#include <include/IProcess.hpp>
-#include <include/IRepositoryAccessor.hpp>
-
-#include "InputDataState.hpp"
-#include "WindowController.hpp"
-
 using namespace Qt::Literals::StringLiterals;
 
 namespace RaportPKUP::UI
 {
-WindowController::WindowController(std::weak_ptr<Application> app)
-	: _application(app), _addRepositoryCmd(new Command(this)), _searchForCommitsCmd(new Command(this)),
-	  _presets_manager(this)
+WindowController::WindowController(std::weak_ptr<Application> app) : _application(app), _presets_manager(this)
 {
 	if (auto app_ptr = _application.lock())
 	{
 		auto weak = app_ptr->get<IProcessFactory>();
 		if (!(_process_factory = weak.lock()))
+		{
+			qCritical() << "WindowController::ctor(): ProcessFactory is not available.";
 			return;
+		}
 
 		_repository_detector = app_ptr->get<IRepositoryDetector>().lock();
+		if (!_repository_detector)
+		{
+			qCritical() << "WindowController::ctor(): RepositoryDetector is not available.";
+			return;
+		}
 
 		connect(app_ptr->getQApplication(), &QGuiApplication::aboutToQuit, this,
-				[this]() { _is_about_to_quit = true; });
+				[this]() { _application_exiting.request_stop(); });
+
+		_connection_between_tokens = std::make_unique<std::stop_callback<std::function<void()>>>(
+			_application_exiting.get_token(), [this] { _calculation_cancelled.request_stop(); });
 	}
+	else
+		qCritical() << "WindowController::ctor(): Application pointer is null.";
 
 	const auto today = QDate::currentDate();
 	_fromDay.setValue(QDate(today.year(), today.month(), 1));
 	_toDay.setValue(QDate(today.year(), today.month(), today.daysInMonth()));
-
-	// connect(_addRepositoryCmd, &Command::onExecute, this, &WindowController::addRepository);
-
-	// connect(_searchForCommitsCmd, &Command::onExecute, this, &WindowController::searchForCommits);
 
 	connect(&_presets_manager, &PresetsManager::loaded, this, &WindowController::loadPresets, Qt::QueuedConnection);
 	connect(this, &WindowController::presetsChanged, this, &WindowController::syncPresetsFile, Qt::QueuedConnection);
@@ -57,8 +61,7 @@ WindowController::WindowController(std::weak_ptr<Application> app)
 			[this]()
 			{
 				for (CommitItem* commit : _commits)
-					connect(commit, &CommitItem::durationChanged, this, &WindowController::sumOfHoursChanged,
-							Qt::UniqueConnection);
+					connect(commit, &CommitItem::durationChanged, this, &WindowController::sumOfHoursChanged);
 
 				emit sumOfHoursChanged();
 			});
@@ -308,10 +311,4 @@ uint WindowController::sumOfHours() const
 
 	return sum;
 }
-
-bool WindowController::YesCancelDialog(const QString& title, const QString& message, const QString& detailed_info)
-{
-	return false;
-}
-
 } // namespace RaportPKUP::UI

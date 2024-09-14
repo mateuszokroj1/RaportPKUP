@@ -1,17 +1,14 @@
+#include "WindowController.hpp"
+
+#include <include/IProcess.hpp>
+#include <include/IRepositoryAccessor.hpp>
+
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
 #include <QtGui/QDesktopServices>
 #include <QtQml/QQmlContext>
 #include <QtQml/qqmllist.h>
-
-// #include <tbb/tbb.h>
-
-#include <include/IProcess.hpp>
-#include <include/IRepositoryAccessor.hpp>
-
-#include "InputDataState.hpp"
-#include "WindowController.hpp"
 
 using namespace Qt::Literals::StringLiterals;
 

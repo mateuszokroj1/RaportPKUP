@@ -69,6 +69,15 @@ Button {
                 color: Theme.disabledBackground
                 target: rectangle
             }
+        },
+        State {
+            name: "enabledNonHighlightedHovered"
+            when: root.hovered && root.enabled && !root.highlighted && !root.flat
+
+            PropertyChanges {
+                color: "white"
+                target: rectangle
+            }
         }
     ]
 

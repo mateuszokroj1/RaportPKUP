@@ -15,7 +15,7 @@ class CommitItem : public QObject
 	QML_UNCREATABLE("Read only")
 
   public:
-	CommitItem(std::unique_ptr<Commit>&&, QObject*);
+	CommitItem(const Commit&, QObject*);
 
 	Q_PROPERTY(QString id READ id STORED false CONSTANT)
 	Q_PROPERTY(QString message READ message STORED false CONSTANT)
@@ -33,6 +33,6 @@ class CommitItem : public QObject
 	Q_SIGNAL void durationChanged();
 
   private:
-	std::unique_ptr<Commit> _commit;
+	const Commit& _commit;
 };
 } // namespace RaportPKUP::UI

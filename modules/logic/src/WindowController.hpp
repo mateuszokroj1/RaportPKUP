@@ -52,9 +52,6 @@ class WindowController : public QObject
 
 	Q_PROPERTY(QString previewDocument READ previewDocument NOTIFY previewDocumentChanged)
 
-	Q_PROPERTY(Command* addRepositoryCmd READ addRepositoryCmd CONSTANT)
-	Q_PROPERTY(Command* searchForCommitsCmd READ searchForCommitsCmd CONSTANT)
-
 	QQmlListProperty<Preset> presets();
 	QQmlListProperty<RepositoryListItem> repositories();
 	QQmlListProperty<CommitItem> commits();
@@ -69,21 +66,9 @@ class WindowController : public QObject
 	bool canSavePreset() const;
 	bool canStartSearch() const;
 
-	QString raportFileName() const;
-
 	QString previewDocument() const
 	{
 		return {}; // TODO
-	}
-
-	Command* addRepositoryCmd() const
-	{
-		return _addRepositoryCmd;
-	}
-
-	Command* searchForCommitsCmd() const
-	{
-		return _searchForCommitsCmd;
 	}
 
 	void setPresetSelectorText(QString);
@@ -140,13 +125,9 @@ class WindowController : public QObject
 
 	Q_INVOKABLE void saveRaportToFile(QString filename);
 
-	Q_INVOKABLE bool YesCancelDialog(const QString& title, const QString& message, const QString& detailed_info = {});
-
   private:
 	void loadPresets();
 	void syncPresetsFile();
-
-	void whenCommitsLoaded();
 
 	std::weak_ptr<Application> _application;
 	std::shared_ptr<IProcessFactory> _process_factory;
@@ -155,17 +136,15 @@ class WindowController : public QObject
 
 	QList<Preset*> _presets;
 	QList<RepositoryListItem*> _repositories;
-	std::vector<std::unique_ptr<Commit>> _commits_temp;
+	std::map<Commit::Key, Commit> _commits_temp;
 	QList<CommitItem*> _commits;
 
 	QString _repository_path;
 
-	std::thread _last_thread;
 	std::atomic_bool _thread_finished = false;
-	std::atomic_bool _is_about_to_quit = false;
-
-	Command* _addRepositoryCmd = nullptr;
-	Command* _searchForCommitsCmd = nullptr;
+	std::stop_source _calculation_cancelled;
+	std::stop_source _application_exiting;
+	std::unique_ptr<std::stop_callback<std::function<void()>>> _connection_between_tokens;
 
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _presetSelectorText,
 							   &WindowController::presetSelectorTextChanged)

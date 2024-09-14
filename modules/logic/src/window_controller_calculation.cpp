@@ -1,3 +1,8 @@
+#include "WindowController.hpp"
+
+#include <include/IProcess.hpp>
+#include <include/IRepositoryAccessor.hpp>
+
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
@@ -7,29 +12,16 @@
 
 #include <execution>
 
-#include <include/Filters.hpp>
-#include <include/IProcess.hpp>
-#include <include/IRepositoryAccessor.hpp>
-
-#include "InputDataState.hpp"
-#include "WindowController.hpp"
-
 using namespace Qt::Literals::StringLiterals;
 
 namespace RaportPKUP::UI
 {
 void WindowController::searchForCommits()
 {
-	if (_last_thread.joinable())
-	{
-		qDebug() << "Another thread is working...";
-		return;
-	}
-
 	emit lockScreen();
 	_thread_finished = false;
 
-	_last_thread = std::thread(
+	std::thread thread(
 		[this]()
 		{
 			_commits_temp.clear();
@@ -41,44 +33,27 @@ void WindowController::searchForCommits()
 			author.email = authorEmail().toStdWString();
 			author.name = authorName().toStdWString();
 
-			auto mutex = std::make_unique<std::mutex>();
+			SynchronizationContainerWrapper<Commit, Commit::Key> container(_commits_temp);
 
 			std::for_each(std::execution::par, _repositories.cbegin(), _repositories.cend(),
-						  [this, &from, &to, &author, &mutex](const RepositoryListItem* repo)
+						  [this, &from, &to, &author, &container](const RepositoryListItem* repo)
 						  {
-							  auto list = repo->getRepository()->getCommitsFromTimeRange(from, to, author);
+							  if (_calculation_cancelled.stop_requested())
+								  return;
 
-							  for (const auto& commit : list)
-							  {
-								  if (_is_about_to_quit)
-									  return;
-
-								  std::lock_guard lock(*mutex);
-								  _commits_temp.push_back(std::make_unique<Commit>(commit));
-							  }
+							  repo->getRepository()->getCommitsFromTimeRange(from, to, author, container);
 						  });
-
-			Filters::removeEmptyPointers(_commits_temp);
-			Filters::unique<std::unique_ptr<Commit>, Commit::Id>(_commits_temp, [](const std::unique_ptr<Commit>& item)
-																 { return item->id; });
-			Filters::sortDescending<std::unique_ptr<Commit>, DateTime>(
-				_commits_temp, [](const std::unique_ptr<Commit>& item) { return item->datetime; });
 
 			_thread_finished = true;
 		});
 
-	whenCommitsLoaded();
-}
-
-void WindowController::whenCommitsLoaded()
-{
-	while (!_thread_finished && !_is_about_to_quit)
+	while (!_thread_finished && !_calculation_cancelled.stop_requested())
 		QCoreApplication::processEvents();
 
-	if (_last_thread.joinable())
-		_last_thread.join();
+	if (thread.joinable())
+		thread.join();
 
-	if (_is_about_to_quit)
+	if (_calculation_cancelled.stop_requested())
 		return;
 
 	const auto temp_list = _commits;
@@ -86,17 +61,15 @@ void WindowController::whenCommitsLoaded()
 	emit commitsChanged();
 	qDeleteAll(temp_list);
 
-	for (auto& commit : _commits_temp)
+	auto it = _commits_temp.cend();
+	do
 	{
-		_commits.push_back(new CommitItem(std::move(commit), this));
+		--it;
+		_commits.push_back(new CommitItem(it->second, this));
 
-		if (_is_about_to_quit)
+		if (_calculation_cancelled.stop_requested())
 			return;
-
-		QCoreApplication::processEvents();
-	}
-
-	_commits_temp.clear();
+	} while (it != _commits_temp.cbegin());
 
 	emit commitsChanged();
 	emit unlockScreen();

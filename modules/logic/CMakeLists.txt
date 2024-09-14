@@ -15,7 +15,6 @@ qt_add_library(
   src/RepositoryListItem.hpp
   src/repository_list_item.cpp
   src/Preset.hpp
-  src/preset.cpp
   src/PresetsManager.hpp
   src/presets_manager.cpp
   src/WindowController.hpp
@@ -43,7 +42,6 @@ qt6_add_qml_module(
   src/RepositoryListItem.hpp
   src/repository_list_item.cpp
   src/Preset.hpp
-  src/preset.cpp
   src/PresetsManager.hpp
   src/presets_manager.cpp
   src/WindowController.hpp
