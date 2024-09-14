@@ -49,13 +49,13 @@ ColumnLayout {
                     text: "Data przygotowania raportu"
                 }
                 DatePicker {
-                    id: fromDate
+                    id: raportDate
 
                     Component.onCompleted: {
-                        fromDate.set(controller.fromDay);
+                        raportDate.set(controller.raportDate);
                     }
                     onClicked: {
-                        controller.fromDay = fromDate.selectedDate;
+                        controller.raportDate = raportDate.selectedDate;
                     }
                 }
             }
@@ -64,21 +64,36 @@ ColumnLayout {
             }
         }
     }
-    TextEdit {
-        id: preview
-
+    Item {
         Layout.fillHeight: true
         Layout.fillWidth: true
-        readOnly: true
-        text: controller.previewDocument
-        textFormat: TextEdit.RichText
-        wrapMode: TextEdit.Wrap
+        Layout.margins: Theme.defaultPageMargin
+
+        Rectangle {
+            anchors.fill: parent
+            border.color: "#bbb"
+            border.width: 1
+        }
+        TextEdit {
+            id: preview
+
+            anchors.fill: parent
+            readOnly: true
+            text: controller.previewDocument
+            textFormat: TextEdit.RichText
+            wrapMode: TextEdit.Wrap
+        }
     }
     Item {
         Layout.alignment: Qt.AlignBottom
         Layout.fillWidth: true
+        Layout.preferredHeight: 100
+        implicitHeight: saveButton.implicitHeight
+        implicitWidth: saveButton.implicitWidth
 
         UIButton {
+            id: saveButton
+
             anchors.centerIn: parent
             anchors.margins: Theme.defaultPadding
             highlighted: true
