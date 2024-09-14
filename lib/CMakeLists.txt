@@ -1,6 +1,6 @@
 project(RaportPKUP.Core)
 
-set(PRIVATE_LIBS TBB::tbb)
+set(PRIVATE_LIBS)
 
 set(PUBLIC_LIBS unofficial::libgit2::libgit2)
 
@@ -14,12 +14,11 @@ set(PUBLIC_HEADERS
     IRepositoryAccessor.hpp
     GitRepositoryAccessor.hpp
     GitRepositoryDetector.hpp
-    Filters.hpp
     ICommand.hpp)
 
 set(SOURCES git_repository.cpp libgit.cpp repository_detector_git.cpp)
 
-set(TESTS git_repository.cpp filters.cpp)
+set(TESTS git_repository.cpp)
 
 list(TRANSFORM SOURCES PREPEND "src/")
 

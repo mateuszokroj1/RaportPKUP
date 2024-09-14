@@ -12,6 +12,8 @@ if(NOT EXISTS "${CMAKE_C_COMPILER}" OR NOT EXISTS "${CMAKE_CXX_COMPILER}")
   endif()
 endif()
 
+find_program(git_app NAMES git REQUIRED)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 if(NOT DEFINED DISABLE_PRECOMMIT)
@@ -27,10 +29,13 @@ set(ENABLE_TESTS
 
 project(RaportPKUP)
 
-find_package(TBB CONFIG REQUIRED)
 find_package(unofficial-libgit2 CONFIG REQUIRED)
 
 include(config/Version.cmake)
+include(cmake/GenerateVersionInformation.cmake)
+message("Version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+generateversioninformation()
+
 configure_file(config/Version.h.in ${CMAKE_CURRENT_LIST_DIR}/config/Version.h
                @ONLY)
 
@@ -56,6 +61,5 @@ add_subdirectory(modules/content)
 add_subdirectory(app)
 
 set(QML_IMPORT_PATH
-    CACHE
-      STRING
-      "${CMAKE_BINARY_DIR}/modules/logic;${CMAKE_BINARY_DIR}/modules/content")
+    "${CMAKE_BINARY_DIR}/modules"
+    CACHE PATH "Generated modules for QML editor")
