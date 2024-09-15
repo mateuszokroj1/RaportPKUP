@@ -20,12 +20,14 @@ class CommitItem : public QObject
 	Q_PROPERTY(QString id READ id STORED false CONSTANT)
 	Q_PROPERTY(QString message READ message STORED false CONSTANT)
 	Q_PROPERTY(QDateTime time READ time STORED false CONSTANT)
+	Q_PROPERTY(QString timeString READ timeString STORED false CONSTANT)
 	Q_PROPERTY(QString repositoryName READ repositoryName STORED false CONSTANT)
 	Q_PROPERTY(ushort duration MEMBER duration NOTIFY durationChanged)
 
 	QString id() const;
 	QString message() const;
 	QDateTime time() const;
+	QString timeString() const;
 	QString repositoryName() const;
 
 	ushort duration = 0;
@@ -34,5 +36,6 @@ class CommitItem : public QObject
 
   private:
 	const Commit& _commit;
+	const QDateTime _date;
 };
 } // namespace RaportPKUP::UI

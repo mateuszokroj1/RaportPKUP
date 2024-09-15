@@ -318,7 +318,7 @@ Item {
                                 anchors.centerIn: parent
                                 anchors.margins: Theme.defaultPadding
                                 color: textColor
-                                text: modelData.time.getDate() + "-" + modelData.time.getMonth() + "-" + modelData.time.getFullYear()
+                                text: modelData.timeString
                             }
                         }
                         Rectangle {
