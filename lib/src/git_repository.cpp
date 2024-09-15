@@ -47,7 +47,7 @@ void GitRepository::getCommitsFromTimeRange(const DateTime& from, const DateTime
 											ISynchronizationContainerWrapper<Commit, Commit::Key>& container,
 											const std::stop_token& stop_token) const
 {
-	const auto branches = _repository->enumerateAllRemoteBranches();
+	const auto branches = _repository->enumerateAllLocalPublishedBranches();
 	const auto repo_name = getNameOfRemoteRepository();
 
 	if (stop_token.stop_requested())
