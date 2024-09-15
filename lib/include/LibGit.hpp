@@ -61,6 +61,7 @@ class LibGit_Commit final
 class LibGit_Ref final
 {
 	friend class LibGit_BranchIterator;
+	friend class LibGit_Repository;
 
   public:
 	using Ptr = Ptr<LibGit_Ref>;
@@ -148,7 +149,7 @@ class LibGit_Repository
 	bool fetch(const LibGit_Remote&);
 	bool prune(const LibGit_Remote&);
 
-	std::vector<Ptr<LibGit_Ref>> enumerateAllLocalBranches() const;
+	std::vector<Ptr<LibGit_Ref>> enumerateAllLocalPublishedBranches() const;
 	std::vector<Ptr<LibGit_Ref>> enumerateAllRemoteBranches() const;
 	std::vector<Ptr<LibGit_Remote>> enumerateRemotes() const;
 

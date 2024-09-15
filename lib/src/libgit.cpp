@@ -338,14 +338,38 @@ std::vector<Ptr<LibGit_Ref>> enumerateBranches(const LibGit_Repository& reposito
 }
 } // namespace
 
-std::vector<Ptr<LibGit_Ref>> LibGit_Repository::enumerateAllLocalBranches() const
+std::vector<Ptr<LibGit_Ref>> LibGit_Repository::enumerateAllLocalPublishedBranches() const
 {
-	return enumerateBranches(*this, GIT_BRANCH_LOCAL);
+	std::vector<Ptr<LibGit_Ref>> result;
+	LibGit_BranchIterator iterator(*this, GIT_BRANCH_LOCAL);
+
+	while (auto ptr = iterator.next())
+	{
+		git_reference* tracking_branch = nullptr;
+		const auto ret = git_branch_upstream(&tracking_branch, ptr->_handle);
+		if (tracking_branch)
+			git_reference_free(tracking_branch);
+
+		if (ret == GIT_ENOTFOUND)
+			continue;
+		else if (ret != 0)
+			return {};
+
+		result.push_back(std::move(ptr));
+	}
+
+	return result;
 }
 
 std::vector<Ptr<LibGit_Ref>> LibGit_Repository::enumerateAllRemoteBranches() const
 {
-	return enumerateBranches(*this, GIT_BRANCH_REMOTE);
+	std::vector<Ptr<LibGit_Ref>> result;
+	LibGit_BranchIterator iterator(*this, GIT_BRANCH_REMOTE);
+
+	while (auto ptr = iterator.next())
+		result.push_back(ptr);
+
+	return result;
 }
 
 std::vector<Ptr<LibGit_Remote>> LibGit_Repository::enumerateRemotes() const
