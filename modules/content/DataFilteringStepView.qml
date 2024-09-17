@@ -333,6 +333,7 @@ Item {
                                 anchors.centerIn: parent
                                 implicitHeight: text5.implicitHeight
                                 implicitWidth: text5.implicitWidth
+                                width: parent.width - Theme.defaultPadding * 2
 
                                 UIText {
                                     id: text5
@@ -341,7 +342,8 @@ Item {
                                     color: textColor
                                     elide: Text.ElideRight
                                     text: modelData.message
-                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                    wrapMode: Text.Wrap
                                 }
                             }
                         }

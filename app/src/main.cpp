@@ -54,7 +54,11 @@ int main(int argc, char* argv[])
 	ApplicationBuilder::build(std::move(definition), app);
 
 	set_qt_environment();
+
 	std::setlocale(LC_ALL, "pl_PL.UTF-8");
+	QLocale selectedLocale("pl_PL");
+	QLocale::setDefault(selectedLocale);
+
 	auto qapp = app.getQApplication();
 	qapp->setOrganizationName(u"Mateusz Okrój"_qs);
 	qapp->setApplicationName("RaportPKUP");

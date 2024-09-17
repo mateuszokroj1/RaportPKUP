@@ -31,9 +31,9 @@ uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
 		stream << commit->time().toString("dd-MM-yyyy");
 		stream << " & ";
 		stream << commit->id();
-		stream << " & ";
+		stream << " & \\RaggedRight{";
 		stream << commit->message();
-		stream << " & ";
+		stream << "} & ";
 		stream << commit->duration;
 
 		if (commits.last() != commit)
@@ -48,16 +48,17 @@ uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
 	return total_duration;
 }
 
-void WindowController::saveRaportToFile(QString filename_url)
+void WindowController::saveRaportToFile(QString filename_url) // TODO escape LaTEX special chars
 {
 	QString filename;
 	if (filename_url.startsWith("file:///"))
 		filename = filename_url.mid(8);
 
-	const auto tex_file = filename + ".tex";
+	const auto tex_file =
+		filename.endsWith(".pdf", Qt::CaseInsensitive) ? filename.chopped(4) + ".tex" : filename + ".tex";
 
 	{
-		QFile file(filename);
+		QFile file(tex_file);
 		if (!file.open(QIODeviceBase::NewOnly | QIODeviceBase::ReadWrite | QIODeviceBase::Text))
 			return;
 
@@ -67,50 +68,52 @@ void WindowController::saveRaportToFile(QString filename_url)
 			return;
 		}
 
+		QLocale defaultLocale;
+
 		{
 			QTextStream stream(&file);
 
-			stream << "\\documentclass[10pt, a4paper, oneside]{report}" << '\n';
-			stream << "\\usepackage{ragged2e}" << '\n';
-			stream << "\\usepackage[T1]{fontenc}" << '\n';
-			stream << "\\usepackage{longtable}" << '\n';
-			stream << "\\usepackage{array}" << '\n';
-
-			stream << "\\title{Raport}" << '\n';
-
-			stream << "\\begin{document}" << '\n';
+			stream << "\\documentclass[9pt]{extreport}\n"
+					  "\\usepackage[a4paper, total={7in, 9in}]{geometry}\n"
+					  "\\usepackage{ragged2e}\n\\usepackage[T1]{fontenc}\n"
+					  "\\usepackage{longtable}\n"
+					  "\\usepackage{array}\n"
+					  "\\title{Raport dotyczący Podwyższonych Kosztów Uzyskania Przychodów - }\n"
+					  "\\begin{document}\n";
 			stream << "\\begin{flushright} " << city() << ", " << raportDate().toString("dd-MM-yyyy")
 				   << "\\end{flushright}" << '\n';
 
 			stream << "\\paragraph{" << '\n';
 
-			stream << "\\begin{center} Raport od " << fromDay().toString("dd MMMM yyyy") << " do "
-				   << toDay().toString("dd MMMM yyyy") << "\\end{center}" << '\n';
+			stream << "\\begin{center} Raport od " << defaultLocale.toString(fromDay()) << " do "
+				   << defaultLocale.toString(toDay()) << "\\end{center}" << '\n';
 			stream << "}" << '\n';
 
-			stream
-				<< "\\begin{flushleft} Lista przekazanych utworów objętych majątkowym prawem autorskim, wytworzonych i "
-				   "przekazanych pracodawcy przez pracownika: "
-				<< authorName() << ".\\end{flushleft}" << '\n';
+			stream << "\\begin{flushleft} Lista przekazanych utworów objętych majątkowym prawem autorskim, "
+					  "wytworzonych i "
+					  "przekazanych pracodawcy przez pracownika: "
+				   << authorName() << ".\\end{flushleft}" << '\n';
 
 			stream << "\\begin{center}" << '\n';
-			stream << "\\begin{longtable}{|l|l|l|l|l|l|l|}" << '\n';
+			stream << "\\begin{longtable}{|p{1cm}|p{3cm}|p{3cm}|p{1.5cm}|p{3.5cm}|p{2cm}|}" << '\n';
 
-			stream
-				<< "\\hline \\multicolumn{1}{|c|}{\\textbf{Lp.}} & \\multicolumn{1}{c|}{\\textbf{Nazwa repozytorium}} "
-				   "& "
-				   "\\multicolumn{1}{c|}{\\textbf{Data wykonania}} & \\multicolumn{1}{|c|}{\\textbf{ID}} & "
-				   "\\multicolumn{1}{c|}{\\textbf{Tytuł}} & \\multicolumn{1}{c|}{\\textbf{Liczba godzin}} \\\\ \\hline"
-				<< '\n';
+			stream << "\\hline \\multicolumn{1}{|c|}{\\textbf{Lp.}} & \\multicolumn{1}{c|}{\\textbf{Nazwa "
+					  "repozytorium}} "
+					  "& "
+					  "\\multicolumn{1}{c|}{\\textbf{Data wykonania}} & \\multicolumn{1}{|c|}{\\textbf{ID}} & "
+					  "\\multicolumn{1}{c|}{\\textbf{Tytuł}} & \\multicolumn{1}{c|}{\\textbf{Liczba godzin}} \\\\ "
+					  "\\hline"
+				   << '\n';
 			stream << "\\endfirsthead" << '\n';
 
 			stream << "\\multicolumn{6}{c}{} \\\\" << '\n';
-			stream
-				<< "\\hline \\multicolumn{1}{|c|}{\\textbf{Lp.}} & \\multicolumn{1}{c|}{\\textbf{Nazwa repozytorium}} "
-				   "& "
-				   "\\multicolumn{1}{c|}{\\textbf{Data wykonania}} & \\multicolumn{1}{|c|}{\\textbf{ID}} & "
-				   "\\multicolumn{1}{c|}{\\textbf{Tytuł}} & \\multicolumn{1}{c|}{\\textbf{Liczba godzin}} \\\\ \\hline"
-				<< '\n';
+			stream << "\\hline \\multicolumn{1}{|c|}{\\textbf{Lp.}} & \\multicolumn{1}{c|}{\\textbf{Nazwa "
+					  "repozytorium}} "
+					  "& "
+					  "\\multicolumn{1}{c|}{\\textbf{Data wykonania}} & \\multicolumn{1}{|c|}{\\textbf{ID}} & "
+					  "\\multicolumn{1}{c|}{\\textbf{Tytuł}} & \\multicolumn{1}{c|}{\\textbf{Liczba godzin}} \\\\ "
+					  "\\hline"
+				   << '\n';
 			stream << "\\endhead" << '\n';
 
 			stream << "\\hline" << '\n';
