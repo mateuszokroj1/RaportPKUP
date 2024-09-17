@@ -14,7 +14,24 @@ using namespace Qt::Literals::StringLiterals;
 
 namespace RaportPKUP::UI
 {
-uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
+QString escapeLatexChars(const QString& input)
+{
+	auto ret = input;
+	ret.replace("\\", R"(\textbackslash{})");
+	ret.replace("#", R"(\#)");
+	ret.replace("$", R"(\$)");
+	ret.replace("%", R"(\%)");
+	ret.replace("&", R"(\&)");
+	ret.replace("^", R"(\textasciicircum{})");
+	ret.replace("_", R"(\_)");
+	ret.replace("{", R"(\{)");
+	ret.replace("}", R"(\})");
+	ret.replace("~", R"(\textasciitilde{})");
+
+	return ret;
+}
+
+uint saveCommitsToLaTexStream(QTextStream& stream, const QList<CommitItem*>& commits)
 {
 	size_t counter = 1;
 	uint total_duration = 0;
@@ -32,7 +49,7 @@ uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
 		stream << " & ";
 		stream << commit->id();
 		stream << " & \\RaggedRight{";
-		stream << commit->message();
+		stream << escapeLatexChars(commit->message());
 		stream << "} & ";
 		stream << commit->duration;
 
@@ -48,7 +65,7 @@ uint saveCommitsToStream(QTextStream& stream, const QList<CommitItem*>& commits)
 	return total_duration;
 }
 
-void WindowController::saveRaportToFile(QString filename_url) // TODO escape LaTEX special chars
+void WindowController::saveRaportToFile(QString filename_url)
 {
 	QString filename;
 	if (filename_url.startsWith("file:///"))
@@ -75,12 +92,16 @@ void WindowController::saveRaportToFile(QString filename_url) // TODO escape LaT
 
 			stream << "\\documentclass[9pt]{extreport}\n"
 					  "\\usepackage[a4paper, total={7in, 9in}]{geometry}\n"
-					  "\\usepackage{ragged2e}\n\\usepackage[T1]{fontenc}\n"
+					  "\\usepackage{ragged2e}\n"
+					  "\\usepackage[T1]{fontenc}\n"
+					  "\\usepackage{mathptmx}\n"
 					  "\\usepackage{longtable}\n"
 					  "\\usepackage{array}\n"
-					  "\\title{Raport dotyczący Podwyższonych Kosztów Uzyskania Przychodów - }\n"
+					  "\\title{Raport dotyczący Podwyższonych Kosztów Uzyskania Przychodów - "
+				   << raportDate().toString("dd-MM-yyyy")
+				   << "}\n"
 					  "\\begin{document}\n";
-			stream << "\\begin{flushright} " << city() << ", " << raportDate().toString("dd-MM-yyyy")
+			stream << "\\begin{flushright}" << escapeLatexChars(city()) << ", " << raportDate().toString("dd-MM-yyyy")
 				   << "\\end{flushright}" << '\n';
 
 			stream << "\\paragraph{" << '\n';
@@ -92,7 +113,7 @@ void WindowController::saveRaportToFile(QString filename_url) // TODO escape LaT
 			stream << "\\begin{flushleft} Lista przekazanych utworów objętych majątkowym prawem autorskim, "
 					  "wytworzonych i "
 					  "przekazanych pracodawcy przez pracownika: "
-				   << authorName() << ".\\end{flushleft}" << '\n';
+				   << escapeLatexChars(authorName()) << ".\\end{flushleft}" << '\n';
 
 			stream << "\\begin{center}" << '\n';
 			stream << "\\begin{longtable}{|p{1cm}|p{3cm}|p{3cm}|p{1.5cm}|p{3.5cm}|p{2cm}|}" << '\n';
@@ -119,7 +140,7 @@ void WindowController::saveRaportToFile(QString filename_url) // TODO escape LaT
 			stream << "\\hline" << '\n';
 			stream << "\\endfoot" << '\n';
 
-			const auto duration = saveCommitsToStream(stream, _commits);
+			const auto duration = saveCommitsToLaTexStream(stream, _commits);
 
 			stream << "\\end{longtable}" << '\n';
 			stream << "\\end{center}" << '\n';
@@ -150,11 +171,85 @@ void WindowController::saveRaportToFile(QString filename_url) // TODO escape LaT
 		file.close();
 	}
 
+	QFileInfo info(tex_file);
+	std::wstring cmd =
+		L"E:/miktex-portable/texmfs/install/miktex/bin/x64/texify.exe -p " + info.fileName().toStdWString();
+	const auto texify_process = _process_factory->createNew(cmd, info.absolutePath().toStdWString());
+
+	texify_process->start();
+	while (!texify_process->isError() && !texify_process->isFinished())
+		QCoreApplication::processEvents();
+
+	qDebug() << "texify: ErrorCode=" << texify_process->exitCode() << "\ntexify: " << texify_process->readError()
+			 << "\n"
+			 << "texify: " << texify_process->readOutput();
+
 	QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
+}
+
+uint saveCommitsToHtmlStream(QTextStream& stream, const QList<CommitItem*>& commits)
+{
+	size_t counter = 1;
+	uint total_duration = 0;
+
+	for (const auto commit : commits)
+	{
+		if (!commit)
+			continue;
+
+		stream << "<tr><td style=\"border: 1px solid black;\">";
+		stream << counter;
+		stream << "</td><td style=\"border: 1px solid black;\">";
+		stream << commit->repositoryName();
+		stream << "</td><td style=\"border: 1px solid black;\">";
+		stream << commit->time().toString("dd-MM-yyyy");
+		stream << "</td><td style=\"border: 1px solid black;\">";
+		stream << commit->id();
+		stream << "</td><td style=\"border: 1px solid black;\">";
+		stream << commit->message().toHtmlEscaped();
+		stream << "</td><td style=\"border: 1px solid black;\">";
+		stream << commit->duration;
+		stream << "</td></tr>\n";
+
+		if (commits.last() != commit)
+			stream << "\\\\\n \\hline\n";
+
+		stream << '\n';
+
+		++counter;
+		total_duration += commit->duration;
+	}
+
+	return total_duration;
 }
 
 QString WindowController::previewDocument() const
 {
-	return "<!DOCTYPE html><html><body><h1>Demo</h1></body></html>";
+	QTextStream text;
+	QLocale defaultLocale;
+
+	text << "<!DOCTYPE html>\n<html>\n<body style=\"font-family: serif; font-size: 9pt; margin: 2cm; padding: "
+			"0;\">\n<p style=\"text-align: right; margin: 0.5cm 0;\">"
+		 << city().toHtmlEscaped() << ", " << raportDate().toString("dd-MM-yyyy")
+		 << "</p>\n<p style=\"text-align: center; font-weight: bold; margin: 0.5cm 0;\">Raport od "
+		 << defaultLocale.toString(fromDay()) << " do " << defaultLocale.toString(toDay())
+		 << "</p>\n<p style=\"margin: 0.5cm 0;\">Lista przekazanych utworów objętych majątkowym prawem autorskim, "
+			"wytworzonych i przekazanych pracodawcy przez pracownika: "
+		 << authorName().toHtmlEscaped()
+		 << ".</p><table style=\"margin: 1cm auto; border-collapse: collapse; width: auto\">\n<tr><th style=\"border: "
+			"1px solid black; width: 1cm;\">Lp.</th><th style=\"border: 1px solid black; width: 3cm;\">Nazwa "
+			"repozytorium</th><th style=\"border: 1px solid black; width: 3cm;\">Data wykonania</th><th "
+			"style=\"border: 1px solid black; width: 1.5cm;\">ID</th><th style=\"border: 1px solid black; width: "
+			"3.5cm;\">Tytuł</th><th style=\"border: 1px solid black; width: 2cm;\">Liczba godzin</th></tr>\n";
+
+	const auto duration = saveCommitsToHtmlStream(text, _commits);
+
+	text << "</table>\n<p style=\"margin: 0.5cm 0;\">Łączny czas pracy poświęcony na wytworzenie utworów objętych "
+			"prawem autorskim w podanym wyżej okresie: "
+		 << duration
+		 << " godzin.</p>\n<br><br><br>\n<div style=\"display: flex; margin-bottom: 3cm; justify-content: "
+			"space-evenly;\"><span>Podpis pracodawcy</span><span>Podpis pracownika</span></div>\n</body>\n</html>";
+
+	return text.readAll();
 }
 } // namespace RaportPKUP::UI
