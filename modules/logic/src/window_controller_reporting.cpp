@@ -106,8 +106,8 @@ void WindowController::saveRaportToFile(QString filename_url)
 
 			stream << "\\paragraph{" << '\n';
 
-			stream << "\\begin{center} Raport od " << defaultLocale.toString(fromDay()) << " do "
-				   << defaultLocale.toString(toDay()) << "\\end{center}" << '\n';
+			stream << "\\begin{center} Raport od " << defaultLocale.toString(fromDay(), "d MMMM yyyy") << " do "
+				   << defaultLocale.toString(toDay(), "d MMMM yyyy") << "\\end{center}" << '\n';
 			stream << "}" << '\n';
 
 			stream << "\\begin{flushleft} Lista przekazanych utworów objętych majątkowym prawem autorskim, "
@@ -187,7 +187,7 @@ void WindowController::saveRaportToFile(QString filename_url)
 	QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
 }
 
-uint saveCommitsToHtmlStream(QTextStream& stream, const QList<CommitItem*>& commits)
+uint saveCommitsToHtml(QString& text, const QList<CommitItem*>& commits)
 {
 	size_t counter = 1;
 	uint total_duration = 0;
@@ -197,24 +197,19 @@ uint saveCommitsToHtmlStream(QTextStream& stream, const QList<CommitItem*>& comm
 		if (!commit)
 			continue;
 
-		stream << "<tr><td style=\"border: 1px solid black;\">";
-		stream << counter;
-		stream << "</td><td style=\"border: 1px solid black;\">";
-		stream << commit->repositoryName();
-		stream << "</td><td style=\"border: 1px solid black;\">";
-		stream << commit->time().toString("dd-MM-yyyy");
-		stream << "</td><td style=\"border: 1px solid black;\">";
-		stream << commit->id();
-		stream << "</td><td style=\"border: 1px solid black;\">";
-		stream << commit->message().toHtmlEscaped();
-		stream << "</td><td style=\"border: 1px solid black;\">";
-		stream << commit->duration;
-		stream << "</td></tr>\n";
-
-		if (commits.last() != commit)
-			stream << "\\\\\n \\hline\n";
-
-		stream << '\n';
+		text.append("<tr><td style=\"border: 1px solid black;\">")
+			.append(QString::number(counter))
+			.append("</td><td style=\"border: 1px solid black;\">")
+			.append(commit->repositoryName())
+			.append("</td><td style=\"border: 1px solid black;\">")
+			.append(commit->time().toString("dd-MM-yyyy"))
+			.append("</td><td style=\"border: 1px solid black;\">")
+			.append(commit->id())
+			.append("</td><td style=\"border: 1px solid black;\">")
+			.append(commit->message().toHtmlEscaped())
+			.append("</td><td style=\"border: 1px solid black;\">")
+			.append(commit->duration)
+			.append("</td></tr>\n");
 
 		++counter;
 		total_duration += commit->duration;
@@ -225,31 +220,36 @@ uint saveCommitsToHtmlStream(QTextStream& stream, const QList<CommitItem*>& comm
 
 QString WindowController::previewDocument() const
 {
-	QTextStream text;
+	QString text;
 	QLocale defaultLocale;
 
-	text << "<!DOCTYPE html>\n<html>\n<body style=\"font-family: serif; font-size: 9pt; margin: 2cm; padding: "
-			"0;\">\n<p style=\"text-align: right; margin: 0.5cm 0;\">"
-		 << city().toHtmlEscaped() << ", " << raportDate().toString("dd-MM-yyyy")
-		 << "</p>\n<p style=\"text-align: center; font-weight: bold; margin: 0.5cm 0;\">Raport od "
-		 << defaultLocale.toString(fromDay()) << " do " << defaultLocale.toString(toDay())
-		 << "</p>\n<p style=\"margin: 0.5cm 0;\">Lista przekazanych utworów objętych majątkowym prawem autorskim, "
-			"wytworzonych i przekazanych pracodawcy przez pracownika: "
-		 << authorName().toHtmlEscaped()
-		 << ".</p><table style=\"margin: 1cm auto; border-collapse: collapse; width: auto\">\n<tr><th style=\"border: "
+	text.append("<!DOCTYPE html>\n<html>\n<body style=\"font-family: serif; font-size: 9pt; margin: 2cm; padding: "
+				"0;\">\n<p style=\"text-align: right; margin: 0.5cm 0;\">")
+		.append(city().toHtmlEscaped())
+		.append(", ")
+		.append(raportDate().toString("dd-MM-yyyy"))
+		.append("</p>\n<p style=\"text-align: center; font-weight: bold; margin: 0.5cm 0;\">Raport od ")
+		.append(defaultLocale.toString(fromDay(), "d MMMM yyyy"))
+		.append(" do ")
+		.append(defaultLocale.toString(toDay(), "d MMMM yyyy"))
+		.append("</p>\n<p style=\"margin: 0.5cm 0;\">Lista przekazanych utworów objętych majątkowym prawem autorskim, "
+				"wytworzonych i przekazanych pracodawcy przez pracownika: ")
+		.append(authorName().toHtmlEscaped())
+		.append(
+			".</p><table style=\"margin: 1cm auto; border-collapse: collapse; width: auto\">\n<tr><th style=\"border: "
 			"1px solid black; width: 1cm;\">Lp.</th><th style=\"border: 1px solid black; width: 3cm;\">Nazwa "
 			"repozytorium</th><th style=\"border: 1px solid black; width: 3cm;\">Data wykonania</th><th "
 			"style=\"border: 1px solid black; width: 1.5cm;\">ID</th><th style=\"border: 1px solid black; width: "
-			"3.5cm;\">Tytuł</th><th style=\"border: 1px solid black; width: 2cm;\">Liczba godzin</th></tr>\n";
+			"3.5cm;\">Tytuł</th><th style=\"border: 1px solid black; width: 2cm;\">Liczba godzin</th></tr>\n");
 
-	const auto duration = saveCommitsToHtmlStream(text, _commits);
+	const auto duration = saveCommitsToHtml(text, _commits);
 
-	text << "</table>\n<p style=\"margin: 0.5cm 0;\">Łączny czas pracy poświęcony na wytworzenie utworów objętych "
-			"prawem autorskim w podanym wyżej okresie: "
-		 << duration
-		 << " godzin.</p>\n<br><br><br>\n<div style=\"display: flex; margin-bottom: 3cm; justify-content: "
-			"space-evenly;\"><span>Podpis pracodawcy</span><span>Podpis pracownika</span></div>\n</body>\n</html>";
+	text.append("</table>\n<p style=\"margin: 0.5cm 0;\">Łączny czas pracy poświęcony na wytworzenie utworów objętych "
+				"prawem autorskim w podanym wyżej okresie: ")
+		.append(QString::number(duration))
+		.append(" godzin.</p>\n<br><br><br>\n<div style=\"display: flex; margin-bottom: 3cm; justify-content: "
+				"space-evenly;\"><span>Podpis pracodawcy</span><span>Podpis pracownika</span></div>\n</body>\n</html>");
 
-	return text.readAll();
+	return text;
 }
 } // namespace RaportPKUP::UI
