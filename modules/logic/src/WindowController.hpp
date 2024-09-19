@@ -108,7 +108,9 @@ class WindowController : public QObject
 	void commitsChanged();
 	void sumOfHoursChanged();
 
-	void lockScreen();
+	void lockScreen1();
+	void lockScreen2();
+	void showWarning(QString msg);
 	void unlockScreen();
 	void showFilteringView();
 

@@ -17,16 +17,18 @@ namespace RaportPKUP::UI
 QString escapeLatexChars(const QString& input)
 {
 	auto ret = input;
+
 	ret.replace("\\", R"(\textbackslash{})");
+	ret.replace("{", R"(\{)");
+	ret.replace("}", R"(\})");
 	ret.replace("#", R"(\#)");
 	ret.replace("$", R"(\$)");
 	ret.replace("%", R"(\%)");
 	ret.replace("&", R"(\&)");
 	ret.replace("^", R"(\textasciicircum{})");
 	ret.replace("_", R"(\_)");
-	ret.replace("{", R"(\{)");
-	ret.replace("}", R"(\})");
 	ret.replace("~", R"(\textasciitilde{})");
+	ret.replace(R"(\textbackslash\{\})", R"(\textbackslash{})");
 
 	return ret;
 }
@@ -177,6 +179,8 @@ void WindowController::saveRaportToFile(QString filename_url)
 	const auto texify_process = _process_factory->createNew(cmd, info.absolutePath().toStdWString());
 
 	texify_process->start();
+
+	emit lockScreen2();
 	while (!texify_process->isError() && !texify_process->isFinished())
 		QCoreApplication::processEvents();
 
@@ -184,7 +188,12 @@ void WindowController::saveRaportToFile(QString filename_url)
 			 << "\n"
 			 << "texify: " << texify_process->readOutput();
 
-	QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
+	emit unlockScreen();
+
+	if (texify_process->isError())
+		emit showWarning("Wystąpił błąd podczas generowania pliku PDF w aplikacji zewnetrznej.");
+	else
+		QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
 }
 
 uint saveCommitsToHtml(QString& text, const QList<CommitItem*>& commits)
@@ -197,18 +206,18 @@ uint saveCommitsToHtml(QString& text, const QList<CommitItem*>& commits)
 		if (!commit)
 			continue;
 
-		text.append("<tr><td style=\"border: 1px solid black;\">")
+		text.append("<tr><td>")
 			.append(QString::number(counter))
-			.append("</td><td style=\"border: 1px solid black;\">")
+			.append("</td><td>")
 			.append(commit->repositoryName())
-			.append("</td><td style=\"border: 1px solid black;\">")
+			.append("</td><td>")
 			.append(commit->time().toString("dd-MM-yyyy"))
-			.append("</td><td style=\"border: 1px solid black;\">")
+			.append("</td><td>")
 			.append(commit->id())
-			.append("</td><td style=\"border: 1px solid black;\">")
+			.append("</td><td>")
 			.append(commit->message().toHtmlEscaped())
-			.append("</td><td style=\"border: 1px solid black;\">")
-			.append(commit->duration)
+			.append("</td><td>")
+			.append(QString::number(commit->duration))
 			.append("</td></tr>\n");
 
 		++counter;
@@ -223,32 +232,35 @@ QString WindowController::previewDocument() const
 	QString text;
 	QLocale defaultLocale;
 
-	text.append("<!DOCTYPE html>\n<html>\n<body style=\"font-family: serif; font-size: 9pt; margin: 2cm; padding: "
-				"0;\">\n<p style=\"text-align: right; margin: 0.5cm 0;\">")
+	text.append("<style>#root { font-family: serif; font-size: 10pt; margin: 2cm; padding: 0;}.right { text-align: "
+				"right; }p, h1 { margin: 0.5cm 0; }p { text-align: left; }h1 { text-align: center; font-weight: bold; "
+				"font-size: inherit; }table { margin: 1cm auto; border-collapse: collapse; font: inherit; }td, th { "
+				"border: 1px solid black; }#captions { border: "
+				"none; margin: 1cm auto; }#captions td { width: 40cm; border: none; text-align: center; "
+				"}</style>\n<div id=\"root\">\n<p class=\"right\" margin=30>")
 		.append(city().toHtmlEscaped())
 		.append(", ")
 		.append(raportDate().toString("dd-MM-yyyy"))
-		.append("</p>\n<p style=\"text-align: center; font-weight: bold; margin: 0.5cm 0;\">Raport od ")
+		.append("</p><br>\n<h1 margin=30>Raport od ")
 		.append(defaultLocale.toString(fromDay(), "d MMMM yyyy"))
 		.append(" do ")
 		.append(defaultLocale.toString(toDay(), "d MMMM yyyy"))
-		.append("</p>\n<p style=\"margin: 0.5cm 0;\">Lista przekazanych utworów objętych majątkowym prawem autorskim, "
-				"wytworzonych i przekazanych pracodawcy przez pracownika: ")
+		.append("</h1><br>\n<p margin=30>Lista przekazanych utworów objętych majątkowym prawem autorskim, wytworzonych "
+				"i przekazanych pracodawcy przez pracownika: ")
 		.append(authorName().toHtmlEscaped())
-		.append(
-			".</p><table style=\"margin: 1cm auto; border-collapse: collapse; width: auto\">\n<tr><th style=\"border: "
-			"1px solid black; width: 1cm;\">Lp.</th><th style=\"border: 1px solid black; width: 3cm;\">Nazwa "
-			"repozytorium</th><th style=\"border: 1px solid black; width: 3cm;\">Data wykonania</th><th "
-			"style=\"border: 1px solid black; width: 1.5cm;\">ID</th><th style=\"border: 1px solid black; width: "
-			"3.5cm;\">Tytuł</th><th style=\"border: 1px solid black; width: 2cm;\">Liczba godzin</th></tr>\n");
+		.append(".</p><br>\n<table margin=30 align=center border=1 cellpadding=15>\n<tr><th id=\"header1\" "
+				"width=60>Lp.</th><th id=\"header2\" width=200>Nazwa repozytorium</th><th id=\"header3\" "
+				"width=200>Data wykonania</th><th id=\"header4\" width=100>ID</th><th id=\"header5\" "
+				"width=300>Tytuł</th><th id=\"header6\" width=120>Liczba godzin</th></tr>\n");
 
 	const auto duration = saveCommitsToHtml(text, _commits);
 
-	text.append("</table>\n<p style=\"margin: 0.5cm 0;\">Łączny czas pracy poświęcony na wytworzenie utworów objętych "
-				"prawem autorskim w podanym wyżej okresie: ")
+	text.append("</table><br>\n<p>Łączny czas pracy poświęcony na wytworzenie utworów objętych prawem autorskim w "
+				"podanym wyżej okresie: ")
 		.append(QString::number(duration))
-		.append(" godzin.</p>\n<br><br><br>\n<div style=\"display: flex; margin-bottom: 3cm; justify-content: "
-				"space-evenly;\"><span>Podpis pracodawcy</span><span>Podpis pracownika</span></div>\n</body>\n</html>");
+		.append(
+			" godzin.</p>\n<br><br><br>\n<table align=center id=\"captions\">\n<tr><td width='500' align=center>Podpis "
+			"pracodawcy</td><td width='500' align=center>Podpis pracownika</td></tr>\n</table>\n</div>");
 
 	return text;
 }

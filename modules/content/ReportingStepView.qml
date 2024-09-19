@@ -74,14 +74,22 @@ ColumnLayout {
             border.color: "#bbb"
             border.width: 1
         }
-        TextEdit {
-            id: preview
-
+        ScrollView {
             anchors.fill: parent
-            readOnly: true
-            text: controller.previewDocument
-            textFormat: TextEdit.RichText
-            wrapMode: TextEdit.Wrap
+            contentHeight: preview.paintedHeight
+            contentWidth: preview.paintedWidth
+
+            TextEdit {
+                id: preview
+
+                anchors.left: parent.left
+                anchors.margins: 30
+                anchors.right: parent.right
+                readOnly: true
+                text: controller.previewDocument
+                textFormat: TextEdit.RichText
+                wrapMode: TextEdit.Wrap
+            }
         }
     }
     Item {

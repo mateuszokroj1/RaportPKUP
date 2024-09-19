@@ -57,13 +57,23 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 	connect(this, &WindowController::fromDayChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::toDayChanged, this, &WindowController::canStartSearchChanged);
 
+	connect(this, &WindowController::authorNameChanged, this, &WindowController::previewDocumentChanged);
+	connect(this, &WindowController::cityChanged, this, &WindowController::previewDocumentChanged);
+	connect(this, &WindowController::raportDateChanged, this, &WindowController::previewDocumentChanged);
+	connect(this, &WindowController::fromDayChanged, this, &WindowController::previewDocumentChanged);
+	connect(this, &WindowController::toDayChanged, this, &WindowController::previewDocumentChanged);
+
 	connect(this, &WindowController::commitsChanged, this,
 			[this]()
 			{
 				for (CommitItem* commit : _commits)
+				{
 					connect(commit, &CommitItem::durationChanged, this, &WindowController::sumOfHoursChanged);
+					connect(commit, &CommitItem::durationChanged, this, &WindowController::previewDocumentChanged);
+				}
 
 				emit sumOfHoursChanged();
+				emit previewDocumentChanged();
 			});
 
 	_raportDate.setBinding([this]() { return _toDay.value(); });

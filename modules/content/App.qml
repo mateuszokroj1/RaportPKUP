@@ -61,20 +61,46 @@ Window {
                 Layout.alignment: Qt.AlignHCenter
             }
             UIText {
+                id: locked1_text
+
                 Layout.alignment: Qt.AlignHCenter
                 color: "white"
                 text: "Skanowanie repozytoriów..."
             }
+            UIText {
+                id: locked2_text
+
+                Layout.alignment: Qt.AlignHCenter
+                color: "white"
+                text: "Generowanie pliku PDF..."
+            }
         }
+    }
+    MessageDialog {
+        id: warningDialog
+
+        buttons: MessageDialog.Ok
+        modality: Qt.ApplicationModal
     }
     Connections {
         target: controller
 
-        onLockScreen: {
+        onLockScreen1: {
             locked.visible = true;
+            locked1_text.visible = true;
+            locked2_text.visible = false;
+        }
+        onLockScreen2: {
+            locked.visible = true;
+            locked1_text.visible = false;
+            locked2_text.visible = true;
         }
         onShowFilteringView: {
             content.selectView(1);
+        }
+        onShowWarning: text => {
+            warningDialog.text = text;
+            warningDialog.open();
         }
         onUnlockScreen: {
             locked.visible = false;
