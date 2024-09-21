@@ -6,6 +6,7 @@ import logic
 
 FormItemBase {
     property alias focusInside: textField.focus
+    property alias inputMethodHints: textField.inputMethodHints
     property alias placeholderText: textField.placeholderText
     property alias validator: textField.validator
     property alias value: textField.text

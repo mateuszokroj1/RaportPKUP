@@ -19,12 +19,7 @@ struct Commit
 
 		std::string toString() const
 		{
-			std::string str;
-
-			for (char i = 0; i < 8; ++i)
-				str.append(value.data());
-
-			return str;
+			return std::string(value.data());
 		}
 
 		operator std::string() const

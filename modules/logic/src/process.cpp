@@ -2,7 +2,8 @@
 
 namespace RaportPKUP::UI
 {
-Process::Process(QObject* parent, QString&& command, QString&& working_directory) : _process(parent)
+Process::Process(QObject* parent, QString&& command, QString&& working_directory)
+	: _process(parent), _command(std::move(command))
 {
 	_process.setWorkingDirectory(std::move(working_directory));
 }

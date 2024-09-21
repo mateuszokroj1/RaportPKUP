@@ -18,7 +18,7 @@ namespace RaportPKUP::UI
 {
 void WindowController::searchForCommits()
 {
-	emit lockScreen();
+	emit lockScreen1();
 	_thread_finished = false;
 
 	std::thread thread(

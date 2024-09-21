@@ -57,14 +57,30 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 	connect(this, &WindowController::fromDayChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::toDayChanged, this, &WindowController::canStartSearchChanged);
 
+	connect(this, &WindowController::authorNameChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::cityChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::raportDateChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::fromDayChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::toDayChanged, this, &WindowController::resetPreviewTimer);
+
 	connect(this, &WindowController::commitsChanged, this,
 			[this]()
 			{
 				for (CommitItem* commit : _commits)
+				{
 					connect(commit, &CommitItem::durationChanged, this, &WindowController::sumOfHoursChanged);
+					connect(commit, &CommitItem::durationChanged, this, &WindowController::resetPreviewTimer);
+				}
 
 				emit sumOfHoursChanged();
+				resetPreviewTimer();
 			});
+
+	_timeout_for_preview.setSingleShot(true);
+	_timeout_for_preview.setInterval(std::chrono::seconds(1));
+	connect(&_timeout_for_preview, &QTimer::timeout, this, &WindowController::previewDocumentChanged);
+
+	_raportDate.setBinding([this]() { return _toDay.value(); });
 
 	_presets_manager.loadFromFile();
 }
@@ -151,6 +167,11 @@ bool WindowController::canStartSearch() const
 	return true;
 }
 
+QDate WindowController::raportDate() const
+{
+	return _raportDate.value();
+}
+
 void WindowController::setPresetSelectorText(QString value)
 {
 	_presetSelectorText.setValue(std::move(value));
@@ -215,6 +236,11 @@ void WindowController::setRepositoryPath(QString value)
 	emit repositoryPathChanged();
 }
 
+void WindowController::setRaportDate(QDate value)
+{
+	_raportDate.setValue(value);
+}
+
 QBindable<QString> WindowController::bindablePresetSelectorText() const
 {
 	return &_presetSelectorText;
@@ -243,6 +269,11 @@ QBindable<QDate> WindowController::bindableFromDay() const
 QBindable<QDate> WindowController::bindableToDay() const
 {
 	return &_toDay;
+}
+
+QBindable<QDate> WindowController::bindableRaportDate() const
+{
+	return &_raportDate;
 }
 
 void WindowController::addRepository()
@@ -310,5 +341,11 @@ uint WindowController::sumOfHours() const
 		sum += commit->duration;
 
 	return sum;
+}
+
+void WindowController::resetPreviewTimer()
+{
+	_timeout_for_preview.stop();
+	_timeout_for_preview.start();
 }
 } // namespace RaportPKUP::UI

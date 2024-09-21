@@ -2,7 +2,8 @@
 
 namespace RaportPKUP::UI
 {
-CommitItem::CommitItem(const Commit& commit, QObject* parent) : QObject(parent), _commit(commit)
+CommitItem::CommitItem(const Commit& commit, QObject* parent)
+	: QObject(parent), _commit(commit), _date(QDateTime::fromStdTimePoint(_commit.datetime))
 {
 }
 
@@ -18,7 +19,12 @@ QString CommitItem::message() const
 
 QDateTime CommitItem::time() const
 {
-	return QDateTime::fromStdTimePoint(_commit.datetime);
+	return _date;
+}
+
+QString CommitItem::timeString() const
+{
+	return _date.toString("dd-MM-yyyy");
 }
 
 QString CommitItem::repositoryName() const

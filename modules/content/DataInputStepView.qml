@@ -195,7 +195,7 @@ ColumnLayout {
                     value: controller.authorName
 
                     validator: RegularExpressionValidator {
-                        regularExpression: /^[A-z]/
+                        regularExpression: /^[A-z].*/
                     }
 
                     onValueChanged: {
@@ -213,6 +213,7 @@ ColumnLayout {
                 InputField {
                     id: authorEmail
 
+                    inputMethodHints: Qt.ImhEmailCharactersOnly
                     value: controller.authorEmail
 
                     validator: RegularExpressionValidator {

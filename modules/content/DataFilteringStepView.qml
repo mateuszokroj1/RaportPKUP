@@ -33,7 +33,7 @@ Item {
                     color: Theme.accentTitle
                     font.bold: true
                     font.pointSize: 14
-                    text: "Przelicznik pracy twórczej"
+                    text: "Przelicznik czasu pracy twórczej"
                 }
                 RowLayout {
                     Layout.fillWidth: true
@@ -55,6 +55,7 @@ Item {
                             property int defaultValue: Math.round(Math.abs((controller.toDay - controller.fromDay) / (24 * 60 * 60 * 1000)))
 
                             Layout.fillHeight: false
+                            inputMethodHints: Qt.ImhDigitsOnly
                             value: defaultValue
 
                             validator: IntValidator {
@@ -139,50 +140,63 @@ Item {
                 Rectangle {
                     id: header3
 
-                    SplitView.minimumWidth: 140
+                    SplitView.minimumWidth: 100
                     color: "#eeeeee"
 
                     UIText {
                         id: header3_text
 
                         anchors.centerIn: parent
-                        text: "Data wykonania"
+                        text: "ID"
                     }
                 }
                 Rectangle {
                     id: header4
 
-                    SplitView.fillWidth: true
+                    SplitView.minimumWidth: 140
                     color: "#eeeeee"
 
                     UIText {
                         id: header4_text
 
                         anchors.centerIn: parent
-                        text: "Tytuł"
+                        text: "Data wykonania"
                     }
                 }
                 Rectangle {
                     id: header5
 
-                    SplitView.minimumWidth: 100
+                    SplitView.fillWidth: true
                     color: "#eeeeee"
 
                     UIText {
                         id: header5_text
 
                         anchors.centerIn: parent
-                        text: "Liczba godzin"
+                        text: "Tytuł"
                     }
                 }
                 Rectangle {
                     id: header6
 
-                    SplitView.minimumWidth: 120
+                    SplitView.minimumWidth: 100
                     color: "#eeeeee"
 
                     UIText {
                         id: header6_text
+
+                        anchors.centerIn: parent
+                        text: "Liczba godzin"
+                    }
+                }
+                Rectangle {
+                    id: header7
+
+                    SplitView.minimumWidth: 120
+                    color: "#eeeeee"
+
+                    UIText {
+                        id: header7_text
 
                         anchors.centerIn: parent
                         text: "Usuń"
@@ -288,36 +302,54 @@ Item {
                                 anchors.centerIn: parent
                                 anchors.margins: Theme.defaultPadding
                                 color: textColor
-                                text: modelData.time.getDate() + "-" + modelData.time.getMonth() + "-" + modelData.time.getFullYear()
+                                elide: Text.ElideRight
+                                text: modelData.id
                             }
                         }
                         Rectangle {
                             Layout.fillHeight: true
                             Layout.preferredWidth: header4.width
                             color: background
-                            implicitHeight: text4_wrapper.implicitHeight + Theme.defaultPadding * 2
+                            implicitHeight: text4.implicitHeight + Theme.defaultPadding * 2
 
-                            Item {
-                                id: text4_wrapper
+                            UIText {
+                                id: text4
 
                                 anchors.centerIn: parent
-                                implicitHeight: text4.implicitHeight
-                                implicitWidth: text4.implicitWidth
-
-                                UIText {
-                                    id: text4
-
-                                    anchors.fill: parent
-                                    color: textColor
-                                    elide: Text.ElideRight
-                                    text: modelData.message
-                                    wrapMode: Text.WordWrap
-                                }
+                                anchors.margins: Theme.defaultPadding
+                                color: textColor
+                                text: modelData.timeString
                             }
                         }
                         Rectangle {
                             Layout.fillHeight: true
                             Layout.preferredWidth: header5.width
+                            color: background
+                            implicitHeight: text5_wrapper.implicitHeight + Theme.defaultPadding * 2
+
+                            Item {
+                                id: text5_wrapper
+
+                                anchors.centerIn: parent
+                                implicitHeight: text5.implicitHeight
+                                implicitWidth: text5.implicitWidth
+                                width: parent.width - Theme.defaultPadding * 2
+
+                                UIText {
+                                    id: text5
+
+                                    anchors.fill: parent
+                                    color: textColor
+                                    elide: Text.ElideRight
+                                    text: modelData.message
+                                    width: parent.width
+                                    wrapMode: Text.Wrap
+                                }
+                            }
+                        }
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: header6.width
                             color: background
                             implicitHeight: textField1.implicitHeight + Theme.defaultPadding * 2
 
@@ -325,6 +357,7 @@ Item {
                                 id: textField1
 
                                 anchors.centerIn: parent
+                                inputMethodHints: Qt.ImhDigitsOnly
                                 value: modelData.duration
                                 width: 80
 
@@ -348,7 +381,7 @@ Item {
                         }
                         Rectangle {
                             Layout.fillHeight: true
-                            Layout.preferredWidth: header6.width
+                            Layout.preferredWidth: header7.width
                             color: background
                             implicitHeight: button1.implicitHeight + Theme.defaultPadding * 2
 
