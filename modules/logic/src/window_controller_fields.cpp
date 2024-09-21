@@ -57,11 +57,11 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 	connect(this, &WindowController::fromDayChanged, this, &WindowController::canStartSearchChanged);
 	connect(this, &WindowController::toDayChanged, this, &WindowController::canStartSearchChanged);
 
-	connect(this, &WindowController::authorNameChanged, this, &WindowController::previewDocumentChanged);
-	connect(this, &WindowController::cityChanged, this, &WindowController::previewDocumentChanged);
-	connect(this, &WindowController::raportDateChanged, this, &WindowController::previewDocumentChanged);
-	connect(this, &WindowController::fromDayChanged, this, &WindowController::previewDocumentChanged);
-	connect(this, &WindowController::toDayChanged, this, &WindowController::previewDocumentChanged);
+	connect(this, &WindowController::authorNameChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::cityChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::raportDateChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::fromDayChanged, this, &WindowController::resetPreviewTimer);
+	connect(this, &WindowController::toDayChanged, this, &WindowController::resetPreviewTimer);
 
 	connect(this, &WindowController::commitsChanged, this,
 			[this]()
@@ -69,12 +69,16 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 				for (CommitItem* commit : _commits)
 				{
 					connect(commit, &CommitItem::durationChanged, this, &WindowController::sumOfHoursChanged);
-					connect(commit, &CommitItem::durationChanged, this, &WindowController::previewDocumentChanged);
+					connect(commit, &CommitItem::durationChanged, this, &WindowController::resetPreviewTimer);
 				}
 
 				emit sumOfHoursChanged();
-				emit previewDocumentChanged();
+				resetPreviewTimer();
 			});
+
+	_timeout_for_preview.setSingleShot(true);
+	_timeout_for_preview.setInterval(std::chrono::seconds(1));
+	connect(&_timeout_for_preview, &QTimer::timeout, this, &WindowController::previewDocumentChanged);
 
 	_raportDate.setBinding([this]() { return _toDay.value(); });
 
@@ -337,5 +341,11 @@ uint WindowController::sumOfHours() const
 		sum += commit->duration;
 
 	return sum;
+}
+
+void WindowController::resetPreviewTimer()
+{
+	_timeout_for_preview.stop();
+	_timeout_for_preview.start();
 }
 } // namespace RaportPKUP::UI

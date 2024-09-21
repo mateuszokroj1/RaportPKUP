@@ -260,7 +260,7 @@ QString WindowController::previewDocument() const
 		.append(QString::number(duration))
 		.append(
 			" godzin.</p>\n<br><br><br>\n<table align=center id=\"captions\">\n<tr><td width='500' align=center>Podpis "
-			"pracodawcy</td><td width='500' align=center>Podpis pracownika</td></tr>\n</table>\n</div>");
+			"pracodawcy</td><td width='500' align=center>Podpis pracownika</td></tr>\n</table>\n<br><br></div>");
 
 	return text;
 }

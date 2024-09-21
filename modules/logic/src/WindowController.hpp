@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QThread>
+#include <QtCore/QTimer>
 #include <QtQml/QQmlListProperty>
 
 #include <include/IProcess.hpp>
@@ -136,6 +137,7 @@ class WindowController : public QObject
   private:
 	void loadPresets();
 	void syncPresetsFile();
+	void resetPreviewTimer();
 
 	std::weak_ptr<Application> _application;
 	std::shared_ptr<IProcessFactory> _process_factory;
@@ -149,6 +151,7 @@ class WindowController : public QObject
 
 	QString _repository_path;
 
+	QTimer _timeout_for_preview;
 	std::atomic_bool _thread_finished = false;
 	std::stop_source _calculation_cancelled;
 	std::stop_source _application_exiting;
