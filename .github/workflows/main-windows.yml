@@ -80,7 +80,7 @@ jobs:
 
     - name: Upload a Build Artifact
       if: github.event_name != 'pull_request'
-      uses: actions/upload-artifact@v4.3.1
+      uses: actions/upload-artifact@v3.1.0
       with:
         # Artifact name
         name: Build on Windows - ${{ steps.ref_name.outputs.branch }} - ${{ github.sha }}
