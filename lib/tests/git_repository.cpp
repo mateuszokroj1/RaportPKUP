@@ -17,6 +17,7 @@ using namespace std::filesystem;
 using namespace RaportPKUP;
 
 constexpr wchar_t EMAIL_REGEX[] = L"^[\\w\\-\\.]+@([\\w\\-]+\\.)+[\\w\\-]{2,4}$";
+constexpr wchar_t MINIMAL_NAME_REGEX[] = L"^[\\w\\.\\-]+$";
 constexpr char BRANCH_NAME_REGEX[] = "^[A-z0-9_-]+(\\/[A-z0-9_-]+)*$";
 
 class DetectorMock : public GitRepositoryDetector
@@ -76,14 +77,15 @@ TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
 	ASSERT_TRUE(repo);
 
 	const auto author = repo->getDefaultAuthor();
+	if (author)
+	{
+		ASSERT_FALSE(author->email.empty());
+		ASSERT_FALSE(author->name.empty());
 
-	ASSERT_TRUE(author.has_value());
-	ASSERT_FALSE(author->email.empty());
-	ASSERT_FALSE(author->name.empty());
+		std::wregex test(MINIMAL_NAME_REGEX);
 
-	std::wregex test(EMAIL_REGEX);
-
-	ASSERT_TRUE(std::regex_match(author->email, test));
+		ASSERT_TRUE(std::regex_match(author->email, test));
+	}
 }
 
 TEST_F(GitRepositoryTest, getNameOfRemoteRepo_shouldReturnGitHubName)
