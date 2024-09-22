@@ -63,3 +63,5 @@ add_subdirectory(app)
 set(QML_IMPORT_PATH
     "${CMAKE_BINARY_DIR}/modules"
     CACHE PATH "Generated modules for QML editor")
+
+include(CPack)
