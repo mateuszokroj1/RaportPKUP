@@ -85,7 +85,19 @@ jobs:
         # Artifact name
         name: Build on Windows - ${{ steps.ref_name.outputs.branch }} - ${{ github.sha }}
         # A file, directory or wildcard pattern that describes what to upload
-        path: out/install
+        path: |
+          out/install/generic/*
+          out/install/iconengines/*
+          out/install/imageformats/*
+          out/install/miktex/*
+          out/install/networkinformation/*
+          out/install/platforms/*
+          out/install/qml/*
+          out/install/qmltooling/*
+          out/install/tls/*
+          out/install/translations/*
+          out/install/*.dll
+          out/install/RaportPKUPGenerator.exe
         # The desired behavior if no files are found using the provided path.
         if-no-files-found: warn
         # Duration after which artifact will expire in days. 0 means using default retention.
