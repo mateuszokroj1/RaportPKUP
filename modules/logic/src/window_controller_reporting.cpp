@@ -175,7 +175,7 @@ void WindowController::saveRaportToFile(QString filename_url)
 
 	QFileInfo info(tex_file);
 	std::wstring cmd =
-		L"E:/miktex-portable/texmfs/install/miktex/bin/x64/texify.exe -p " + info.fileName().toStdWString();
+		L"miktex/miktex-portable/texmfs/install/miktex/bin/x64/texify.exe -p " + info.fileName().toStdWString();
 	const auto texify_process = _process_factory->createNew(cmd, info.absolutePath().toStdWString());
 
 	texify_process->start();
