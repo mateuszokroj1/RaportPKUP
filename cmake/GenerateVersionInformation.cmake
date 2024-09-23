@@ -37,7 +37,7 @@ function(GenerateVersionInformation)
 
   if(NOT DEFINED VERSION_REVISION)
     execute_process(
-      COMMAND ${git_app} rev-list --count --first-parent "${out}"
+      COMMAND ${git_app} rev-list --count --first-parent ${out} --
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
       OUTPUT_VARIABLE out
       OUTPUT_STRIP_TRAILING_WHITESPACE)
