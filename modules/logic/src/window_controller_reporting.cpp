@@ -237,7 +237,7 @@ QString WindowController::previewDocument() const
 				"font-size: inherit; }table { margin: 1cm auto; border-collapse: collapse; font: inherit; }td, th { "
 				"border: 1px solid black; }#captions { border: "
 				"none; margin: 1cm auto; }#captions td { width: 40cm; border: none; text-align: center; "
-				"}</style>\n<br><br><div id=\"root\">\n<p class=\"right\" margin=30>")
+				"}</style>\n<div id=\"root\">\n<br><br><p class=\"right\" margin=30>")
 		.append(city().toHtmlEscaped())
 		.append(", ")
 		.append(raportDate().toString("dd-MM-yyyy"))
