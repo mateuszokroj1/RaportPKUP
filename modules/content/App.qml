@@ -42,7 +42,7 @@ Window {
 
                 ReportingStepView {
                     readonly property int minimumHeight: 1000
-                    readonly property int minimumWidth: 1090
+                    readonly property int minimumWidth: 1480
                 }
             }
         ]
