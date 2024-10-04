@@ -52,4 +52,4 @@ jobs:
       run: cpack .
       
     - name: Create Release with Installation Packages
-      run: gh release create ${{ env.tag_name }} --title '${{ env.release_name }}' .out/install/RaportPKUP.zip
+      run: gh release create ${{ env.tag_name }} --title '${{ env.release_name }}' -F readme.md .out/install/RaportPKUP.zip
