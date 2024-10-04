@@ -48,8 +48,12 @@ jobs:
       run: cmake --install out/build
 
     - name: Pack archive
-      shell: sh
-      run: cpack .
+      uses: ihiroky/archive-action@v1
+      with:
+        root_dir: out/install
+        base_dir: out/install
+        file_path: RaportPKUP.zip
+        verbose: true
       
     - name: Create Release with Installation Packages
       run: gh release create ${{ env.tag_name }} --title '${{ env.release_name }}' -F readme.md .out/install/RaportPKUP.zip
