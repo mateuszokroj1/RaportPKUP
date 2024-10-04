@@ -1,0 +1,55 @@
+name: C/C++ Publish Release
+
+on:
+  workflow_dispatch:  
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  tag_name: 'v1.0'
+  release_name: 'Generator Raportów PKUP v1.0'
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        lfs: true
+
+    - name: Configure Visual Studio path
+      uses: TheMrMilchmann/setup-msvc-dev@v3
+      with:
+        arch: x64
+
+    - name: Install Qt 6
+      # You may pin to the exact commit or the version.
+      # uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
+      uses: jurplel/install-qt-action@v3.3.0
+      with:
+        # Version of Qt to install
+        version: 6.7.*
+        # Specify which Qt archive to install
+        archives: qtbase qtdeclarative qtsvg
+
+    - name: Configure CMake
+      shell: sh
+      run: cmake --preset "release" -DDISABLE_PRECOMMIT=true
+
+    - name: Build all
+      shell: sh
+      run: cmake --build out/build
+
+    - name: Install artifacts
+      shell: sh
+      run: cmake --install out/build
+
+    - name: Pack archive
+      shell: sh
+      run: cpack .
+      
+    - name: Create Release with Installation Packages
+      run: gh release create ${{ env.tag_name }} --title '${{ env.release_name }}' .out/install/RaportPKUP.zip
