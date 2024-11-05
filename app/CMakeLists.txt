@@ -85,7 +85,7 @@ if(WIN32)
             $<TARGET_FILE_DIR:${executable_name}>)
 endif()
 
-set(MIKTEX_PACKAGE_VERSION "2024.9.22.1")
+set(MIKTEX_PACKAGE_VERSION "2024.11.3.1")
 set(_miktex_dir ${CMAKE_BINARY_DIR}/app/miktex)
 set(_miktex_info_file ${_miktex_dir}/.installed_version)
 set(_update_miktex FALSE)
@@ -104,9 +104,25 @@ if(${_update_miktex})
   file(REMOVE_RECURSE ${_miktex_dir})
 
   message(STATUS "Updating MikTEX package...")
-  file(ARCHIVE_EXTRACT INPUT ${CMAKE_SOURCE_DIR}/3rd/miktex-portable.7z
-       DESTINATION ${_miktex_dir} VERBOSE)
+  file(
+    DOWNLOAD
+    "https://api.onedrive.com/v1.0/drives/2ce549fd0ebebf04/items/2CE549FD0EBEBF04!102899"
+    ${_miktex_info_file})
+  message(STATUS "Downloading MikTEX package...")
+
+  if(NOT EXISTS ${_miktex_info_file})
+    message(FATAL_ERROR "Cannot download information from OneDrive.")
+  endif()
+
+  file(READ ${_miktex_info_file} _info_json)
+
+  string(JSON _download_url GET ${_info_json} "@content.downloadUrl")
+  file(DOWNLOAD ${_download_url} ${_miktex_dir}/.archive.7z)
+
+  file(ARCHIVE_EXTRACT INPUT ${_miktex_dir}/.archive.7z DESTINATION
+       ${_miktex_dir} VERBOSE)
   file(WRITE ${_miktex_info_file} ${MIKTEX_PACKAGE_VERSION})
+  file(REMOVE ${_miktex_dir}/.archive.7z)
 endif()
 
 if(BUILD_QDS_COMPONENTS)
