@@ -48,9 +48,9 @@ jobs:
       uses: jurplel/install-qt-action@v3.3.0
       with:
         # Version of Qt to install
-        version: 6.7.*
+        version: 6.8.*
         # Specify which Qt archive to install
-        archives: qtbase qtdeclarative qtsvg
+        archives: qtbase qtdeclarative
         # Whether or not to cache Qt automatically
         cache: true
 
