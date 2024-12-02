@@ -43,7 +43,7 @@ include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(${ENABLE_TESTS})
@@ -54,7 +54,7 @@ endif()
 
 add_subdirectory(lib)
 
-find_package(Qt6 6.7 REQUIRED COMPONENTS Core Quick Gui Widgets)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Quick Gui Widgets)
 set(CMAKE_AUTOMOC true)
 add_subdirectory(modules/logic)
 add_subdirectory(modules/content)

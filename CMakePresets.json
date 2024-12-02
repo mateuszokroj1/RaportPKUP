@@ -2,6 +2,9 @@
   "configurePresets": [
     {
       "binaryDir": "${sourceDir}/out/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      },
       "description": "Base configuration",
       "displayName": "Base",
       "generator": "Ninja",

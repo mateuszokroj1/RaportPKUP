@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 
-option(LINK_INSIGHT "Link Qt Insight Tracker library" ON)
+option(LINK_INSIGHT "Link Qt Insight Tracker library" OFF)
 
 set(executable_name RaportPKUPGenerator)
 
@@ -18,7 +18,6 @@ set(CPACK_SOURCE_IGNORE_FILES "/cmake/;/include/")
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 6.7 REQUIRED COMPONENTS Core Gui Qml Quick)
 qt_standard_project_setup()
 
 set(os_mode "")
@@ -93,6 +92,7 @@ if(NOT EXISTS ${_miktex_extract_location})
     message(FATAL_ERROR "Not found miktex-portable.7z.")
   endif()
 
+  message(STATUS "Extracting miktex-package")
   file(ARCHIVE_EXTRACT INPUT ${_miktex_package} DESTINATION
        ${_miktex_extract_location} VERBOSE)
 endif()
@@ -107,10 +107,6 @@ execute_process(COMMAND ${miktex_app} packages update)
 
 if(BUILD_QDS_COMPONENTS)
   include(qmlcomponents)
-endif()
-
-if(LINK_INSIGHT)
-  include(insight)
 endif()
 
 install(
@@ -134,7 +130,8 @@ if(WIN32)
     )
   ]])
 
-  file(GLOB _vcpkg_dlls ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*)
+  file(GLOB _vcpkg_dlls
+       ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*.dll)
 
   foreach(dll_path ${_vcpkg_dlls})
     install(FILES ${dll_path} DESTINATION ${CMAKE_INSTALL_PREFIX})
