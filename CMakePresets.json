@@ -2,11 +2,6 @@
   "configurePresets": [
     {
       "binaryDir": "${sourceDir}/out/build",
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "dynamic"
-      },
       "description": "Base configuration",
       "displayName": "Base",
       "generator": "Ninja",
@@ -16,8 +11,7 @@
     },
     {
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "VCPKG_BUILD_TYPE": "debug"
+        "CMAKE_BUILD_TYPE": "Debug"
       },
       "displayName": "Debug",
       "inherits": [
@@ -27,8 +21,7 @@
     },
     {
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "VCPKG_BUILD_TYPE": "release"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       },
       "displayName": "Release with debug info",
       "inherits": [
@@ -38,8 +31,7 @@
     },
     {
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "VCPKG_BUILD_TYPE": "release"
+        "CMAKE_BUILD_TYPE": "Release"
       },
       "displayName": "Release",
       "inherits": [

@@ -99,7 +99,8 @@ endif()
 
 find_program(
   miktex_app
-  PATHS ${_miktex_extract_location}
+  PATHS
+    "${_miktex_extract_location}/miktex-portable/texmfs/install/miktex/bin/x64"
   NAMES miktex REQUIRED)
 message(STATUS "MIKTEX: Updating packages...")
 execute_process(COMMAND ${miktex_app} packages update)
