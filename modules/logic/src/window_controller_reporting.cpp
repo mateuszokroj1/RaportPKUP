@@ -14,6 +14,8 @@ using namespace Qt::Literals::StringLiterals;
 
 namespace RaportPKUP::UI
 {
+constexpr wchar_t MIKTEX_PATH[] = L"miktex/miktex-portable/texmfs/install/miktex/bin/x64/";
+
 QString escapeLatexChars(const QString& input)
 {
 	auto ret = input;
@@ -65,6 +67,26 @@ uint saveCommitsToLaTexStream(QTextStream& stream, const QList<CommitItem*>& com
 	}
 
 	return total_duration;
+}
+
+void WindowController::updateMiktex()
+{
+	auto process = _process_factory->createNew(std::wstring(MIKTEX_PATH) + L"miktex.exe packages update");
+	if (!process)
+	{
+		qWarning() << "Miktex updating process not created.";
+		return;
+	}
+
+	process->start();
+
+	if (!process->waitForFinished())
+	{
+		qWarning() << "Miktex updating process not finished successfully.";
+		return;
+	}
+
+	qDebug() << process->readOutput();
 }
 
 void WindowController::saveRaportToFile(QString filename_url)
@@ -174,8 +196,7 @@ void WindowController::saveRaportToFile(QString filename_url)
 	}
 
 	QFileInfo info(tex_file);
-	std::wstring cmd =
-		L"miktex/miktex-portable/texmfs/install/miktex/bin/x64/texify.exe -p " + info.fileName().toStdWString();
+	std::wstring cmd = std::wstring(MIKTEX_PATH) + L"texify.exe -p " + info.fileName().toStdWString();
 	const auto texify_process = _process_factory->createNew(cmd, info.absolutePath().toStdWString());
 
 	texify_process->start();

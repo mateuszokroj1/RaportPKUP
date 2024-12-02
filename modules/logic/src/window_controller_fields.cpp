@@ -83,6 +83,8 @@ WindowController::WindowController(std::weak_ptr<Application> app) : _applicatio
 	_raportDate.setBinding([this]() { return _toDay.value(); });
 
 	_presets_manager.loadFromFile();
+
+	_update_miktex_thread = std::thread{&WindowController::updateMiktex, this};
 }
 
 WindowController::~WindowController() noexcept
@@ -90,6 +92,8 @@ WindowController::~WindowController() noexcept
 	qDeleteAll(_presets);
 	qDeleteAll(_repositories);
 	qDeleteAll(_commits);
+
+	_update_miktex_thread.join();
 }
 
 QQmlListProperty<Preset> WindowController::presets()

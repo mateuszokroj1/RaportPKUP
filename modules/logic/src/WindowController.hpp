@@ -69,8 +69,6 @@ class WindowController : public QObject
 	bool canSavePreset() const;
 	bool canStartSearch() const;
 
-	QString raportFileName() const;
-
 	QString previewDocument() const;
 
 	QDate raportDate() const;
@@ -138,6 +136,7 @@ class WindowController : public QObject
 	void loadPresets();
 	void syncPresetsFile();
 	void resetPreviewTimer();
+	void updateMiktex();
 
 	std::weak_ptr<Application> _application;
 	std::shared_ptr<IProcessFactory> _process_factory;
@@ -156,6 +155,7 @@ class WindowController : public QObject
 	std::stop_source _calculation_cancelled;
 	std::stop_source _application_exiting;
 	std::unique_ptr<std::stop_callback<std::function<void()>>> _connection_between_tokens;
+	std::thread _update_miktex_thread;
 
 	Q_OBJECT_BINDABLE_PROPERTY(WindowController, QString, _presetSelectorText,
 							   &WindowController::presetSelectorTextChanged)
