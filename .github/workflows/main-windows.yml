@@ -39,6 +39,10 @@ jobs:
         # An explicit key for restoring and saving the cache
         key: build-cache
 
+    - name: Update vcpkg
+      working-directory: ${{ env.VCPKG_ROOT }}
+      run: git pull
+
     - name: Install Qt 6
       # You may pin to the exact commit or the version.
       # uses: jurplel/install-qt-action@b3ea5275e37b734d027040e2c7fe7a10ea2ef946
