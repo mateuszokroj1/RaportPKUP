@@ -52,23 +52,20 @@ jobs:
         cache: true
 
     - name: Configure CMake
-      shell: pwsh
+      shell: cmd
       run: |
         &"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
         cmake --preset "release" -DDISABLE_PRECOMMIT=true
 
     - name: Build all
-      shell: pwsh
       run: cmake --build out/build
 
     - name: Test
-      shell: pwsh
       working-directory: out/build
       run: ctest .
       timeout-minutes: 1
 
     - name: Install artifacts
-      shell: pwsh
       run: cmake --install out/build
 
     - name: Set ref name
