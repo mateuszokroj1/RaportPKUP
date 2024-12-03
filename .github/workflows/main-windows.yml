@@ -27,7 +27,7 @@ jobs:
     - name: Configure Visual Studio path
       working-directory:  "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build"
       shell: cmd
-      run: ./vcvarsall.bat
+      run: ./vcvars64.bat
 
     - name: Configure preinstalled vcpkg to use repo cache
       uses: actions/github-script@v7.0.1
