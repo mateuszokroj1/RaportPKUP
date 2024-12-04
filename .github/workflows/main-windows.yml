@@ -17,12 +17,13 @@ jobs:
     env:
       VCPKG_ROOT: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\vcpkg"
       VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+      DISABLE_LFS: ${{ github.event_name == 'pull_request' && 1 || 0 }}
 
     steps:
     - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
-        lfs: true
+        lfs: ${{ github.event_name != 'pull_request' && true || false }}
 
     - name: Configure preinstalled vcpkg to use repo cache
       uses: actions/github-script@v7.0.1
