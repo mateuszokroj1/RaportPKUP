@@ -72,6 +72,8 @@ TEST_F(GitRepositoryTest, checkIsValidPath_whenValueIsInvalid_shouldReturnFalse)
 	ASSERT_FALSE(result.has_value());
 }
 
+#ifndef PULL_REQUEST
+
 TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
 {
 	auto repo = accessor->openRepository(valid_path).get();
@@ -87,14 +89,6 @@ TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
 
 		ASSERT_TRUE(std::regex_match(author->email, test));
 	}
-}
-
-TEST_F(GitRepositoryTest, getNameOfRemoteRepo_shouldReturnGitHubName)
-{
-	auto repo = accessor->openRepository(valid_path).get();
-	ASSERT_TRUE(repo);
-
-	ASSERT_STREQ(repo->getNameOfRemoteRepository().c_str(), "RaportPKUP");
 }
 
 TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
@@ -125,4 +119,14 @@ TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
 
 	const auto& author = test_commit.author;
 	// ASSERT_TRUE(std::regex_match(author.email, std::wregex(EMAIL_REGEX)));
+}
+
+#endif
+
+TEST_F(GitRepositoryTest, getNameOfRemoteRepo_shouldReturnGitHubName)
+{
+	auto repo = accessor->openRepository(valid_path).get();
+	ASSERT_TRUE(repo);
+
+	ASSERT_STREQ(repo->getNameOfRemoteRepository().c_str(), "RaportPKUP");
 }
