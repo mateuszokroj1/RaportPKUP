@@ -21,6 +21,13 @@ if(NOT DEFINED DISABLE_PRECOMMIT)
   precommitinstall()
 endif()
 
+if(EXISTS $ENV{VCPKG_ROOT})
+  message(STATUS "Updating vcpkg repo...")
+
+  execute_process(WORKING_DIRECTORY $ENV{VCPKG_ROOT} COMMAND ${git_app} pull -r
+                                                             -p)
+endif()
+
 set(GIT_REPOSITORY_ROOT ${CMAKE_CURRENT_LIST_DIR})
 
 set(ENABLE_TESTS
