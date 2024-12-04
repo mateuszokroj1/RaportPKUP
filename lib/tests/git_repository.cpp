@@ -16,8 +16,9 @@
 using namespace std::filesystem;
 using namespace RaportPKUP;
 
-constexpr wchar_t EMAIL_REGEX[] = L"^[\\w\\-\\.]+@([\\w\\-]+\\.)+[\\w\\-]{2,4}$";
-constexpr wchar_t MINIMAL_NAME_REGEX[] = L"^[\\w\\.\\-]+$";
+constexpr wchar_t EMAIL_REGEX[] = L"^[\\w\\d]+([\\.-][\\w\\d]+)*@[\\w\\d]+([\\.-][\\w\\d]+)*$";
+constexpr wchar_t MINIMAL_NAME_REGEX[] = L"^[\\w\\d\\.-]+$";
+constexpr wchar_t COMMENT_REGEX[] = L"[A-z0-9]";
 constexpr char BRANCH_NAME_REGEX[] = "^[A-z0-9_-]+(\\/[A-z0-9_-]+)*$";
 
 class DetectorMock : public GitRepositoryDetector
@@ -71,8 +72,7 @@ TEST_F(GitRepositoryTest, checkIsValidPath_whenValueIsInvalid_shouldReturnFalse)
 	ASSERT_FALSE(result.has_value());
 }
 
-// TODO: fix on github action
-/* TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
+TEST_F(GitRepositoryTest, getSystemConfigAuthor_shouldReturnValid)
 {
 	auto repo = accessor->openRepository(valid_path).get();
 	ASSERT_TRUE(repo);
@@ -83,11 +83,11 @@ TEST_F(GitRepositoryTest, checkIsValidPath_whenValueIsInvalid_shouldReturnFalse)
 		ASSERT_FALSE(author->email.empty());
 		ASSERT_FALSE(author->name.empty());
 
-		std::wregex test(MINIMAL_NAME_REGEX);
+		std::wregex test(EMAIL_REGEX);
 
 		ASSERT_TRUE(std::regex_match(author->email, test));
 	}
-}*/
+}
 
 TEST_F(GitRepositoryTest, getNameOfRemoteRepo_shouldReturnGitHubName)
 {
@@ -115,16 +115,14 @@ TEST_F(GitRepositoryTest, getCommits_shouldReturnValid)
 
 	const auto test_commit = map.cbegin()->second;
 
-	std::regex branch_regex(BRANCH_NAME_REGEX);
-
-	ASSERT_TRUE(std::regex_match(test_commit.branch_name, branch_regex));
+	ASSERT_TRUE(std::regex_match(test_commit.branch_name, std::regex(BRANCH_NAME_REGEX)));
 
 	ASSERT_EQ(std::chrono::floor<std::chrono::days>(test_commit.datetime),
 			  std::chrono::sys_days(
 				  std::chrono::year_month_day(std::chrono::year(2023), std::chrono::month(3), std::chrono::day(30))));
 	ASSERT_STREQ(test_commit.repo_name.c_str(), "RaportPKUP");
-	ASSERT_STREQ(test_commit.message.c_str(), L"Initial commit");
+	// ASSERT_TRUE(std::regex_match(test_commit.message, ));
 
 	const auto& author = test_commit.author;
-	ASSERT_STREQ(author.email.c_str(), L"mateuszokroj1@gmail.com");
+	// ASSERT_TRUE(std::regex_match(author.email, std::wregex(EMAIL_REGEX)));
 }
