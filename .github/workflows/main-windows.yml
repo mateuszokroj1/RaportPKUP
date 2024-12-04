@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
-        lfs: ${{ github.event_name == 'pull_request' && false || true }}
+        lfs: ${{ github.event_name != 'pull_request' && true || false }}
 
     - name: Configure preinstalled vcpkg to use repo cache
       uses: actions/github-script@v7.0.1
