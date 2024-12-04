@@ -64,10 +64,6 @@ if(WIN32)
   target_sources(${executable_name} PUBLIC app.rc)
 endif()
 
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  target_compile_definitions(${executable_name} PRIVATE RAPORTPKUP_NOSIGNAL)
-endif()
-
 if(WIN32)
   add_custom_command(
     TARGET ${executable_name}
@@ -84,26 +80,28 @@ if(WIN32)
             $<TARGET_FILE_DIR:${executable_name}>)
 endif()
 
-set(_miktex_package ${CMAKE_SOURCE_DIR}/3rd/miktex-portable.7z)
-set(_miktex_extract_location ${CMAKE_CURRENT_BINARY_DIR}/miktex)
+if(NOT $ENV{DISABLE_LFS} EQUAL 1)
+  set(_miktex_package ${CMAKE_SOURCE_DIR}/3rd/miktex-portable.7z)
+  set(_miktex_extract_location ${CMAKE_CURRENT_BINARY_DIR}/miktex)
 
-if(NOT EXISTS ${_miktex_extract_location})
-  if(NOT EXISTS ${_miktex_package})
-    message(FATAL_ERROR "Not found miktex-portable.7z.")
+  if(NOT EXISTS ${_miktex_extract_location})
+    if(NOT EXISTS ${_miktex_package})
+      message(FATAL_ERROR "Not found miktex-portable.7z.")
+    endif()
+
+    message(STATUS "Extracting miktex-package")
+    file(ARCHIVE_EXTRACT INPUT ${_miktex_package} DESTINATION
+         ${_miktex_extract_location} VERBOSE)
   endif()
 
-  message(STATUS "Extracting miktex-package")
-  file(ARCHIVE_EXTRACT INPUT ${_miktex_package} DESTINATION
-       ${_miktex_extract_location} VERBOSE)
+  find_program(
+    miktex_app
+    PATHS
+      "${_miktex_extract_location}/miktex-portable/texmfs/install/miktex/bin/x64"
+    NAMES miktex REQUIRED)
+  message(STATUS "MIKTEX: Updating packages...")
+  execute_process(COMMAND ${miktex_app} packages update)
 endif()
-
-find_program(
-  miktex_app
-  PATHS
-    "${_miktex_extract_location}/miktex-portable/texmfs/install/miktex/bin/x64"
-  NAMES miktex REQUIRED)
-message(STATUS "MIKTEX: Updating packages...")
-execute_process(COMMAND ${miktex_app} packages update)
 
 if(BUILD_QDS_COMPONENTS)
   include(qmlcomponents)
