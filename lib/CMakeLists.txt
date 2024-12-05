@@ -48,6 +48,11 @@ if(${ENABLE_TESTS})
 
   target_compile_definitions(${executable_name}
                              PRIVATE RAPORTPKUP_CORE_STATIC_DEFINE)
+
+  if("$ENV{DISABLE_LFS}" EQUAL "1")
+    target_compile_definitions(${executable_name} PRIVATE PULL_REQUEST)
+  endif()
+
   target_compile_definitions(
     ${executable_name} PRIVATE GIT_REPOSITORY_ROOT="${GIT_REPOSITORY_ROOT}")
 

@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Pull Request CI
 
 on:
   push:
@@ -10,22 +10,21 @@ on:
 
 jobs:
   build:
+    name: Build on MS Windows
 
     runs-on: windows-latest
 
-    env: 
+    env:
+      VCPKG_ROOT: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\vcpkg"
       VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+      DISABLE_LFS: ${{ github.event_name == 'pull_request' && 1 || 0 }}
+      BUILD_WRAPPER_OUT_DIR: D:/sonar-qube-scanner
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
-        lfs: true
-
-    - name: Configure Visual Studio path
-      uses: TheMrMilchmann/setup-msvc-dev@v3
-      with:
-        arch: x64
+        lfs: ${{ github.event_name != 'pull_request' && true || false }}
 
     - name: Configure preinstalled vcpkg to use repo cache
       uses: actions/github-script@v7.0.1
@@ -35,7 +34,7 @@ jobs:
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
     - name: Cache
-      uses: actions/cache@v4.0.0
+      uses: actions/cache@v4.1.2
       with:
         # A list of files, directories, and wildcard patterns to cache and restore
         path: ~/out/build
@@ -54,22 +53,34 @@ jobs:
         # Whether or not to cache Qt automatically
         cache: true
 
+    - name: Install sonar-scanner and build-wrapper
+      uses: sonarsource/sonarcloud-github-c-cpp@v3.1.0
+
     - name: Configure CMake
-      shell: sh
-      run: cmake --preset "release" -DDISABLE_PRECOMMIT=true
+      shell: cmd
+      run: |
+        call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+        cmake --preset "release" -DDISABLE_PRECOMMIT=true
 
     - name: Build all
-      shell: sh
-      run: cmake --build out/build
+      shell: cmd
+      run: |
+        call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+        build-wrapper-win-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build out/build
 
     - name: Test
-      shell: sh
       working-directory: out/build
       run: ctest .
       timeout-minutes: 1
 
+    - name: Run sonar-scanner
+      continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: sonar-scanner --define sonar.cfamily.compile-commands="${{ env.BUILD_WRAPPER_OUT_DIR }}/compile_commands.json"
+
     - name: Install artifacts
-      shell: sh
       run: cmake --install out/build
 
     - name: Set ref name
@@ -80,7 +91,7 @@ jobs:
 
     - name: Upload a Build Artifact
       if: github.event_name != 'pull_request'
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v4.4.3
       with:
         # Artifact name
         name: Build on Windows - ${{ steps.ref_name.outputs.branch }} - ${{ github.sha }}
