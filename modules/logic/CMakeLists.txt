@@ -21,6 +21,7 @@ qt_add_library(
   src/window_controller_fields.cpp
   src/window_controller_presets.cpp
   src/window_controller_calculation.cpp
+  src/window_controller_document.cpp
   src/window_controller_reporting.cpp)
 
 qt6_add_qml_module(

@@ -3,6 +3,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
+#include <QtGui/QTextDocument>
 #include <QtQml/QQmlListProperty>
 
 #include <include/IProcess.hpp>
@@ -55,6 +56,8 @@ class WindowController : public QObject
 		QDate raportDate READ raportDate WRITE setRaportDate NOTIFY raportDateChanged BINDABLE bindableRaportDate)
 	Q_PROPERTY(QString previewDocument READ previewDocument NOTIFY previewDocumentChanged)
 
+	Q_PROPERTY(QSharedPointer<QTextDocument> document READ document NOTIFY documentChanged)
+
 	QQmlListProperty<Preset> presets();
 	QQmlListProperty<RepositoryListItem> repositories();
 	QQmlListProperty<CommitItem> commits();
@@ -70,6 +73,7 @@ class WindowController : public QObject
 	bool canStartSearch() const;
 
 	QString previewDocument() const;
+	QSharedPointer<QTextDocument> document();
 
 	QDate raportDate() const;
 
@@ -115,6 +119,7 @@ class WindowController : public QObject
 
 	void raportDateChanged();
 	void previewDocumentChanged();
+	void documentChanged();
 
   public:
 	Q_INVOKABLE void savePreset(const QString&);
