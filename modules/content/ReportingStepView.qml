@@ -86,9 +86,16 @@ ColumnLayout {
                 anchors.margins: 30
                 anchors.right: parent.right
                 readOnly: true
-                text: controller.previewDocument
-                textFormat: TextEdit.RichText
+
+                //textFormat: TextEdit.RichText
                 wrapMode: TextEdit.Wrap
+            }
+            Connections {
+                function onDocumentChanged() {
+                    controller.setDocumentInQml(preview.textDocument);
+                }
+
+                target: controller
             }
         }
     }

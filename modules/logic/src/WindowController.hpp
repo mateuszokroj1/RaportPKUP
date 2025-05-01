@@ -5,6 +5,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QTextDocument>
 #include <QtQml/QQmlListProperty>
+#include <QtQuick/QQuickTextDocument>
 
 #include <include/IProcess.hpp>
 #include <include/IRepositoryDetector.hpp>
@@ -73,7 +74,9 @@ class WindowController : public QObject
 	bool canStartSearch() const;
 
 	QString previewDocument() const;
-	QSharedPointer<QTextDocument> document();
+	QSharedPointer<QTextDocument> document() const;
+
+	Q_INVOKABLE void setDocumentInQml(QQuickTextDocument* text) const;
 
 	QDate raportDate() const;
 
