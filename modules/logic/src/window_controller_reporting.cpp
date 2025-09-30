@@ -100,7 +100,7 @@ void WindowController::saveRaportToFile(QString filename_url)
 
 	{
 		QFile file(tex_file);
-		if (!file.open(QIODeviceBase::NewOnly | QIODeviceBase::ReadWrite | QIODeviceBase::Text))
+		if (!file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Text))
 			return;
 
 		if (!file.isWritable())
@@ -196,7 +196,7 @@ void WindowController::saveRaportToFile(QString filename_url)
 	}
 
 	QFileInfo info(tex_file);
-	std::wstring cmd = std::wstring(MIKTEX_PATH) + L"texify.exe -p " + info.fileName().toStdWString();
+	std::wstring cmd = std::format(L"{}/texify.exe -p \"{}\"", MIKTEX_PATH, info.fileName().toStdWString());
 	const auto texify_process = _process_factory->createNew(cmd, info.absolutePath().toStdWString());
 
 	texify_process->start();
