@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <future>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <stop_token>
@@ -30,9 +31,12 @@ IRepository::Ptr openRepositoryImpl(const std::filesystem::path& path, std::opti
 		throw CanceledOperationException();
 
 	auto repo = std::make_shared<LibGit_Repository>();
-
-	if (!repo->tryOpen(path))
+	const auto result = repo->tryOpen(path);
+	if (!result)
+	{
+		std::cerr << result.error();
 		return {};
+	}
 
 	return std::shared_ptr<GitRepository>(new GitRepository(repo, path.generic_wstring()));
 }
