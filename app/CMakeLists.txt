@@ -1,14 +1,11 @@
-cmake_minimum_required(VERSION 3.24)
-
-option(LINK_INSIGHT "Link Qt Insight Tracker library" OFF)
-
-set(executable_name RaportPKUPGenerator)
-
 project(
-  ${executable_name}
+  RaportPKUPGenerator
   LANGUAGES CXX
   VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_REVISION}
 )
+
+option(LINK_INSIGHT "Link Qt Insight Tracker library" OFF)
+
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
@@ -26,10 +23,10 @@ if(WIN32)
   set(os_mode "WIN32")
 endif()
 
-qt_add_executable(${executable_name} ${os_mode} src/main.cpp)
+qt_add_executable(${PROJECT_NAME} ${os_mode} src/main.cpp)
 
 qt6_add_qml_module(
-  ${executable_name}
+  ${PROJECT_NAME}
   URI
   "Main"
   VERSION
@@ -43,41 +40,40 @@ qt6_add_qml_module(
   QML_FILES
   main.qml)
 
-target_link_libraries(${executable_name} PRIVATE logicplugin logic
-                                                 contentplugin content)
+target_link_libraries(${PROJECT_NAME} PRIVATE logicplugin logic contentplugin
+                                              content)
 
-target_include_directories(${executable_name}
+target_include_directories(${PROJECT_NAME}
                            PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
-target_include_directories(${executable_name}
-                           PRIVATE "${CMAKE_SOURCE_DIR}/config")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/config")
 
-qt_add_resources(${executable_name} "configuration" PREFIX "/" FILES
+qt_add_resources(${PROJECT_NAME} "configuration" PREFIX "/" FILES
                  qtquickcontrols2.conf)
 
-target_link_libraries(${executable_name} PRIVATE Qt6::Core Qt6::Gui Qt6::Qml
-                                                 Qt6::Quick)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Gui Qt6::Qml
+                                              Qt6::Quick)
 
-target_link_libraries(${executable_name} PUBLIC RaportPKUP.Core)
+target_link_libraries(${PROJECT_NAME} PUBLIC RaportPKUP.Core)
 if(WIN32)
   configure_file(app.rc.in app.rc @ONLY)
-  target_sources(${executable_name} PUBLIC app.rc)
+  target_sources(${PROJECT_NAME} PUBLIC app.rc)
 endif()
 
 if(WIN32)
   add_custom_command(
-    TARGET ${executable_name}
+    TARGET ${PROJECT_NAME}
     POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${executable_name}>
-            $<TARGET_FILE_DIR:${executable_name}>
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
     COMMAND_EXPAND_LISTS)
   find_program(windep NAMES windeployqt REQUIRED)
 
   add_custom_command(
-    TARGET ${executable_name}
+    TARGET ${PROJECT_NAME}
     POST_BUILD
     COMMAND ${windep} --qmldir ${CMAKE_SOURCE_DIR}
-            $<TARGET_FILE_DIR:${executable_name}>)
+            $<TARGET_FILE:RaportPKUPGenerator>)
 endif()
 
 if(NOT $ENV{DISABLE_LFS} EQUAL 1)
@@ -108,7 +104,7 @@ if(BUILD_QDS_COMPONENTS)
 endif()
 
 install(
-  TARGETS ${executable_name}
+  TARGETS ${PROJECT_NAME}
   BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
 

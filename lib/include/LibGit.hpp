@@ -1,6 +1,7 @@
 #pragma once
 
-#include <list>
+#include <expected>
+#include <filesystem>
 
 #include <git2.h>
 
@@ -144,7 +145,7 @@ class LibGit_Repository
 	~LibGit_Repository() noexcept;
 	COPY_CONSTRUCTOR(LibGit_Repository) = delete;
 
-	bool tryOpen(const std::filesystem::path& dir) noexcept;
+	std::expected<void, std::string> tryOpen(const std::filesystem::path& dir) noexcept;
 
 	bool fetch(const LibGit_Remote&);
 	bool prune(const LibGit_Remote&);

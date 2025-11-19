@@ -3,6 +3,7 @@
 #include <include/IProcess.hpp>
 #include <include/IRepositoryAccessor.hpp>
 
+#include <QtCore/QRegularExpression>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
@@ -20,11 +21,16 @@ QString escapeLatexChars(const QString& input)
 {
 	auto ret = input;
 
-	ret.replace("\\", R"(\textbackslash{})");
 	ret.replace("{", R"(\{)");
 	ret.replace("}", R"(\})");
+
+	{
+		const QRegularExpression regex{R"(\\(?![{}]))"};
+		ret.replace(regex, R"(\textbackslash{})");
+	}
+
 	ret.replace("#", R"(\#)");
-	ret.replace("$", R"(\$)");
+	ret.replace("$", R"(\textdollar{})");
 	ret.replace("%", R"(\%)");
 	ret.replace("&", R"(\&)");
 	ret.replace("^", R"(\textasciicircum{})");
@@ -47,11 +53,11 @@ uint saveCommitsToLaTexStream(QTextStream& stream, const QList<CommitItem*>& com
 
 		stream << counter;
 		stream << " & ";
-		stream << commit->repositoryName();
+		stream << escapeLatexChars(commit->repositoryName());
 		stream << " & ";
 		stream << commit->time().toString("dd-MM-yyyy");
 		stream << " & ";
-		stream << commit->id();
+		stream << escapeLatexChars(commit->id());
 		stream << " & \\RaggedRight{";
 		stream << escapeLatexChars(commit->message());
 		stream << "} & ";
@@ -100,7 +106,7 @@ void WindowController::saveRaportToFile(QString filename_url)
 
 	{
 		QFile file(tex_file);
-		if (!file.open(QIODeviceBase::NewOnly | QIODeviceBase::ReadWrite | QIODeviceBase::Text))
+		if (!file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Text))
 			return;
 
 		if (!file.isWritable())
@@ -196,7 +202,7 @@ void WindowController::saveRaportToFile(QString filename_url)
 	}
 
 	QFileInfo info(tex_file);
-	std::wstring cmd = std::wstring(MIKTEX_PATH) + L"texify.exe -p " + info.fileName().toStdWString();
+	std::wstring cmd = std::format(L"{}/texify.exe -p \"{}\"", MIKTEX_PATH, info.fileName().toStdWString());
 	const auto texify_process = _process_factory->createNew(cmd, info.absolutePath().toStdWString());
 
 	texify_process->start();

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <codecvt>
+#include <expected>
 #include <filesystem>
 
 #include <LibGit.hpp>
@@ -299,17 +300,25 @@ LibGit_Repository::~LibGit_Repository() noexcept
 	_handle = nullptr;
 }
 
-bool LibGit_Repository::tryOpen(const std::filesystem::path& dir) noexcept
+std::expected<void, std::string> LibGit_Repository::tryOpen(const std::filesystem::path& dir) noexcept
 {
 	if (_handle)
-		return false;
+		return std::unexpected("Already opened.");
 
 	int err = git_repository_open(&_handle, dir.generic_string().c_str());
 
 	auto e = git_error_last();
-	std::string s(e->message);
+	const std::string error_msg(e->message);
 
-	return err == 0 && _handle;
+	if (err != 0)
+	{
+		if (error_msg.empty())
+			return std::unexpected(std::format("Error nr: {}", err));
+		else
+			return std::unexpected(error_msg);
+	}
+
+	return {};
 }
 
 bool LibGit_Repository::fetch(const LibGit_Remote& remote)

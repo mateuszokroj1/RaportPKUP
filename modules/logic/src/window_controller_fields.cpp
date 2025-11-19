@@ -289,6 +289,7 @@ void WindowController::addRepository()
 							{ return item && item->path() == _repository_path; }))
 		return;
 
+	// TODO get config author from Git
 	std::optional<Author> author;
 	if (auto repo = accessor.openRepository(std::filesystem::path(std::move(wstr))).get())
 	{

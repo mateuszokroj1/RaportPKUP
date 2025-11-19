@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 	Application app;
 	ApplicationBuilder::build(std::move(definition), app);
 
-	set_qt_environment();
+	// set_qt_environment();
 
 	std::setlocale(LC_ALL, "pl_PL.UTF-8");
 	QLocale selectedLocale("pl_PL");
