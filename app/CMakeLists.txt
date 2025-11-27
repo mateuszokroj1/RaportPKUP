@@ -36,7 +36,6 @@ qt6_add_qml_module(
   content
   RESOURCE_PREFIX
   "/qt/qml"
-  NO_PLUGIN
   QML_FILES
   main.qml)
 
@@ -71,13 +70,6 @@ if(WIN32)
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
             $<TARGET_FILE_DIR:${PROJECT_NAME}>
     COMMAND_EXPAND_LISTS)
-  find_program(windep NAMES windeployqt REQUIRED)
-
-  add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${windep} --qmldir ${CMAKE_SOURCE_DIR}
-            $<TARGET_FILE:RaportPKUPGenerator>)
 endif()
 
 set(_miktex_package ${CMAKE_SOURCE_DIR}/3rd/miktex-portable.7z)
@@ -107,29 +99,26 @@ endif()
 
 install(
   TARGETS ${PROJECT_NAME}
-  BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
+  BUNDLE DESTINATION .
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+qt_generate_deploy_qml_app_script(TARGET ${PROJECT_NAME} OUTPUT_SCRIPT
+                                  qt_deploy_script)
+install(SCRIPT ${qt_deploy_script})
 
 install(DIRECTORY ${_miktex_extract_location} USE_SOURCE_PERMISSIONS
         DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-if(WIN32)
-  install(CODE "set(_qmldir \"${CMAKE_SOURCE_DIR}\")")
+# if(WIN32) install(CODE "set(_qmldir \"${CMAKE_SOURCE_DIR}\")")
 
-  install(
-    CODE [[
-    find_program(windep NAMES windeployqt REQUIRED)
+# install( CODE [[ find_program(windep NAMES windeployqt REQUIRED)
 
-    execute_process(
-      WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
-      COMMAND ${windep} --qmldir ${_qmldir} ${CMAKE_INSTALL_PREFIX}
-    )
-  ]])
+# execute_process( WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX} COMMAND ${windep}
+# --qmldir ${_qmldir} ${CMAKE_INSTALL_PREFIX} ) ]])
 
-  file(GLOB _vcpkg_dlls
-       ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*.dll)
+# file(GLOB _vcpkg_dlls
+# ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*.dll)
 
-  foreach(dll_path ${_vcpkg_dlls})
-    install(FILES ${dll_path} DESTINATION ${CMAKE_INSTALL_PREFIX})
-  endforeach()
-endif()
+# foreach(dll_path ${_vcpkg_dlls}) install(FILES ${dll_path} DESTINATION
+# ${CMAKE_INSTALL_BINDIR}) endforeach() endif()

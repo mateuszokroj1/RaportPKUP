@@ -2,13 +2,11 @@ cmake_minimum_required(VERSION 3.24)
 
 if(NOT EXISTS "${CMAKE_C_COMPILER}" OR NOT EXISTS "${CMAKE_CXX_COMPILER}")
   if(${WIN32})
-    find_program(cl NAMES cl.exe REQUIRED)
-    set(CMAKE_C_COMPILER ${cl})
-    set(CMAKE_CXX_COMPILER ${cl})
+    set(CMAKE_C_COMPILER "cl.exe")
+    set(CMAKE_CXX_COMPILER "cl.exe")
   else()
-    find_program(clang NAMES clang REQUIRED)
-    set(CMAKE_C_COMPILER ${clang})
-    set(CMAKE_CXX_COMPILER ${clang})
+    set(CMAKE_C_COMPILER "clang")
+    set(CMAKE_CXX_COMPILER "clang")
   endif()
 endif()
 
@@ -56,12 +54,16 @@ add_subdirectory(lib)
 
 find_package(Qt6 6.8 REQUIRED COMPONENTS Core Quick Gui Widgets)
 set(CMAKE_AUTOMOC true)
+set(ENV{QML_IMPORT_PATH} "${CMAKE_BINARY_DIR}/modules")
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  set(QT_QPA_PLATFORM_PLUGIN_PATH
+      "${QT6_INSTALL_PREFIX}/debug/Qt6/plugins/platforms")
+else()
+  set(QT_QPA_PLATFORM_PLUGIN_PATH "${QT6_INSTALL_PREFIX}/Qt6/plugins/platforms")
+endif()
+
 add_subdirectory(modules/logic)
 add_subdirectory(modules/content)
 add_subdirectory(app)
-
-set(QML_IMPORT_PATH
-    "${CMAKE_BINARY_DIR}/modules"
-    CACHE PATH "Generated modules for QML editor")
 
 include(CPack)

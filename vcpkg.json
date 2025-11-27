@@ -3,6 +3,18 @@
   "builtin-baseline": "b810d1cdd47bfe729a5c78aa1e5b16dfa30da873",
   "dependencies": [
     {
+      "name": "qtbase",
+      "version>=": "6.9.1"
+    },
+    {
+      "name": "qtdeclarative",
+      "version>=": "6.9.1"
+    },
+    {
+      "name": "qttranslations",
+      "version>=": "6.9.1"
+    },
+    {
       "name": "gtest",
       "version>=": "1.15.2"
     },
