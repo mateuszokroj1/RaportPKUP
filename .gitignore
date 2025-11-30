@@ -3,6 +3,7 @@
 
 /out/*
 /Testing/Temporary/*
+/config/generated.env
 
 *~
 *.autosave

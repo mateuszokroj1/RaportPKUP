@@ -1,3 +1,5 @@
+project(RaportPKUP.Content)
+
 qt_add_library(content STATIC)
 set_source_files_properties(Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE true)
 set_source_files_properties(Fonts.qml PROPERTIES QT_QML_SINGLETON_TYPE true)

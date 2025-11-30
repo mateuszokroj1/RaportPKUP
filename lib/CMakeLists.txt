@@ -29,10 +29,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${PUBLIC_LIBS})
 
 generate_export_header(${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME}
-                           PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 if(${ENABLE_TESTS})
   set(executable_name ${PROJECT_NAME}Tests)
@@ -48,8 +48,6 @@ if(${ENABLE_TESTS})
 
   target_compile_definitions(${executable_name}
                              PRIVATE RAPORTPKUP_CORE_STATIC_DEFINE)
-  target_compile_definitions(
-    ${executable_name} PRIVATE GIT_REPOSITORY_ROOT="${GIT_REPOSITORY_ROOT}")
 
   target_include_directories(${executable_name}
                              PRIVATE ${CMAKE_CURRENT_LIST_DIR}/include)
@@ -73,10 +71,8 @@ install(
   ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}
-  INCLUDES
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  FILE_SET public_headers_fileset
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+          FILE_SET public_headers_fileset
+          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(
   EXPORT ${PROJECT_NAME}Targets

@@ -1,13 +1,12 @@
 #include "app_environment.h"
 #include "import_qml_components_plugins.h"
 #include "import_qml_plugins.h"
-
-#include "Application.hpp"
-#include "Process.hpp"
 #include <Version.h>
+#include <include/Application.hpp>
 #include <include/IProcess.hpp>
+#include <include/Process.hpp>
 
-#include "GitAccessImpl.hpp"
+#include <include/GitAccessImpl.hpp>
 #include <include/GitRepositoryAccessor.hpp>
 
 namespace RaportPKUP::UI

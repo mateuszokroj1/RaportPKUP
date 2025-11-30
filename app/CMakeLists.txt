@@ -1,10 +1,7 @@
 project(
   RaportPKUPGenerator
-  LANGUAGES CXX
   VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_REVISION}
 )
-
-option(LINK_INSIGHT "Link Qt Insight Tracker library" OFF)
 
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
@@ -23,6 +20,23 @@ if(WIN32)
   set(os_mode "WIN32")
 endif()
 
+set(ENV_FILE
+    ${GIT_REPOSITORY_ROOT}/config/generated.env
+    CACHE PATH "Path to the generated environment file")
+file(WRITE ${ENV_FILE} PATH=$ENV{PATH};${PROJECT_BINARY_DIR})
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  file(
+    APPEND ${ENV_FILE}
+    QT_QPA_PLATFORM_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/Debug/${QT6_INSTALL_PLUGINS}/platforms
+  )
+else()
+  file(
+    APPEND ${ENV_FILE}
+    QT_QPA_PLATFORM_PLUGIN_PATH=${QT6_INSTALL_PREFIX}/${QT6_INSTALL_PLUGINS}/platforms
+  )
+endif()
+
 qt_add_executable(${PROJECT_NAME} ${os_mode} src/main.cpp)
 
 qt6_add_qml_module(
@@ -31,6 +45,7 @@ qt6_add_qml_module(
   "Main"
   VERSION
   ${VERSION_MAJOR}.${VERSION_MINOR}
+  NO_PLUGIN
   IMPORTS
   logic
   content
@@ -57,19 +72,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC RaportPKUP.Core)
 if(WIN32)
   configure_file(app.rc.in app.rc @ONLY)
   target_sources(${PROJECT_NAME} PUBLIC app.rc)
-endif()
-
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  target_compile_definitions(${PROJECT_NAME} PRIVATE RAPORTPKUP_NOSIGNAL)
-endif()
-
-if(WIN32)
-  add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    COMMAND_EXPAND_LISTS)
 endif()
 
 set(_miktex_package ${CMAKE_SOURCE_DIR}/3rd/miktex-portable.7z)
@@ -99,7 +101,7 @@ endif()
 
 install(
   TARGETS ${PROJECT_NAME}
-  BUNDLE DESTINATION .
+  BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
@@ -112,10 +114,9 @@ install(DIRECTORY ${_miktex_extract_location} USE_SOURCE_PERMISSIONS
 
 # if(WIN32) install(CODE "set(_qmldir \"${CMAKE_SOURCE_DIR}\")")
 
-# install( CODE [[ find_program(windep NAMES windeployqt REQUIRED)
-
-# execute_process( WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX} COMMAND ${windep}
-# --qmldir ${_qmldir} ${CMAKE_INSTALL_PREFIX} ) ]])
+install(CODE [[ find_program(windep NAMES windeployqt REQUIRED)
+execute_process( WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX} COMMAND ${windep}
+--qmldir ${_qmldir} ${CMAKE_INSTALL_PREFIX} ) ]])
 
 # file(GLOB _vcpkg_dlls
 # ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*.dll)

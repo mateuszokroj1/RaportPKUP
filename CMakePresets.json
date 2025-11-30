@@ -7,6 +7,10 @@
         "CMAKE_C_COMPILER": "cl",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
+      "environment": {
+        "PATH": "${sourceDir}/out/build/app;$penv{path}",
+        "QML_IMPORT_PATH": "${sourceDir}/out/build/modules"
+      },
       "description": "Base configuration",
       "displayName": "Base",
       "generator": "Ninja",
@@ -18,30 +22,33 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       },
+      "environment": {
+        "QT_QPA_PLATFORM_PLUGIN_PATH": "${sourceDir}/out/build/vcpkg_installed/x64-windows/debug/Qt6/plugins/platforms"
+      },
       "displayName": "Debug",
-      "inherits": [
-        "base"
-      ],
+      "inherits": ["base"],
       "name": "debug"
     },
     {
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       },
+      "environment": {
+        "QT_QPA_PLATFORM_PLUGIN_PATH": "${sourceDir}/out/build/vcpkg_installed/x64-windows/Qt6/plugins/platforms"
+      },
       "displayName": "Release with debug info",
-      "inherits": [
-        "base"
-      ],
+      "inherits": ["base"],
       "name": "rel-debinfo"
     },
     {
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       },
+      "environment": {
+        "QT_QPA_PLATFORM_PLUGIN_PATH": "${sourceDir}/out/build/vcpkg_installed/x64-windows/Qt6/plugins/platforms"
+      },
       "displayName": "Release",
-      "inherits": [
-        "base"
-      ],
+      "inherits": ["base"],
       "name": "release"
     }
   ],
